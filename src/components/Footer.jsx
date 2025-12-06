@@ -25,11 +25,12 @@ const Footer = () => {
                 <h3 className="text-lg font-bold tracking-wider font-serif mt-1">
                   EMR&RC
                 </h3>
-              </div>
-            </div>
-            <p className="text-sm italic text-cyan-100/80 mt-1 pl-1">
+                 <p className="text-sm italic text-cyan-100/80 mt-1 pl-1">
               Education at your door step
             </p>
+              </div>
+            </div>
+           
             <div className="flex space-x-4 mt-4 pl-1">
               <SocialIcon icon={<FaFacebookF />} href="#" />
               <SocialIcon icon={<FaLinkedinIn />} href="#" />
