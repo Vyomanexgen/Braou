@@ -1,0 +1,110 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { FaFacebookF, FaLinkedinIn, FaYoutube, FaInstagram } from 'react-icons/fa'; 
+
+const Footer = () => {
+  return (
+    <footer className="w-full bg-[#004B52] text-white font-['Arial'] relative z-10">
+      <div className="max-w-[1600px] mx-auto px-4 py-10 md:py-14">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+
+          {/* --- BRANDING --- */}
+          <div className="flex flex-col items-start space-y-4">
+            <div className="flex items-center space-x-3">
+              <div className="h-20 w-20 bg-white rounded-full p-1 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                 <img 
+                  src="/pictures/Logo_C_PNG[1] 1.png" 
+                  alt="BRAOU Logo" 
+                  className="h-full w-full object-contain"
+                />
+              </div>
+              <div className="flex flex-col">
+                <h2 className="text-3xl font-black uppercase tracking-wide leading-none font-['Arial']">
+                  BRAOU
+                </h2>
+                <h3 className="text-lg font-bold tracking-wider font-serif mt-1">
+                  EMR&RC
+                </h3>
+              </div>
+            </div>
+            <p className="text-sm italic text-cyan-100/80 mt-1 pl-1">
+              Education at your door step
+            </p>
+            <div className="flex space-x-4 mt-4 pl-1">
+              <SocialIcon icon={<FaFacebookF />} href="#" />
+              <SocialIcon icon={<FaLinkedinIn />} href="#" />
+              <SocialIcon icon={<FaYoutube />} href="#" />
+              <SocialIcon icon={<FaInstagram />} href="#" />
+            </div>
+          </div>
+
+          {/* --- STUDENT SERVICES --- */}
+          <div>
+            <h3 className="text-lg font-bold uppercase mb-4 text-cyan-200 border-b border-cyan-200/30 pb-2 inline-block">
+              Student Services
+            </h3>
+            <ul className="space-y-2 text-sm md:text-base">
+              <FooterLink to="/live">Live</FooterLink>
+              <FooterLink to="/youtube">Youtube</FooterLink>
+              <FooterLink to="/air">Air</FooterLink>
+              <FooterLink to="/vidyagani">Vidyagani</FooterLink>
+              <FooterLink to="/tsat">T-SAT Vidya/Nipuna</FooterLink>
+              <FooterLink to="/webradio">Web Radio</FooterLink>
+            </ul>
+          </div>
+
+          {/* --- USEFUL LINKS --- */}
+          <div>
+            <h3 className="text-lg font-bold uppercase mb-4 text-cyan-200 border-b border-cyan-200/30 pb-2 inline-block">
+              Useful Links
+            </h3>
+            <ul className="space-y-2 text-sm md:text-base">
+              <FooterLink to="/youtube">Youtube (EMR&RC)</FooterLink>
+              <FooterLink to="/vidyagani">Vidyagani</FooterLink>
+              <FooterLink to="/webradio">Web Radio</FooterLink>
+              <FooterLink to="/tsat">T-SAT Vidya/Nipuna</FooterLink>
+            </ul>
+          </div>
+
+          {/* --- CONTACT US --- */}
+          <div>
+            <h3 className="text-lg font-bold uppercase mb-4 text-cyan-200 border-b border-cyan-200/30 pb-2 inline-block">
+              Contact US
+            </h3>
+            <div className="space-y-3 text-sm md:text-base text-gray-100">
+              <p className="font-bold text-white text-base">Prof. D. Rabindranath Solomon</p>
+              <p className="leading-relaxed opacity-90">Director, Electronic Media Resources & Research Centre (EMR&RC)</p>
+              <p className="pt-2">
+                <a href="mailto:directoravprc@braou.ac.in" className="hover:text-cyan-300 transition-colors flex items-center gap-2">
+                  <span>✉</span> directoravprc@braou.ac.in
+                </a>
+              </p>
+              <p>
+                <a href="tel:040-23680320" className="hover:text-cyan-300 transition-colors flex items-center gap-2">
+                  <span>📞</span> 040-23680320, 9281013602
+                </a>
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+const FooterLink = ({ to, children }) => (
+  <li>
+    <Link to={to} className="hover:text-cyan-300 hover:pl-2 transition-all duration-300 inline-block opacity-90 hover:opacity-100">
+      {children}
+    </Link>
+  </li>
+);
+
+const SocialIcon = ({ icon, href }) => (
+  <a href={href} className="bg-white/10 hover:bg-white hover:text-[#004B52] h-9 w-9 flex items-center justify-center rounded-md transition-all duration-300">
+    {icon}
+  </a>
+);
+
+export default Footer;
