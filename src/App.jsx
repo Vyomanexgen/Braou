@@ -8,12 +8,11 @@
 
 // export default App;
 
-
 // import React from 'react';
 // import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // // 1. Import Pages
-// import Home from './pages/Home'; 
+// import Home from './pages/Home';
 
 // // 2. Import Components
 // import Header from "./components/Header";
@@ -25,7 +24,7 @@
 //     <Router>
 //       {/* Main Container: Flex column ensures vertical stacking */}
 //       <div className="flex flex-col min-h-screen bg-gray-50">
-        
+
 //         {/* Header appears first at the very top */}
 //         <Header />
 
@@ -71,13 +70,11 @@
 
 // export default App;
 
-
-
 // import React from 'react';
 // import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 // // Pages
-// import Home from './pages/Home'; 
+// import Home from './pages/Home';
 
 // // Components
 // import Header from "./components/Header";
@@ -102,7 +99,7 @@
 
 //   return (
 //     <div className="flex flex-col min-h-screen bg-gray-50">
-      
+
 //       {/* Fixed Header & Navbar */}
 //       <Header />
 //       <Navbar />
@@ -111,10 +108,10 @@
 //       <main className="flex-grow w-full">
 //         <Routes>
 //           <Route path="/" element={<Navigate to="/home" replace />} />
-          
+
 //           {/* Real Pages */}
 //           <Route path="/home" element={<Home />} />
-          
+
 //           {/* Placeholder Pages (You will replace these with real components later) */}
 //           <Route path="/about" element={<PageTitle title="About Us" />} />
 //           <Route path="/live" element={<PageTitle title="Live Streaming" />} />
@@ -147,29 +144,38 @@
 
 // export default App;
 
-
-
-
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 // --- PAGES ---
-import Home from './pages/Home'; 
+import Home from "./pages/Home";
 
 // --- COMPONENTS ---
 import Header from "./components/Header";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import BottomBar from "./components/BottomBar";
+import About from "./pages/About";
+import Live from "./pages/Live";
+import TSAT from "./pages/TSAT";
+import AIR from "./pages/AIR";
+import Events from "./pages/Events";
 
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
-const ADMIN_BANNER_API_URL = "http://localhost:5000/api/popup-banner"; 
+const ADMIN_BANNER_API_URL = "http://localhost:5000/api/popup-banner";
 
 // FOR TESTING ONLY: Use this image if the API is not ready yet
-const TEST_BANNER_IMAGE = "https://placehold.co/800x600/004B52/ffffff/png?text=Welcome+to+BRAOU+Admission+Open";
+const TEST_BANNER_IMAGE =
+  "https://placehold.co/800x600/004B52/ffffff/png?text=Welcome+to+BRAOU+Admission+Open";
 
 function App() {
   return (
@@ -182,7 +188,7 @@ function App() {
 // Separate component to allow usage of 'useLocation' hook
 const MainLayout = () => {
   const location = useLocation();
-  
+
   // STATE: Banner Logic
   const [bannerImage, setBannerImage] = useState(null);
   const [isBannerOpen, setIsBannerOpen] = useState(false);
@@ -193,11 +199,11 @@ const MainLayout = () => {
       try {
         // 1. Attempt to fetch from Admin Backend
         const response = await fetch(ADMIN_BANNER_API_URL);
-        
+
         if (response.ok) {
           const data = await response.json();
-          const imageUrl = data.url || data; 
-          
+          const imageUrl = data.url || data;
+
           if (imageUrl) {
             setBannerImage(imageUrl);
             setIsBannerOpen(true);
@@ -218,16 +224,16 @@ const MainLayout = () => {
   }, []);
 
   // Logic: Show Big Footer ONLY on '/home' and '/tsat'
-  const showBigFooter = location.pathname === '/home' || location.pathname === '/tsat';
+  const showBigFooter =
+    location.pathname === "/home" || location.pathname === "/tsat";
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 relative">
-      
       {/* --- GLOBAL POPUP BANNER (Z-Index 9999 to cover everything) --- */}
-      <PopupBanner 
-        isOpen={isBannerOpen} 
-        onClose={() => setIsBannerOpen(false)} 
-        imageSrc={bannerImage} 
+      <PopupBanner
+        isOpen={isBannerOpen}
+        onClose={() => setIsBannerOpen(false)}
+        imageSrc={bannerImage}
       />
 
       {/* --- HEADER & NAVBAR --- */}
@@ -238,24 +244,23 @@ const MainLayout = () => {
       <main className="flex-grow w-full">
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
-          
-          {/* Pages */}
+          {/* Real Pages */}
           <Route path="/home" element={<Home />} />
-          <Route path="/about" element={<PageTitle title="About Us" />} />
-          <Route path="/live" element={<PageTitle title="Live Streaming" />} />
-          <Route path="/youtube" element={<PageTitle title="Youtube (EMR&RC)" />} />
-          <Route path="/webradio" element={<PageTitle title="Web Radio" />} />
-          <Route path="/vidyagani" element={<PageTitle title="Vidyagani" />} />
-          <Route path="/tsat" element={<PageTitle title="T-SAT Vidya/Nipuna" />} />
-          <Route path="/air" element={<PageTitle title="All India Radio (AIR)" />} />
-          <Route path="/events" element={<PageTitle title="BRAOU Events" />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/live" element={<Live />} />
+          {/* <Route path="/youtube" element={<Youtube />} />
+          <Route path="/webradio" element={<WebRadio />} />
+          <Route path="/vidyagani" element={<Vidyagani />} /> */}
+          <Route path="/tsat" element={<TSAT />} />
+          <Route path="/air" element={<AIR />} />
+          <Route path="/events" element={<Events />} />
         </Routes>
       </main>
 
       {/* --- FOOTER LOGIC --- */}
-      {showBigFooter && <Footer />}
+      {/* {showBigFooter && <Footer />} */}
+      <Footer />
       <BottomBar />
-
     </div>
   );
 };
@@ -282,7 +287,7 @@ const PopupBanner = ({ isOpen, onClose, imageSrc }) => {
           >
             {/* Close Button (Top Right) */}
             <div className="flex justify-end mb-2">
-               <button
+              <button
                 onClick={onClose}
                 className="bg-red-600 hover:bg-red-700 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors font-bold shadow-md"
                 title="Close Banner"
@@ -293,11 +298,11 @@ const PopupBanner = ({ isOpen, onClose, imageSrc }) => {
 
             {/* Banner Image */}
             <div className="w-full flex justify-center bg-gray-100 rounded overflow-hidden">
-                <img 
-                src={imageSrc} 
-                alt="Announcement Banner" 
+              <img
+                src={imageSrc}
+                alt="Announcement Banner"
                 className="w-full h-auto object-contain max-h-[80vh]"
-                />
+              />
             </div>
           </motion.div>
         </motion.div>
