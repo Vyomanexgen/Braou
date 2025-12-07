@@ -32,10 +32,10 @@ const Footer = () => {
             </div>
            
             <div className="flex space-x-4 mt-4 pl-1">
-              <SocialIcon icon={<FaFacebookF />} href="#" />
-              <SocialIcon icon={<FaLinkedinIn />} href="#" />
-              <SocialIcon icon={<FaYoutube />} href="#" />
-              <SocialIcon icon={<FaInstagram />} href="#" />
+              <SocialIcon icon={<FaFacebookF />} href="https://m.facebook.com/avprc.braou/" />
+              <SocialIcon icon={<FaLinkedinIn />} href="https://www.linkedin.com/company/dr-b-r-ambedkar-open-university/?originalSubdomain=in" />
+              <SocialIcon icon={<FaYoutube />} href="https://www.youtube.com/@BRAOUOfficial" />
+              <SocialIcon icon={<FaInstagram />} href="https://www.instagram.com/emrrcbraou?igsh=MWt3MzJzZGxuMGdwdQ==" />
             </div>
           </div>
 
@@ -48,9 +48,10 @@ const Footer = () => {
               <FooterLink to="/live">Live</FooterLink>
               <FooterLink to="https://www.youtube.com/@BRAOUOfficial" target="_blank">Youtube</FooterLink>
               <FooterLink to="/air" target="_blank" >Air</FooterLink>
-              <FooterLink to="https://vidyagani.braou.ac.in/" target="_blank">Vidyagani</FooterLink>
+             
               <FooterLink to="/tsat">T-SAT Vidya/Nipuna</FooterLink>
-              <FooterLink to="https://vidyagani.braou.ac.in/" target="_blank">Web Radio</FooterLink>
+              <FooterLink to="https://example-webradio-url.com/" target="_blank">Web Radio</FooterLink>
+               <FooterLink to="https://vidyagani.braou.ac.in/" target="_blank">Vidyagani</FooterLink>
             </ul>
           </div>
 
@@ -62,7 +63,7 @@ const Footer = () => {
             <ul className="space-y-2 text-sm md:text-base">
               <FooterLink to="https://www.youtube.com/@BRAOUOfficial" target="_blank">Youtube (EMR&RC)</FooterLink>
               <FooterLink to="https://vidyagani.braou.ac.in/" target="_blank">Vidyagani</FooterLink>
-              <FooterLink to="https://vidyagani.braou.ac.in/" target="_blank">Web Radio</FooterLink>
+              <FooterLink to="https://example-webradio-url.com/" target="_blank">Web Radio</FooterLink>
               <FooterLink to="/tsat">T-SAT Vidya/Nipuna</FooterLink>
             </ul>
           </div>

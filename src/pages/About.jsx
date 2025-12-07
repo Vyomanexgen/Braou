@@ -67,7 +67,7 @@ const About = () => {
             ABOUT EMR&RC
           </h2>
 
-          <p className="text-gray-800 text-lg leading-relaxed font-bold">
+          <p className="text-gray-800 text-lg leading-relaxed font-bold text-justify">
             {emrrc[0].about}
           </p>
         </section>
@@ -117,18 +117,21 @@ const About = () => {
                 </h4>
 
                 {/* Points */}
-                <ul className="list-disc pl-5 space-y-2 text-[15px] leading-relaxed">
+             <ul className="list-disc pl-6 space-y-2 text-[15px] leading-relaxed">
+
                   {item.points.map((pt, i) => (
                     <li
-                      key={i}
-                      className="
-                        
-                        text-left font-semibold text-[#004F56]
-                        transition-all duration-700
-                        group-hover:text-white group-active:text-white group-focus:text-white
-                      "
-                    >
-                      {pt}
+  key={i}
+  className="
+    text-justify font-semibold text-[#004F56]
+    transition-all duration-700
+    group-hover:text-white group-active:text-white group-focus:text-white
+  "
+>
+  {pt}
+
+
+                     
                     </li>
                   ))}
                 </ul>

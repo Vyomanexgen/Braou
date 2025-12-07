@@ -198,9 +198,7 @@ const Header = () => {
             whileHover={{ scale: 1.02 }}
             src="/pictures/Logo_C_PNG[1] 1.png" 
             alt="University Logo" 
-            // FLUID HEIGHT: 
-            // Logo starts at 50px (mobile) and grows smoothly to 112px (desktop)
-            // It will never be "too big" or "too small" at intermediate sizes (like 768px)
+            
             className="h-[clamp(50px,8vw,112px)] w-auto object-contain"
           />
         </div>
