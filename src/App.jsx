@@ -171,6 +171,8 @@ const ADMIN_BANNER_API_URL = "http://localhost:5000/api/popup-banner";
 // FOR TESTING ONLY: Use this image if the API is not ready yet
 const TEST_BANNER_IMAGE = "https://placehold.co/800x600/004B52/ffffff/png?text=Welcome+to+BRAOU+Admission+Open";
 
+const SHOW_DUMMY_BANNER = true;
+
 function App() {
   return (
     <Router>
@@ -186,36 +188,72 @@ const MainLayout = () => {
   // STATE: Banner Logic
   const [bannerImage, setBannerImage] = useState(null);
   const [isBannerOpen, setIsBannerOpen] = useState(false);
+  const [isInitialLoadDone, setIsInitialLoadDone] = useState(false);
+
 
   // EFFECT: Check for Banner on App Load
-  useEffect(() => {
-    const checkBannerStatus = async () => {
-      try {
-        // 1. Attempt to fetch from Admin Backend
-        const response = await fetch(ADMIN_BANNER_API_URL);
-        
-        if (response.ok) {
-          const data = await response.json();
-          const imageUrl = data.url || data; 
-          
-          if (imageUrl) {
-            setBannerImage(imageUrl);
-            setIsBannerOpen(true);
-          }
-        } else {
-          throw new Error("API not active");
-        }
-      } catch (error) {
-        // 2. FALLBACK FOR TESTING:
-        // If API fails (no backend yet), show the Test Image so you can see the design.
-        console.warn("Backend not detected. Showing TEST BANNER.");
-        setBannerImage(TEST_BANNER_IMAGE);
-        setIsBannerOpen(true);
-      }
-    };
+  
+// useEffect(() => {
+//   const checkBannerStatus = async () => {
+//     try {
+//       const response = await fetch(ADMIN_BANNER_API_URL);
 
-    checkBannerStatus();
-  }, []);
+//       if (response.ok) {
+//         const data = await response.json();
+//         const imageUrl = data.url || data;
+
+//         if (imageUrl) {
+//           setBannerImage(imageUrl);
+//           setIsBannerOpen(true);
+//         }
+//       }
+//     } catch (error) {
+//       console.warn("Banner API unavailable:", error);
+
+//   // ✅ Show test banner ONLY when explicitly enabled
+//   if (import.meta.env.VITE_USE_TEST_BANNER === "true") {
+//     setBannerImage(TEST_BANNER_IMAGE);
+//     setIsBannerOpen(true);
+//   }
+//     }
+//   };
+
+//   checkBannerStatus();
+// }, []);
+
+useEffect(() => {
+  if (!isInitialLoadDone) return; // ⛔ wait for loader
+
+  const checkBannerStatus = async () => {
+    // ✅ TEMPORARY demo banner
+    if (SHOW_DUMMY_BANNER) {
+      setBannerImage(TEST_BANNER_IMAGE);
+      setIsBannerOpen(true);
+      return;
+    }
+
+
+    // ✅ FUTURE: admin-controlled banner
+    try {
+      const response = await fetch(ADMIN_BANNER_API_URL);
+
+      if (response.ok) {
+        const data = await response.json();
+        const imageUrl = data?.url || data;
+
+        if (imageUrl) {
+          setBannerImage(imageUrl);
+          setIsBannerOpen(true);
+        }
+      }
+    } catch (error) {
+      console.warn("Banner API unavailable:", error);
+    }
+  };
+
+  checkBannerStatus();
+}, [isInitialLoadDone]);
+
 
   // Logic: Show Big Footer ONLY on '/home' and '/tsat'
   const showBigFooter = location.pathname === '/home' || location.pathname === '/tsat';
@@ -240,7 +278,11 @@ const MainLayout = () => {
           <Route path="/" element={<Navigate to="/home" replace />} />
           
           {/* Pages */}
-          <Route path="/home" element={<Home />} />
+      <Route
+  path="/home"
+  element={<Home onInitialLoadDone={() => setIsInitialLoadDone(true)} />}
+/>
+
           <Route path="/about" element={<PageTitle title="About Us" />} />
           <Route path="/live" element={<PageTitle title="Live Streaming" />} />
           <Route path="/youtube" element={<PageTitle title="Youtube (EMR&RC)" />} />

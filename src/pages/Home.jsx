@@ -26,7 +26,7 @@ const infoServices = [
     id: 1,
     title: "LIVE",
     shortDesc: "BRAOU conducts interactive live tele-conference programs",
-    fullDesc: "BRAOU conducts interactive live tele-conference programs every Thursday from 2–3 PM.",
+    fullDesc: "BRAOU conducts interactive live tele-conference programs every Thursday from 2–3 PM on different subjects. They are broadcast on the BRAOU YouTube channel and T-SAT NIPUNA, and students can clarify their doubts through the live session by calling 040-23680456.",
     mobileColor: "bg-[#22b9d3]",
     layout: { top: "18%", left: "22%", width: "22%", height: "11%" },
   },
@@ -34,23 +34,30 @@ const infoServices = [
     id: 2,
     title: "Vidyagani",
     shortDesc: "Vidyagani is Dr. B. R. Ambedkar Open University's digital portal",
-    fullDesc: "Vidyagani provides access to digital learning materials, audio, and video lessons.",
+    fullDesc: "Vidyagani (vidyagani.braou.ac.in) is Dr. B.R. Ambedkar Open University’s digital learning portal. It offers students audio lessons, video lectures, and teleconference recordings to support flexible, open-distance learning. The platform enables learners to access and download multimedia study materials anytime, forming an integral part of the university’s online academic support system.",
     mobileColor: "bg-[#fca51f]",
     layout: { top: "17%", right: "11%", width: "23%", height: "11%" },
   },
-  {
-    id: 3,
-    title: "Youtube",
-    shortDesc: "Detailed information on BRAOU's courses, programs, and degrees",
-    fullDesc: "The YouTube channel offers detailed guides on courses, admissions, and exam prep.",
-    mobileColor: "bg-[#56a877]",
-    layout: { top: "43%", left: "10%", width: "21%", height: "11%" },
-  },
+{
+  id: 3,
+  title: "Youtube",
+  shortDesc: "Detailed information on BRAOU's courses, programs, and degrees",
+  fullDesc: [
+    "Video lessons for UG, PG, and distance-learning courses",
+    "Course-wise and subject-wise organized playlists for easy access",
+    "Recordings of seminars, workshops, and university events",
+    "Academic updates, guidance videos, and student information",
+    "Accessible learning resources available anytime on the official BRAOU channel"
+  ],
+  mobileColor: "bg-[#56a877]",
+  layout: { top: "43%", left: "10%", width: "20%", height: "13%" },
+},
+
   {
     id: 4,
     title: "T-SAT (Vidya/Nipuna)",
     shortDesc: "T-SAT telecasts video lessons produced by the EMRRC...",
-    fullDesc: "T-SAT Vidya and Nipuna broadcast educational video lessons Monday–Saturday.",
+    fullDesc: "T-SAT telecasts video lessons produced by EMR&RC through its two channels, Vidya and Nipuna, from Monday to Saturday. T-SAT Vidya broadcasts lessons from 1:00–2:00 PM and 8:30–9:30 PM, while T-SAT Nipuna airs lessons from 2:00–3:00 PM. The platform also hosts live teleconferencing sessions for interactive learning.",
     mobileColor: "bg-[#f25c34]",
     layout: { top: "43%", right: "2%", width: "20%", height: "14%" },
   },
@@ -58,7 +65,7 @@ const infoServices = [
     id: 5,
     title: "AIR",
     shortDesc: "Audio lessons are broadcast on All India Radio according",
-    fullDesc: "Daily audio lessons are aired on AIR Hyderabad A from 6:25 PM to 6:40 PM.",
+    fullDesc: "All India Radio (AIR): Audio lessons produced by EMR&RC are broadcast on All India Radio (AIR), Hyderabad A (HYD A) according to scheduled time slots. Lessons air daily from 6:25 PM to 6:40 PM on the Medium Wave (MW) frequency 738 kHz (AM), providing students with accessible radio-based learning.",
     mobileColor: "bg-[#2d5aa8]",
     layout: { bottom: "20%", left: "20%", width: "19%", height: "11%" },
   },
@@ -66,47 +73,95 @@ const infoServices = [
     id: 6,
     title: "Web Radio",
     shortDesc: "Welcome to Web Radio. Your hub for live radio lessons",
-    fullDesc: "Web Radio provides real-time updates, schedules, podcasts, and learning tips.",
+    fullDesc: "Welcome to HiBRAOU Web Radio, your hub for live radio lessons and real-time university updates. Tune in for program schedules, health tips, and engaging live podcasts. Students can also interact live with teachers to clarify their doubts, staying informed, inspired, and connected with campus life—anytime, anywhere.",
     mobileColor: "bg-[#3e4a59]",
-    layout: { bottom: "20%", right: "12%", width: "19%", height: "11%" },
+    layout: { bottom: "20%", right: "12%", width: "20%", height: "11%" },
   },
 ];
 
 // ============================================================================
 // HOME COMPONENT (Content Only)
 // ============================================================================
-const Home = () => {
+const Home = ({ onInitialLoadDone }) => {
   const [sliderImages, setSliderImages] = useState(DEFAULT_IMAGES);
   const [tickerItems, setTickerItems] = useState(DEFAULT_TICKER_NEWS);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => {
+  return !sessionStorage.getItem("home_loaded");
+});
+
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       setLoading(true);
+  //       // Fetch Slider
+  //       const sliderRes = await fetch(ADMIN_SLIDER_API_URL).catch(() => null);
+  //       if (sliderRes?.ok) {
+  //         const sData = await sliderRes.json();
+  //         if (sData?.length > 0) setSliderImages(sData);
+  //       }
+        
+  //       // Fetch Ticker
+  //       const tickerRes = await fetch(ADMIN_TICKER_API_URL).catch(() => null);
+  //       if (tickerRes?.ok) {
+  //         const tData = await tickerRes.json();
+  //         if (tData?.length > 0) setTickerItems(tData);
+  //       }
+  //     } catch (err) {
+  //       console.warn("Home Data API failed, using defaults.");
+  //     } finally {
+  //       // Small delay to simulate loading or just ensure UI is ready
+  //       setTimeout(() => setLoading(false), 500);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        // Fetch Slider
-        const sliderRes = await fetch(ADMIN_SLIDER_API_URL).catch(() => null);
-        if (sliderRes?.ok) {
-          const sData = await sliderRes.json();
-          if (sData?.length > 0) setSliderImages(sData);
-        }
-        
-        // Fetch Ticker
-        const tickerRes = await fetch(ADMIN_TICKER_API_URL).catch(() => null);
-        if (tickerRes?.ok) {
-          const tData = await tickerRes.json();
-          if (tData?.length > 0) setTickerItems(tData);
-        }
-      } catch (err) {
-        console.warn("Home Data API failed, using defaults.");
-      } finally {
-        // Small delay to simulate loading or just ensure UI is ready
-        setTimeout(() => setLoading(false), 500);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      setLoading(true);
 
+      // Fetch Slider from admin backend
+      const sliderRes = await fetch(ADMIN_SLIDER_API_URL).catch(() => null);
+      if (sliderRes?.ok) {
+        const sData = await sliderRes.json();
+        if (Array.isArray(sData) && sData.length > 0) {
+          setSliderImages(sData);
+        }
+      }
+
+      // Fetch Ticker
+      const tickerRes = await fetch(ADMIN_TICKER_API_URL).catch(() => null);
+      if (tickerRes?.ok) {
+        const tData = await tickerRes.json();
+        if (Array.isArray(tData) && tData.length > 0) {
+          setTickerItems(tData);
+        }
+      }
+    } catch (err) {
+      console.warn("Home Data API failed, using defaults.");
+    } finally {
+      // Mark that we already loaded once in this tab
+      sessionStorage.setItem("home_loaded", "true");
+      setTimeout(() => {
+  setLoading(false);
+  onInitialLoadDone?.(); // ✅ notify App
+}, 500);
+
+    }
+  };
+
+  // Only fetch + show loader if we haven't loaded before in this tab
+  if (!sessionStorage.getItem("home_loaded")) {
     fetchData();
-  }, []);
+  } else {
+    setLoading(false);
+  }
+}, []);
+
 
   if (loading) {
     return <PageLoader />;
@@ -114,12 +169,14 @@ const Home = () => {
 
   return (
     <main
-      className="w-full flex flex-col min-h-screen bg-cover bg-center bg-no-repeat"
-      style={{
-        backgroundImage: "url('/pictures/website BG Final.jpg')",
-      }}
-    >
-      <HeroSlider images={sliderImages} />
+  className="w-full overflow-x-hidden flex flex-col min-h-screen bg-cover bg-center bg-no-repeat"
+  style={{ backgroundImage: "url('/pictures/website BG Final.jpg')" }}
+>
+
+    {sliderImages && sliderImages.length > 0 && (
+  <HeroSlider images={sliderImages} />
+)}
+
 
       <section className="w-full py-6 md:py-10 px-4 text-center">
         <h1 className="font-black uppercase tracking-wide text-slate-900 text-[clamp(18px,4vw,36px)]">
@@ -130,9 +187,7 @@ const Home = () => {
       <NewsTicker news={tickerItems} />
       <InfographicSection />
 
-      <section className="min-h-[100px] p-8 text-center text-slate-600 font-medium">
-        (More Homepage Content Goes Here)
-      </section>
+      
     </main>
   );
 };
@@ -163,7 +218,22 @@ const HeroSlider = ({ images }) => {
   }, [currentIndex, safeImages.length]);
 
   return (
-    <div className="relative w-full aspect-[1920/543] overflow-hidden shadow-lg bg-gray-900">
+   <div
+  className="
+    relative
+    w-full
+    h-[55vw]
+    sm:h-[40vw]
+    md:aspect-[1920/543]
+    max-h-[540px]
+    overflow-hidden
+    shadow-lg
+    bg-gray-900
+  "
+>
+
+
+
       <AnimatePresence mode="wait">
         <motion.img
           key={currentIndex}
@@ -200,7 +270,8 @@ const NewsTicker = ({ news }) => {
       <motion.div
         className="whitespace-nowrap font-extrabold uppercase text-slate-900"
         animate={{ x: ["0%", "-50%"] }}
-        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+       transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+
       >
         <span className="mr-20">{newsString}</span>
         <span className="mr-20">{newsString}</span>
@@ -223,20 +294,52 @@ const InfographicSection = () => {
         {infoServices.map((item) => (
           <div key={item.id} style={item.layout} className="absolute overflow-hidden">
             <div className="absolute top-[10%] left-[12%] w-[75%]">
-              <h3 className="text-white font-black uppercase text-[clamp(10px,1.5vw,20px)] leading-tight drop-shadow-md">
-                {item.title}
-              </h3>
+             {/* <h3
+  className={`text-white font-black uppercase leading-tight drop-shadow-md
+    ${
+      item.title === "T-SAT (Vidya/Nipuna)"
+        ? "text-[clamp(8px,1.05vw,14px)] md:text-[clamp(10px,1.5vw,20px)]"
+        : "text-[clamp(10px,1.5vw,20px)]"
+    }
+  `}
+>
+  {item.title}
+</h3> */}
+
+<h3 className="
+  text-white
+  font-black
+  uppercase
+  leading-tight
+  drop-shadow-md
+  text-[7px]
+  sm:text-[clamp(10px,1.5vw,20px)]
+">
+  {item.title}
+</h3>
+
             </div>
             <div className="absolute bottom-[12%] left-[12%] w-[75%]">
-              <p className="text-white font-semibold text-[clamp(7px,1vw,13px)] leading-tight drop-shadow-sm line-clamp-2">
-                {item.shortDesc}
-              </p>
-              <button
-                onClick={() => setSelectedFeature(item)}
-                className="text-white underline font-bold uppercase text-[clamp(7px,1vw,12px)] mt-1 hover:text-cyan-200"
-              >
-                Know More
-              </button>
+              {/* Description – hidden below 768px */}
+<p className="hidden md:block text-white font-semibold text-[clamp(7px,1vw,13px)] leading-tight drop-shadow-sm line-clamp-2">
+  {item.shortDesc}
+</p>
+
+{/* Know More – always visible */}
+<button
+  onClick={() => setSelectedFeature(item)}
+className="
+  text-white
+  underline
+  font-bold
+  uppercase
+  text-[6.5px]
+  sm:text-[clamp(8px,1vw,12px)]
+ mt-1 hover:text-cyan-200"
+>
+  Know More
+</button>
+
             </div>
           </div>
         ))}
@@ -267,7 +370,18 @@ const InfographicSection = () => {
                 </button>
               </div>
               <div className="p-8">
-                <p className="text-slate-700 text-lg leading-relaxed">{selectedFeature.fullDesc}</p>
+                <div className="text-slate-700 text-sm sm:text-lg leading-relaxed">
+  {Array.isArray(selectedFeature.fullDesc) ? (
+    <ul className="list-disc pl-6 space-y-2">
+      {selectedFeature.fullDesc.map((point, index) => (
+        <li key={index}>{point}</li>
+      ))}
+    </ul>
+  ) : (
+    <p>{selectedFeature.fullDesc}</p>
+  )}
+</div>
+
                 <div className="mt-6 text-right">
                   <button
                     onClick={() => setSelectedFeature(null)}

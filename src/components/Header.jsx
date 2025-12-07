@@ -209,7 +209,19 @@ const Header = () => {
         {/* flex-1: Takes up all available space between left and right.
           px-[clamp...]: Adds dynamic breathing room so text doesn't touch the logos.
         */}
-        <div className="flex-1 flex flex-col items-center justify-center text-center px-[clamp(0.5rem,2vw,2rem)]">
+<div className="
+  flex-1
+  flex
+  flex-col
+  items-center
+  justify-center
+  text-center
+  pl-[clamp(0.5rem,1.5vw,1rem)]
+  pr-[clamp(3rem,6vw,6rem)]
+">
+
+
+        
           
           {/* FLUID FONT SIZE (Title):
              - Minimum: 10px (Very small phones)
@@ -217,17 +229,22 @@ const Header = () => {
              - Maximum: 36px (Desktop)
              leading-tight ensures lines don't space out too much.
           */}
-          <h1 className="font-[900] text-black tracking-tight uppercase leading-[1.1] text-[clamp(10px,2.2vw,36px)]">
-            Dr.B.R. AMBEDKAR OPEN UNIVERSITY
-          </h1>
+     <h1 className="font-extrabold text-black tracking-tight leading-[1.1] text-[clamp(12px,2.4vw,38px)]">
+
+  Dr.B.R.AMBEDKAR OPEN UNIVERSITY
+</h1>
+
           
           {/* FLUID FONT SIZE (Subtitle): */}
-          <h2 className="font-bold text-black mt-1 tracking-wide leading-[1.2] text-[clamp(8px,1.2vw,20px)]">
+          <h2 className="font-bold text-black mt-1 tracking-wide leading-[1.2] text-[clamp(10px,1.6vw,24px)]">
+
+
             Electronic Media Resources & Research Centre
           </h2>
           
           {/* FLUID FONT SIZE (Acronym): */}
-          <h3 className="font-bold text-black text-[clamp(8px,1.1vw,18px)]">
+          <h3 className="font-bold text-black text-[clamp(9px,1.2vw,18px)]">
+
             (EMR&RC)
           </h3>
         </div>
@@ -236,8 +253,8 @@ const Header = () => {
         {/* These icons are hidden on very small mobile (< 640px) to prevent crushing the text.
            On screens > 640px, they appear and scale fluidly.
         */}
-        <div className="hidden sm:flex flex-shrink-0 items-center gap-[clamp(0.5rem,1.5vw,2rem)]">
-          
+      <div className="hidden sm:flex flex-shrink-0 items-center gap-[clamp(1rem,2vw,2.5rem)] ml-[clamp(1rem,3vw,4rem)]">
+
           {/* Icon 1: NAAC */}
           <motion.img 
             variants={iconVariants}

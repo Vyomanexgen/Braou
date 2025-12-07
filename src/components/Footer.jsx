@@ -46,11 +46,11 @@ const Footer = () => {
             </h3>
             <ul className="space-y-2 text-sm md:text-base">
               <FooterLink to="/live">Live</FooterLink>
-              <FooterLink to="/youtube">Youtube</FooterLink>
-              <FooterLink to="/air">Air</FooterLink>
-              <FooterLink to="/vidyagani">Vidyagani</FooterLink>
+              <FooterLink to="https://www.youtube.com/@BRAOUOfficial" target="_blank">Youtube</FooterLink>
+              <FooterLink to="/air" target="_blank" >Air</FooterLink>
+              <FooterLink to="https://vidyagani.braou.ac.in/" target="_blank">Vidyagani</FooterLink>
               <FooterLink to="/tsat">T-SAT Vidya/Nipuna</FooterLink>
-              <FooterLink to="/webradio">Web Radio</FooterLink>
+              <FooterLink to="https://vidyagani.braou.ac.in/" target="_blank">Web Radio</FooterLink>
             </ul>
           </div>
 
@@ -60,9 +60,9 @@ const Footer = () => {
               Useful Links
             </h3>
             <ul className="space-y-2 text-sm md:text-base">
-              <FooterLink to="/youtube">Youtube (EMR&RC)</FooterLink>
-              <FooterLink to="/vidyagani">Vidyagani</FooterLink>
-              <FooterLink to="/webradio">Web Radio</FooterLink>
+              <FooterLink to="https://www.youtube.com/@BRAOUOfficial" target="_blank">Youtube (EMR&RC)</FooterLink>
+              <FooterLink to="https://vidyagani.braou.ac.in/" target="_blank">Vidyagani</FooterLink>
+              <FooterLink to="https://vidyagani.braou.ac.in/" target="_blank">Web Radio</FooterLink>
               <FooterLink to="/tsat">T-SAT Vidya/Nipuna</FooterLink>
             </ul>
           </div>
