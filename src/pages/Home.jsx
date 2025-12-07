@@ -499,59 +499,95 @@ const Home = ({ onInitialLoadDone }) => {
   const [tickerItems, setTickerItems] = useState(DEFAULT_TICKER_NEWS);
   const [infoServices, setInfoServices] = useState(DEFAULT_INFO_SERVICES); // NEW
   const [loading, setLoading] = useState(() => {
-    return !sessionStorage.getItem("home_loaded");
+    return sessionStorage.setItem("home_loaded", "true");
+
   });
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       setLoading(true);
+
+  //       // Fetch Slider from admin backend
+  //       const sliderRes = await fetch(ADMIN_SLIDER_API_URL).catch(() => null);
+  //       if (sliderRes?.ok) {
+  //         const sData = await sliderRes.json();
+  //         if (Array.isArray(sData) && sData.length > 0) {
+  //           setSliderImages(sData);
+  //         }
+  //       }
+
+  //       // Fetch Ticker
+  //       const tickerRes = await fetch(ADMIN_TICKER_API_URL).catch(() => null);
+  //       if (tickerRes?.ok) {
+  //         const tData = await tickerRes.json();
+  //         if (Array.isArray(tData) && tData.length > 0) {
+  //           setTickerItems(tData);
+  //         }
+  //       }
+
+  //       // 🔹 Fetch Info Services (Know More content) from admin
+  //       const infoRes = await fetch(ADMIN_INFO_API_URL).catch(() => null);
+  //       if (infoRes?.ok) {
+  //         const iData = await infoRes.json();
+  //         if (Array.isArray(iData) && iData.length > 0) {
+  //           setInfoServices(iData); // overwrite defaults with admin data
+  //         }
+  //       }
+  //     } catch (err) {
+  //       console.warn("Home Data API failed, using defaults.", err);
+  //     } finally {
+  //       // Mark that we already loaded once in this tab
+  //       sessionStorage.setItem("home_loaded", "true");
+  //       setTimeout(() => {
+  //         setLoading(false);
+  //         onInitialLoadDone?.(); // notify App (for banner logic)
+  //       }, 500);
+  //     }
+  //   };
+
+  //   // Only fetch + show loader if we haven't loaded before in this tab
+  //   if (!sessionStorage.getItem("home_loaded")) {
+  //     fetchData();
+  //   } else {
+  //     setLoading(false);
+  //   }
+  // }, []);
+
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
 
-        // Fetch Slider from admin backend
-        const sliderRes = await fetch(ADMIN_SLIDER_API_URL).catch(() => null);
-        if (sliderRes?.ok) {
-          const sData = await sliderRes.json();
-          if (Array.isArray(sData) && sData.length > 0) {
-            setSliderImages(sData);
-          }
+      const sliderRes = await fetch(ADMIN_SLIDER_API_URL).catch(() => null);
+      if (sliderRes?.ok) {
+        const sData = await sliderRes.json();
+        if (Array.isArray(sData) && sData.length > 0) {
+          setSliderImages(sData);
         }
-
-        // Fetch Ticker
-        const tickerRes = await fetch(ADMIN_TICKER_API_URL).catch(() => null);
-        if (tickerRes?.ok) {
-          const tData = await tickerRes.json();
-          if (Array.isArray(tData) && tData.length > 0) {
-            setTickerItems(tData);
-          }
-        }
-
-        // 🔹 Fetch Info Services (Know More content) from admin
-        const infoRes = await fetch(ADMIN_INFO_API_URL).catch(() => null);
-        if (infoRes?.ok) {
-          const iData = await infoRes.json();
-          if (Array.isArray(iData) && iData.length > 0) {
-            setInfoServices(iData); // overwrite defaults with admin data
-          }
-        }
-      } catch (err) {
-        console.warn("Home Data API failed, using defaults.", err);
-      } finally {
-        // Mark that we already loaded once in this tab
-        sessionStorage.setItem("home_loaded", "true");
-        setTimeout(() => {
-          setLoading(false);
-          onInitialLoadDone?.(); // notify App (for banner logic)
-        }, 500);
       }
-    };
 
-    // Only fetch + show loader if we haven't loaded before in this tab
-    if (!sessionStorage.getItem("home_loaded")) {
-      fetchData();
-    } else {
-      setLoading(false);
+      const tickerRes = await fetch(ADMIN_TICKER_API_URL).catch(() => null);
+      if (tickerRes?.ok) {
+        const tData = await tickerRes.json();
+        if (Array.isArray(tData) && tData.length > 0) {
+          setTickerItems(tData);
+        }
+      }
+    } catch (err) {
+      console.warn("Home Data API failed, using defaults.");
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+        onInitialLoadDone?.();
+      }, 500);
     }
-  }, []);
+  };
+
+  fetchData();
+}, []);
+
 
   if (loading) {
     return <PageLoader />;
@@ -590,6 +626,8 @@ const PageLoader = () => (
     />
   </div>
 );
+
+
 
 const HeroSlider = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
