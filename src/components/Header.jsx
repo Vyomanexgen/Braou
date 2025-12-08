@@ -305,7 +305,7 @@ const Header = () => {
                xl:h-[125px] xl:w-[135px]"
   >
     <img
-      src="https://braou.ac.in/assets/images/user/braou-ambedkar.jpg"
+      src="/pictures/Group 45.png"
       alt="Dr. Ambedkar"
       className="h-full w-full object-cover"
     />
@@ -313,7 +313,7 @@ const Header = () => {
 
   {/* Telangana Rising */}
   <img
-    src="https://braou.ac.in/assets/images/user/RisingLogo.jpg"
+    src="/pictures/Group 88.png"
     alt="Telangana Rising"
     className="h-[85px] lg:h-[110px] xl:h-[120px] w-auto object-contain"
   />

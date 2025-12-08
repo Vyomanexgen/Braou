@@ -47,7 +47,7 @@ const Footer = () => {
             <ul className="space-y-2 text-sm md:text-base">
               <FooterLink to="/live">Live</FooterLink>
               <FooterLink to="https://www.youtube.com/@BRAOUOfficial" target="_blank">Youtube</FooterLink>
-              <FooterLink to="/air" target="_blank" >Air</FooterLink>
+              <FooterLink to="/air" target="_blank" >AIR</FooterLink>
              
               <FooterLink to="/tsat">T-SAT Vidya/Nipuna</FooterLink>
               <FooterLink to="https://example-webradio-url.com/" target="_blank">Web Radio</FooterLink>
