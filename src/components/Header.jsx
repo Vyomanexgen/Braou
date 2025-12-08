@@ -274,15 +274,16 @@ const Header = () => {
             Electronic Media Resources & Research Centre
           </h2>
 
-          <h3
-            className="
-              font-bold text-black mt-2 uppercase
-              text-[12px] sm:text-[13px] md:text-[16px]
-              self-start text-center
-            "
-          >
-            (EMR&RC)
-          </h3>
+         <h3
+  className="
+    font-bold text-black mt-2 uppercase
+    text-[12px] sm:text-[13px] md:text-[18px]
+    self-center -ml-48
+  "
+>
+  (EMR&RC)
+</h3>
+
         </div>
 
         {/* RIGHT ICONS – LARGE SCREENS ONLY */}
