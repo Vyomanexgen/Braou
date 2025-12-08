@@ -410,7 +410,7 @@ const DEFAULT_INFO_SERVICES = [
     fullDesc:
       "BRAOU conducts interactive live tele-conference programs every Thursday from 2–3 PM on different subjects. They are broadcast on the BRAOU YouTube channel and T-SAT NIPUNA, and students can clarify their doubts through the live session by calling 040-23680456.",
     mobileColor: "bg-[#22b9d3]",
-    layout: { top: "18%", left: "22%", width: "22%", height: "11%" },
+    layout: { top: "17%", left: "22%", width: "22%", height: "11%" },
   },
   {
     id: 2,
@@ -435,7 +435,7 @@ const DEFAULT_INFO_SERVICES = [
       "Accessible learning resources available anytime on the official BRAOU channel",
     ],
     mobileColor: "bg-[#56a877]",
-    layout: { top: "43%", left: "10%", width: "20%", height: "13%" },
+    layout: { top: "43%", left: "11%", width: "20%", height: "13%" },
   },
   {
     id: 4,
@@ -762,9 +762,22 @@ const InfographicSection = ({ infoServices }) => {
             </div>
             <div className="absolute bottom-[12%] left-[12%] w-[75%]">
               {/* Description – hidden below 768px */}
-              <p className="hidden md:block text-white font-semibold text-[clamp(7px,1vw,13px)] leading-tight drop-shadow-sm line-clamp-2">
-                {item.shortDesc}
-              </p>
+              <p
+  className={`
+    hidden md:block
+    text-white
+    font-semibold
+    text-[clamp(7px,1vw,13px)]
+    leading-tight
+    drop-shadow-sm
+    line-clamp-2
+    whitespace-normal
+    ${item.title === "LIVE" ? "tracking-tight" : ""}
+  `}
+>
+  {item.shortDesc}
+</p>
+
 
               {/* Know More – always visible */}
               <button
