@@ -1,24 +1,4 @@
-// import React, { useState, useEffect, useRef } from "react";
-// import { motion, AnimatePresence } from "framer-motion";
-
-// // --- CONFIGURATION ---
-// const ADMIN_SLIDER_API_URL = "http://localhost:5000/api/slider-images"; 
-// const ADMIN_TICKER_API_URL = "http://localhost:5000/api/ticker-news"; 
-
-// // --- DEFAULTS ---
-// const DEFAULT_IMAGES = [
-//   "https://placehold.co/1920x543/000000/ffffff?text=Slide+1+(1920x543)",
-//   "https://placehold.co/1920x543/004d4d/ffffff?text=Slide+2+Educational+Broadcasting",
-//   "https://placehold.co/1920x543/00aaaa/ffffff?text=Slide+3+EMR%26RC+Events",
-//   "https://placehold.co/1920x543/000000/ffffff?text=Slide+4+Student+Resources",
-//   "https://placehold.co/1920x543/004d4d/ffffff?text=Slide+5+Research+Initiatives",
-//   "https://placehold.co/1920x543/00aaaa/ffffff?text=Slide+6+Community+Outreach",
-// ];
-
-// const DEFAULT_TICKER_NEWS = [
-//   "Admission notifications for 2024 are now open",
-//   "New video lectures added to Vidyagani portal",
-//   "Live T-SAT schedule updated for this week",
+//edule updated for this week",
 // ];
 
 // const infoServices = [
@@ -381,24 +361,12 @@
 //   )}
 // </div>
 
-//                 <div className="mt-6 text-right">
-//                   <button
-//                     onClick={() => setSelectedFeature(null)}
-//                     className="px-5 py-2 bg-slate-200 rounded-lg font-bold hover:bg-slate-300 text-slate-800"
-//                   >
-//                     Close
-//                   </button>
-//                 </div>
-//               </div>
-//             </motion.div>
-//           </motion.div>
-//         )}
-//       </AnimatePresence>
-//     </section>
-//   );
-// };
+// 
 
-// export default Home;
+
+
+
+// versiom 2n
 
 
 
@@ -419,14 +387,21 @@ const DEFAULT_IMAGES = [
   "https://placehold.co/1920x543/004d4d/ffffff?text=Slide+5+Research+Initiatives",
   "https://placehold.co/1920x543/00aaaa/ffffff?text=Slide+6+Community+Outreach",
 ];
+// const DEFAULT_TICKER_NEWS = [
+//   "Admissions Open 2025",
+//   "Exam Results Out",
+//   "Workshop Today",
+//   "Library Closed",
+// ];//🔹 Rename static infoServices → DEFAULT_INFO_SERVICES (fallback)
+
 
 const DEFAULT_TICKER_NEWS = [
-  "Admission notifications for 2024 are now open",
-  "New video lectures added to Vidyagani portal",
-  "Live T-SAT schedule updated for this week",
+  "Admission notifications for the academic year 2025 are now officially open online",
+  "New video lectures regarding advanced data science have been uploaded to the portal",
+  "Live teleconference sessions will be held every Thursday from 2 PM to 3 PM",
+  "Students can now download the latest examination schedule from the university website",
 ];
 
-// 🔹 Rename static infoServices → DEFAULT_INFO_SERVICES (fallback)
 const DEFAULT_INFO_SERVICES = [
   {
     id: 1,
@@ -687,19 +662,67 @@ const HeroSlider = ({ images }) => {
 };
 
 const NewsTicker = ({ news }) => {
-  const safeNews = news && news.length > 0 ? news : DEFAULT_TICKER_NEWS;
-  const separator = "        ";
-  const newsString = safeNews.join(separator) + separator;
+  const rawNews = news && news.length > 0 ? news : DEFAULT_TICKER_NEWS;
+
+  // Repeat list if short to ensure seamless scrolling
+  const repeatedNews = rawNews.length < 10 
+    ? [...rawNews, ...rawNews, ...rawNews, ...rawNews] 
+    : rawNews;
+
+  // State to manage animation speed
+  const [duration, setDuration] = useState(140); 
+
+  useEffect(() => {
+    const handleResize = () => {
+      // HIGHER NUMBER = SLOWER MOVEMENT
+      
+      // Mobile (< 768px): Increased to 80 (Very Slow/Readable)
+      // Desktop (>= 768px): Increased to 140 (Very Smooth)
+      setDuration(window.innerWidth < 768 ? 80 : 140);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
-    <div className="w-full overflow-hidden py-3 border-y bg-white/20 backdrop-blur-sm">
+    <div className="w-full overflow-hidden py-2 bg-white/20 backdrop-blur-sm">
       <motion.div
-        className="whitespace-nowrap font-extrabold uppercase text-slate-900"
+        className="flex items-center w-max"
         animate={{ x: ["0%", "-50%"] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "linear" }} // faster
+        transition={{
+          duration: duration,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+        key={duration}
       >
-        <span className="mr-20">{newsString}</span>
-        <span className="mr-20">{newsString}</span>
+        {/* Block 1 */}
+        <div className="flex items-center">
+          {repeatedNews.map((item, index) => (
+            <span
+              key={`a-${index}`}
+              className="px-10 font-black text-slate-900 text-sm md:text-lg capitalize whitespace-nowrap"
+              style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
+            >
+              {item}
+            </span>
+          ))}
+        </div>
+
+        {/* Block 2 (Duplicate for loop) */}
+        <div className="flex items-center">
+          {repeatedNews.map((item, index) => (
+            <span
+              key={`b-${index}`}
+              className="px-10 font-black text-slate-900 text-sm md:text-lg capitalize whitespace-nowrap"
+              style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
+            >
+              {item}
+            </span>
+          ))}
+        </div>
       </motion.div>
     </div>
   );

@@ -42,13 +42,7 @@ const Header = () => {
 
 
         
-          
-          {/* FLUID FONT SIZE (Title):
-             - Minimum: 10px (Very small phones)
-             - Preferred: 2.2% of screen width (Scaling)
-             - Maximum: 36px (Desktop)
-             leading-tight ensures lines don't space out too much.
-          */}
+    
    <h1 className="
     font-extrabold text-black tracking-tight
     leading-tight
