@@ -243,7 +243,7 @@ const Header = () => {
             whileHover={{ scale: 1.03 }}
             src="/pictures/Logo_C_PNG[1] 1.png"
             alt="University Logo"
-            className="h-[55px] sm:h-[65px] md:h-[90px] lg:h-[110px] w-auto object-contain"
+            className="h-[55px] sm:h-[65px] md:h-[90px] lg:h-[120px] w-auto object-contain"
           />
         </div>
 
@@ -287,30 +287,38 @@ const Header = () => {
         </div>
 
         {/* RIGHT ICONS – LARGE SCREENS ONLY */}
-        <div className="hidden md:flex items-center gap-8 ml-auto">
-          <img
-            src="/pictures/PNG[1] 1.png"
-            alt="NAAC A Grade"
-            className="h-[70px] lg:h-[90px] w-auto object-contain"
-          />
+        {/* RIGHT ICONS – LARGE SCREENS ONLY */}
+<div className="hidden md:flex items-center gap-20 ml-auto">
 
-          <div
-            className="rounded-full overflow-hidden border
-                       h-[75px] w-[75px] lg:h-[95px] lg:w-[95px]"
-          >
-            <img
-              src="https://braou.ac.in/assets/images/user/braou-ambedkar.jpg"
-              alt="Dr. Ambedkar"
-              className="h-full w-full object-cover"
-            />
-          </div>
+  {/* NAAC */}
+  <img
+    src="/pictures/PNG[1] 1.png"
+    alt="NAAC A Grade"
+    className="h-[85px] lg:h-[110px] xl:h-[120px] w-auto object-contain"
+  />
 
-          <img
-            src="https://braou.ac.in/assets/images/user/RisingLogo.jpg"
-            alt="Telangana Rising"
-            className="h-[70px] lg:h-[90px] w-auto object-contain"
-          />
-        </div>
+  {/* Dr. Ambedkar */}
+  <div
+    className="rounded-full overflow-hidden border
+               h-[90px] w-[90px]
+               lg:h-[115px] lg:w-[115px]
+               xl:h-[125px] xl:w-[135px]"
+  >
+    <img
+      src="https://braou.ac.in/assets/images/user/braou-ambedkar.jpg"
+      alt="Dr. Ambedkar"
+      className="h-full w-full object-cover"
+    />
+  </div>
+
+  {/* Telangana Rising */}
+  <img
+    src="https://braou.ac.in/assets/images/user/RisingLogo.jpg"
+    alt="Telangana Rising"
+    className="h-[85px] lg:h-[110px] xl:h-[120px] w-auto object-contain"
+  />
+</div>
+
       </div>
     </header>
   );

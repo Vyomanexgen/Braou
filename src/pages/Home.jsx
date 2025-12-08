@@ -435,7 +435,8 @@ const DEFAULT_INFO_SERVICES = [
       "Accessible learning resources available anytime on the official BRAOU channel",
     ],
     mobileColor: "bg-[#56a877]",
-    layout: { top: "43%", left: "11%", width: "20%", height: "13%" },
+    layout: { top: "46%", left: "11%", width: "20%", height: "13%" },
+
   },
   {
     id: 4,
