@@ -408,64 +408,92 @@ const DEFAULT_INFO_SERVICES = [
     title: "LIVE",
     shortDesc: "BRAOU conducts interactive live tele-conference",
     fullDesc:
-      "BRAOU conducts interactive live tele-conference programs every Thursday from 2–3 PM on different subjects. They are broadcast on the BRAOU YouTube channel and T-SAT NIPUNA, and students can clarify their doubts through the live session by calling 040-23680456.",
+      "BRAOU conducts interactive live tele-conference programs every Thursday from 2–3 PM on different subjects...",
     mobileColor: "bg-[#22b9d3]",
-    layout: { top: "17%", left: "22%", width: "22%", height: "11%" },
+    layout: {
+      container: { top: "17%", left: "22%", width: "22%", height: "11%" },
+      title: { top: "6%", left: "15%", width: "75%", height: "25%" },
+      shortDesc: { bottom: "12%", left: "12%", width: "75%", height: "40%" },
+    },
   },
+
   {
     id: 2,
     title: "Vidyagani",
-    shortDesc:
-      "Vidyagani is Dr. B. R. Ambedkar Open University's digital portal",
+    shortDesc: "Vidyagani is Dr. B. R. Ambedkar Open University's digital portal",
     fullDesc:
-      "Vidyagani (vidyagani.braou.ac.in) is Dr. B.R. Ambedkar Open University’s digital learning portal. It offers students audio lessons, video lectures, and teleconference recordings to support flexible, open-distance learning. The platform enables learners to access and download multimedia study materials anytime, forming an integral part of the university’s online academic support system.",
+      "Vidyagani (vidyagani.braou.ac.in) is the university’s digital learning portal...",
     mobileColor: "bg-[#fca51f]",
-    layout: { top: "17%", right: "11%", width: "23%", height: "11%" },
+    layout: {
+      container: { top: "17%", right: "11%", width: "23%", height: "11%" },
+      title: { top: "6%", left: "10%", width: "80%", height: "28%" },
+      shortDesc: { bottom: "12%", left: "10%", width: "80%", height: "42%" },
+    },
   },
+
   {
     id: 3,
     title: "Youtube",
-    shortDesc:
-      "Video lessons for UG, PG, and distance-learning courses",
+    shortDesc: "Video lessons for UG, PG, and distance-learning courses",
     fullDesc: [
       "Video lessons for UG, PG, and distance-learning courses",
-      "Course-wise and subject-wise organized playlists for easy access",
-      "Recordings of seminars, workshops, and university events",
-      "Academic updates, guidance videos, and student information",
-      "Accessible learning resources available anytime on the official BRAOU channel",
+      "Course-wise playlists",
+      "Workshops and events",
+      "Academic updates",
     ],
     mobileColor: "bg-[#56a877]",
-    layout: { top: "43%", left: "11%", width: "20%", height: "13%" },
+    layout: {
+      container: { top: "46%", left: "11%", width: "20%", height: "13%" },
+      title: { top: "6%", left: "12%", width: "75%", height: "22%" },
+      shortDesc: { bottom: "12%", left: "12%", width: "75%", height: "45%" },
+    },
   },
+
   {
     id: 4,
-    title: "T-SAT (Vidya/Nipuna)",
-    shortDesc: "T-SAT telecasts video lessons produced by the EMRRC...",
+    title: "T-SAT",
+    subTitle: "Vidya / Nipuna",
+    shortDesc: "T-SAT telecasts video lessons produced by the EMR&RC...",
     fullDesc:
-      "T-SAT telecasts video lessons produced by EMR&RC through its two channels, Vidya and Nipuna, from Monday to Saturday. T-SAT Vidya broadcasts lessons from 1:00–2:00 PM and 8:30–9:30 PM, while T-SAT Nipuna airs lessons from 2:00–3:00 PM. The platform also hosts live teleconferencing sessions for interactive learning.",
+      "T-SAT telecasts video lessons produced by EMR&RC through its two channels...",
     mobileColor: "bg-[#f25c34]",
-    layout: { top: "43%", right: "2%", width: "20%", height: "14%" },
-    
+    layout: {
+      container: { top: "43%", right: "2%", width: "20%", height: "14%" },
+      title: { top: "5%", left: "12%", width: "75%", height: "18%" },
+      subTitle: { top: "26%", left: "12%", width: "75%", height: "16%" },
+      shortDesc: { bottom: "10%", left: "12%", width: "75%", height: "40%" },
+    },
   },
+
   {
     id: 5,
     title: "AIR",
-    shortDesc: "Audio lessons are broadcast on All India Radio according",
+    shortDesc: "Audio lessons are broadcast on All India Radio",
     fullDesc:
-      "All India Radio (AIR): Audio lessons produced by EMR&RC are broadcast on All India Radio (AIR), Hyderabad A (HYD A) according to scheduled time slots. Lessons air daily from 6:25 PM to 6:40 PM on the Medium Wave (MW) frequency 738 kHz (AM), providing students with accessible radio-based learning.",
+      "AIR broadcasts EMR&RC audio lessons daily through MW frequency...",
     mobileColor: "bg-[#2d5aa8]",
-    layout: { bottom: "20%", left: "20%", width: "19%", height: "11%" },
+    layout: {
+      container: { bottom: "20%", left: "20%", width: "19%", height: "11%" },
+      title: { top: "6%", left: "12%", width: "75%", height: "22%" },
+      shortDesc: { bottom: "12%", left: "12%", width: "75%", height: "44%" },
+    },
   },
+
   {
     id: 6,
     title: "Web Radio",
     shortDesc: "Welcome to Web Radio. Your hub for live radio lessons",
     fullDesc:
-      "Welcome to HiBRAOU Web Radio, your hub for live radio lessons and real-time university updates. Tune in for program schedules, health tips, and engaging live podcasts. Students can also interact live with teachers to clarify their doubts, staying informed, inspired, and connected with campus life—anytime, anywhere.",
+      "HiBRAOU Web Radio delivers live lessons and updates...",
     mobileColor: "bg-[#3e4a59]",
-    layout: { bottom: "20%", right: "12%", width: "20%", height: "11%" },
+    layout: {
+      container: { bottom: "20%", right: "12%", width: "20%", height: "11%" },
+      title: { top: "6%", left: "12%", width: "75%", height: "22%" },
+      shortDesc: { bottom: "12%", left: "12%", width: "75%", height: "44%" },
+    },
   },
 ];
+
 
 // ============================================================================
 // HOME COMPONENT
@@ -728,6 +756,152 @@ const NewsTicker = ({ news }) => {
 };
 
 // 🔹 Updated to accept infoServices as prop
+// const InfographicSection = ({ infoServices }) => {
+//   const [selectedFeature, setSelectedFeature] = useState(null);
+
+//   return (
+//     <section className="w-full py-8 px-2 relative">
+//       <div className="max-w-[1200px] mx-auto relative">
+//         <img
+//           src="/pictures/HOME INFO_edit.png"
+//           className="w-full object-contain select-none"
+//           alt="infographic"
+//         />
+//         {infoServices.map((item) => (
+//           <div key={item.id} style={item.layout} className="absolute overflow-hidden">
+//             <div className="absolute top-[10%] left-[12%] w-[75%]">
+//             <h3 className="
+//   text-white
+//   font-black
+//   uppercase
+//   leading-tight
+//   drop-shadow-md
+//   text-[7px]
+//   sm:text-[clamp(10px,1.5vw,20px)]
+// ">
+//   {item.title}
+
+//   {item.subTitle && (
+//     <span className="
+//       block
+//       font-bold
+//       normal-case
+//       text-[6px]
+//       sm:text-[clamp(8px,1.2vw,15px)]
+//       mt-[1px]
+//       opacity-90
+//     ">
+//       ({item.subTitle})
+//     </span>
+//   )}
+// </h3>
+
+
+//             </div>
+//             <div className="absolute bottom-[12%] left-[12%] w-[75%]">
+//               {/* Description – hidden below 768px */}
+//               <p
+//   className={`
+//     hidden md:block
+//     text-white
+//     font-semibold
+//     text-[clamp(7px,1vw,13px)]
+//     leading-tight
+//     drop-shadow-sm
+//     line-clamp-2
+//     whitespace-normal
+//     ${item.title === "LIVE" ? "tracking-tight" : ""}
+//   `}
+// >
+//   {item.shortDesc}
+// </p>
+
+
+//               {/* Know More – always visible */}
+//               <button
+//                 onClick={() => setSelectedFeature(item)}
+//                 className="
+//   inline-flex items-center justify-center
+//   mt-2
+//   px-2 py-[2px]
+//   font-bold uppercase
+//   text-white
+//   text-[6.5px]
+//   sm:text-[clamp(8px,1vw,12px)]
+//   bg-black/30
+//   rounded
+//   transition-all duration-200 ease-out
+//   hover:bg-red-600
+//   hover:text-white
+// "
+
+//               >
+//                 Know More
+//               </button>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//       <AnimatePresence>
+//         {selectedFeature && (
+//           <motion.div
+//             className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+//             initial={{ opacity: 0 }}
+//             animate={{ opacity: 1 }}
+//             exit={{ opacity: 0 }}
+//             onClick={() => setSelectedFeature(null)}
+//           >
+//             <motion.div
+//               className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden"
+//               initial={{ scale: 0.9, opacity: 0, y: 20 }}
+//               animate={{ scale: 1, opacity: 1, y: 0 }}
+//               exit={{ scale: 0.9, opacity: 0, y: 20 }}
+//               onClick={(e) => e.stopPropagation()}
+//             >
+//               <div
+//                 className={`${selectedFeature.mobileColor} p-4 flex justify-between items-center`}
+//               >
+//                 <h3 className="text-xl font-black text-white uppercase">
+//                   {selectedFeature.title}
+//                 </h3>
+//                 <button
+//                   onClick={() => setSelectedFeature(null)}
+//                   className="text-white bg-white/20 rounded-full w-8 h-8 flex items-center justify-center hover:bg-white/30"
+//                 >
+//                   X
+//                 </button>
+//               </div>
+//               <div className="p-8">
+//                 <div className="text-slate-700 text-sm sm:text-lg leading-relaxed">
+//                   {Array.isArray(selectedFeature.fullDesc) ? (
+//                     <ul className="list-disc pl-6 space-y-2">
+//                       {selectedFeature.fullDesc.map((point, index) => (
+//                         <li key={index}>{point}</li>
+//                       ))}
+//                     </ul>
+//                   ) : (
+//                     <p>{selectedFeature.fullDesc}</p>
+//                   )}
+//                 </div>
+
+//                 <div className="mt-6 text-right">
+//                   <button
+//                     onClick={() => setSelectedFeature(null)}
+//                     className="px-5 py-2 bg-slate-200 rounded-lg font-bold hover:bg-slate-300 text-slate-800"
+//                   >
+//                     Close
+//                   </button>
+//                 </div>
+//               </div>
+//             </motion.div>
+//           </motion.div>
+//         )}
+//       </AnimatePresence>
+//     </section>
+//   );
+// };
+
+
 const InfographicSection = ({ infoServices }) => {
   const [selectedFeature, setSelectedFeature] = useState(null);
 
@@ -739,128 +913,59 @@ const InfographicSection = ({ infoServices }) => {
           className="w-full object-contain select-none"
           alt="infographic"
         />
+
         {infoServices.map((item) => (
-          <div key={item.id} style={item.layout} className="absolute overflow-hidden">
-            <div className="absolute top-[10%] left-[12%] w-[75%]">
-             <h3
-  className={`
-    text-white
-    font-black
-    uppercase
-    leading-tight
-    drop-shadow-md
-    ${
-      item.title.startsWith("T-SAT")
-        ? "text-[6.5px] sm:text-[clamp(9.5px,1.35vw,18px)]"
-        : "text-[7px] sm:text-[clamp(10px,1.5vw,20px)]"
-    }
-  `}
->
-  {item.title}
-</h3>
+          <div
+            key={item.id}
+            style={item.layout.container}
+            className="absolute"
+          >
+            {/* TITLE */}
+            <h3
+              style={item.layout.title}
+              className="absolute text-white font-black uppercase leading-tight drop-shadow-md"
+            >
+              {item.title}
+            </h3>
 
-            </div>
-            <div className="absolute bottom-[12%] left-[12%] w-[75%]">
-              {/* Description – hidden below 768px */}
-              <p
-  className={`
-    hidden md:block
-    text-white
-    font-semibold
-    text-[clamp(7px,1vw,13px)]
-    leading-tight
-    drop-shadow-sm
-    line-clamp-2
-    whitespace-normal
-    ${item.title === "LIVE" ? "tracking-tight" : ""}
-  `}
->
-  {item.shortDesc}
-</p>
-
-
-              {/* Know More – always visible */}
-              <button
-                onClick={() => setSelectedFeature(item)}
-                className="
-  inline-flex items-center justify-center
-  mt-2
-  px-2 py-[2px]
-  font-bold uppercase
-  text-white
-  text-[6.5px]
-  sm:text-[clamp(8px,1vw,12px)]
-  bg-black/30
-  rounded
-  transition-all duration-200 ease-out
-  hover:bg-red-600
-  hover:text-white
-"
-
+            {/* SUB TITLE */}
+            {item.subTitle && (
+              <h4
+                style={item.layout.subTitle}
+                className="absolute text-white font-bold opacity-90"
               >
-                Know More
-              </button>
-            </div>
+                ({item.subTitle})
+              </h4>
+            )}
+
+            {/* SHORT DESC */}
+            <p
+              style={item.layout.shortDesc}
+              className="absolute hidden md:block text-white font-semibold leading-tight drop-shadow-sm line-clamp-2"
+            >
+              {item.shortDesc}
+            </p>
+
+            {/* BUTTON */}
+            <button
+              onClick={() => setSelectedFeature(item)}
+              className="
+                absolute bottom-1 left-[12%]
+                px-2 py-[2px]
+                text-white text-[10px] font-bold uppercase
+                border border-white/60 rounded
+                hover:bg-red-600 hover:border-red-600
+                transition
+              "
+            >
+              Know More
+            </button>
           </div>
         ))}
       </div>
-      <AnimatePresence>
-        {selectedFeature && (
-          <motion.div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedFeature(null)}
-          >
-            <motion.div
-              className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden"
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div
-                className={`${selectedFeature.mobileColor} p-4 flex justify-between items-center`}
-              >
-                <h3 className="text-xl font-black text-white uppercase">
-                  {selectedFeature.title}
-                </h3>
-                <button
-                  onClick={() => setSelectedFeature(null)}
-                  className="text-white bg-white/20 rounded-full w-8 h-8 flex items-center justify-center hover:bg-white/30"
-                >
-                  X
-                </button>
-              </div>
-              <div className="p-8">
-                <div className="text-slate-700 text-sm sm:text-lg leading-relaxed">
-                  {Array.isArray(selectedFeature.fullDesc) ? (
-                    <ul className="list-disc pl-6 space-y-2">
-                      {selectedFeature.fullDesc.map((point, index) => (
-                        <li key={index}>{point}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p>{selectedFeature.fullDesc}</p>
-                  )}
-                </div>
-
-                <div className="mt-6 text-right">
-                  <button
-                    onClick={() => setSelectedFeature(null)}
-                    className="px-5 py-2 bg-slate-200 rounded-lg font-bold hover:bg-slate-300 text-slate-800"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </section>
   );
 };
+
 
 export default Home;
