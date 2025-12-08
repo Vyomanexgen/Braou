@@ -406,7 +406,7 @@ const DEFAULT_INFO_SERVICES = [
   {
     id: 1,
     title: "LIVE",
-    shortDesc: "BRAOU conducts interactive live tele-conference programs",
+    shortDesc: "BRAOU conducts interactive live tele-conference",
     fullDesc:
       "BRAOU conducts interactive live tele-conference programs every Thursday from 2–3 PM on different subjects. They are broadcast on the BRAOU YouTube channel and T-SAT NIPUNA, and students can clarify their doubts through the live session by calling 040-23680456.",
     mobileColor: "bg-[#22b9d3]",
@@ -426,7 +426,7 @@ const DEFAULT_INFO_SERVICES = [
     id: 3,
     title: "Youtube",
     shortDesc:
-      "Detailed information on BRAOU's courses, programs, and degrees",
+      "Video lessons for UG, PG, and distance-learning courses",
     fullDesc: [
       "Video lessons for UG, PG, and distance-learning courses",
       "Course-wise and subject-wise organized playlists for easy access",
@@ -445,6 +445,7 @@ const DEFAULT_INFO_SERVICES = [
       "T-SAT telecasts video lessons produced by EMR&RC through its two channels, Vidya and Nipuna, from Monday to Saturday. T-SAT Vidya broadcasts lessons from 1:00–2:00 PM and 8:30–9:30 PM, while T-SAT Nipuna airs lessons from 2:00–3:00 PM. The platform also hosts live teleconferencing sessions for interactive learning.",
     mobileColor: "bg-[#f25c34]",
     layout: { top: "43%", right: "2%", width: "20%", height: "14%" },
+    
   },
   {
     id: 5,
@@ -741,19 +742,23 @@ const InfographicSection = ({ infoServices }) => {
         {infoServices.map((item) => (
           <div key={item.id} style={item.layout} className="absolute overflow-hidden">
             <div className="absolute top-[10%] left-[12%] w-[75%]">
-              <h3
-                className="
-                  text-white
-                  font-black
-                  uppercase
-                  leading-tight
-                  drop-shadow-md
-                  text-[7px]
-                  sm:text-[clamp(10px,1.5vw,20px)]
-                "
-              >
-                {item.title}
-              </h3>
+             <h3
+  className={`
+    text-white
+    font-black
+    uppercase
+    leading-tight
+    drop-shadow-md
+    ${
+      item.title.startsWith("T-SAT")
+        ? "text-[6.5px] sm:text-[clamp(9.5px,1.35vw,18px)]"
+        : "text-[7px] sm:text-[clamp(10px,1.5vw,20px)]"
+    }
+  `}
+>
+  {item.title}
+</h3>
+
             </div>
             <div className="absolute bottom-[12%] left-[12%] w-[75%]">
               {/* Description – hidden below 768px */}
@@ -765,14 +770,20 @@ const InfographicSection = ({ infoServices }) => {
               <button
                 onClick={() => setSelectedFeature(item)}
                 className="
-                  text-white
-                  underline
-                  font-bold
-                  uppercase
-                  text-[6.5px]
-                  sm:text-[clamp(8px,1vw,12px)]
-                  mt-1 hover:text-cyan-200
-                "
+  inline-flex items-center justify-center
+  mt-2
+  px-2 py-[2px]
+  font-bold uppercase
+  text-white
+  text-[6.5px]
+  sm:text-[clamp(8px,1vw,12px)]
+  bg-black/30
+  rounded
+  transition-all duration-200 ease-out
+  hover:bg-red-600
+  hover:text-white
+"
+
               >
                 Know More
               </button>
