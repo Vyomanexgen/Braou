@@ -113,41 +113,152 @@
 
 // export default Header;
 
+// import React from "react";
+// import { motion } from "framer-motion";
+
+// const iconVariants = {
+//   hover: { scale: 1.05, transition: { duration: 0.2 } },
+// };
+
+// const Header = () => {
+//   return (
+//     <header className="w-full bg-white border-b border-gray-300 shadow-sm">
+//       <div
+//         className="
+//           w-full max-w-[1900px] mx-auto px-8 py-4
+//           grid grid-cols-[auto_1fr_auto]
+//           items-center
+//         "
+//       >
+
+//         {/* ===== LEFT: UNIVERSITY LOGO ===== */}
+//         <div className="flex items-center">
+//           <motion.img
+//             whileHover={{ scale: 1.03 }}
+//             src="/pictures/Logo_C_PNG[1] 1.png"
+//             alt="University Logo"
+//             className="h-[80px] md:h-[105px] lg:h-[120px] w-auto object-contain"
+//           />
+//         </div>
+
+//         {/* ===== CENTER: TEXT BLOCK ===== */}
+//         <div className="flex flex-col items-start text-left px-10">
+
+//           <h1
+//             className="
+//               font-extrabold text-black tracking-tight leading-tight
+//               text-[20px] sm:text-[26px] md:text-[34px] lg:text-[36px]
+//             "
+//           >
+//             <span className="normal-case">Dr.</span>{" "}
+//             <span className="uppercase">B. R. Ambedkar Open University</span>
+//           </h1>
+
+//           <h2
+//             className="
+//               font-extrabold text-black leading-snug mt-1 capitalize
+//               text-[15px] sm:text-[20px] md:text-[24px] lg:text-[30px]
+//             "
+//           >
+//             Electronic Media Resources & Research Centre
+//           </h2>
+
+//           {/* EMR&RC – centered under text */}
+//           <h3
+//             className="
+//               font-extrabold text-black mt-2 uppercase self-center
+//               text-[13px] sm:text-[15px] md:text-[20px]
+//             "
+//           >
+//             (EMR&RC)
+//           </h3>
+
+//         </div>
+
+//         {/* ===== RIGHT: ICONS (MOVED RIGHT + BIGGER) ===== */}
+//         <div className="flex items-center gap-10 justify-end">
+
+//           {/* NAAC */}
+//           <motion.img
+//             variants={iconVariants}
+//             whileHover="hover"
+//             src="/pictures/PNG[1] 1.png"
+//             alt="NAAC A Grade"
+//             className="h-[80px] md:h-[100px] lg:h-[120px] w-auto object-contain"
+//           />
+
+//           {/* Dr. Ambedkar portrait */}
+//           <motion.div
+//             variants={iconVariants}
+//             whileHover="hover"
+//             className="
+//               rounded-full overflow-hidden border border-gray-300
+//               h-[85px] w-[85px]
+//               md:h-[105px] md:w-[105px]
+//               lg:h-[125px] lg:w-[125px]
+//             "
+//           >
+//             <img
+//               src="https://braou.ac.in/assets/images/user/braou-ambedkar.jpg"
+//               alt="Dr. Ambedkar"
+//               className="h-full w-full object-cover"
+//             />
+//           </motion.div>
+
+//           {/* Telangana Rising */}
+//           <motion.img
+//             variants={iconVariants}
+//             whileHover="hover"
+//             src="https://braou.ac.in/assets/images/user/RisingLogo.jpg"
+//             alt="Telangana Rising"
+//             className="h-[80px] md:h-[100px] lg:h-[120px] w-auto object-contain"
+//           />
+//         </div>
+
+//       </div>
+//     </header>
+//   );
+// };
+
+// export default Header;
+
+
+
 import React from "react";
 import { motion } from "framer-motion";
-
-const iconVariants = {
-  hover: { scale: 1.05, transition: { duration: 0.2 } },
-};
 
 const Header = () => {
   return (
     <header className="w-full bg-white border-b border-gray-300 shadow-sm">
       <div
         className="
-          w-full max-w-[1900px] mx-auto px-8 py-4
-          grid grid-cols-[auto_1fr_auto]
-          items-center
+          w-full max-w-[1900px] mx-auto px-4 md:px-8 py-4
+          flex items-center
+          gap-4 md:gap-6
         "
       >
-
-        {/* ===== LEFT: UNIVERSITY LOGO ===== */}
-        <div className="flex items-center">
+        {/* LEFT: LOGO (ALWAYS LEFT) */}
+        <div className="flex-shrink-0">
           <motion.img
             whileHover={{ scale: 1.03 }}
             src="/pictures/Logo_C_PNG[1] 1.png"
             alt="University Logo"
-            className="h-[80px] md:h-[105px] lg:h-[120px] w-auto object-contain"
+            className="h-[55px] sm:h-[65px] md:h-[90px] lg:h-[110px] w-auto object-contain"
           />
         </div>
 
-        {/* ===== CENTER: TEXT BLOCK ===== */}
-        <div className="flex flex-col items-start text-left px-10">
-
+        {/* CENTER / RIGHT: TEXT */}
+        <div
+          className="
+            flex-1 flex flex-col
+            items-start
+            text-left
+          "
+        >
           <h1
             className="
               font-extrabold text-black tracking-tight leading-tight
-              text-[20px] sm:text-[26px] md:text-[34px] lg:text-[36px]
+              text-[16px] sm:text-[18px] md:text-[28px] lg:text-[34px]
             "
           >
             <span className="normal-case">Dr.</span>{" "}
@@ -157,64 +268,48 @@ const Header = () => {
           <h2
             className="
               font-extrabold text-black leading-snug mt-1 capitalize
-              text-[15px] sm:text-[20px] md:text-[24px] lg:text-[30px]
+              text-[13px] sm:text-[15px] md:text-[20px] lg:text-[28px]
             "
           >
             Electronic Media Resources & Research Centre
           </h2>
 
-          {/* EMR&RC – centered under text */}
           <h3
             className="
-              font-extrabold text-black mt-2 uppercase self-center
-              text-[13px] sm:text-[15px] md:text-[20px]
+              font-bold text-black mt-2 uppercase
+              text-[12px] sm:text-[13px] md:text-[16px]
+              self-start text-center
             "
           >
             (EMR&RC)
           </h3>
-
         </div>
 
-        {/* ===== RIGHT: ICONS (MOVED RIGHT + BIGGER) ===== */}
-        <div className="flex items-center gap-10 justify-end">
-
-          {/* NAAC */}
-          <motion.img
-            variants={iconVariants}
-            whileHover="hover"
+        {/* RIGHT ICONS – LARGE SCREENS ONLY */}
+        <div className="hidden md:flex items-center gap-8 ml-auto">
+          <img
             src="/pictures/PNG[1] 1.png"
             alt="NAAC A Grade"
-            className="h-[80px] md:h-[100px] lg:h-[120px] w-auto object-contain"
+            className="h-[70px] lg:h-[90px] w-auto object-contain"
           />
 
-          {/* Dr. Ambedkar portrait */}
-          <motion.div
-            variants={iconVariants}
-            whileHover="hover"
-            className="
-              rounded-full overflow-hidden border border-gray-300
-              h-[85px] w-[85px]
-              md:h-[105px] md:w-[105px]
-              lg:h-[125px] lg:w-[125px]
-            "
+          <div
+            className="rounded-full overflow-hidden border
+                       h-[75px] w-[75px] lg:h-[95px] lg:w-[95px]"
           >
             <img
               src="https://braou.ac.in/assets/images/user/braou-ambedkar.jpg"
               alt="Dr. Ambedkar"
               className="h-full w-full object-cover"
             />
-          </motion.div>
+          </div>
 
-          {/* Telangana Rising */}
-          <motion.img
-            variants={iconVariants}
-            whileHover="hover"
+          <img
             src="https://braou.ac.in/assets/images/user/RisingLogo.jpg"
             alt="Telangana Rising"
-            className="h-[80px] md:h-[100px] lg:h-[120px] w-auto object-contain"
+            className="h-[70px] lg:h-[90px] w-auto object-contain"
           />
         </div>
-
       </div>
     </header>
   );
