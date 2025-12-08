@@ -410,7 +410,7 @@ const DEFAULT_INFO_SERVICES = [
     fullDesc:
       "BRAOU conducts interactive live tele-conference programs every Thursday from 2–3 PM on different subjects. They are broadcast on the BRAOU YouTube channel and T-SAT NIPUNA, and students can clarify their doubts through the live session by calling 040-23680456.",
     mobileColor: "bg-[#22b9d3]",
-    layout: { top: "18%", left: "22%", width: "22%", height: "11%" },
+    layout: { top: "20%", left: "22%", width: "22%", height: "11%" },
   },
   {
     id: 2,
@@ -473,10 +473,8 @@ const Home = ({ onInitialLoadDone }) => {
   const [sliderImages, setSliderImages] = useState(DEFAULT_IMAGES);
   const [tickerItems, setTickerItems] = useState(DEFAULT_TICKER_NEWS);
   const [infoServices, setInfoServices] = useState(DEFAULT_INFO_SERVICES); // NEW
-  const [loading, setLoading] = useState(() => {
-    return sessionStorage.setItem("home_loaded", "true");
+ const [loading, setLoading] = useState(true);
 
-  });
 
   // useEffect(() => {
   //   const fetchData = async () => {
