@@ -237,7 +237,7 @@ const Header = () => {
           gap-4 md:gap-6
         "
       >
-        {/* LEFT: LOGO (ALWAYS LEFT) */}
+        
         <div className="flex-shrink-0">
           <motion.img
             whileHover={{ scale: 1.03 }}
@@ -247,7 +247,7 @@ const Header = () => {
           />
         </div>
 
-        {/* CENTER / RIGHT: TEXT */}
+      
         <div
           className="
             flex-1 flex flex-col
@@ -286,18 +286,16 @@ const Header = () => {
 
         </div>
 
-        {/* RIGHT ICONS – LARGE SCREENS ONLY */}
-        {/* RIGHT ICONS – LARGE SCREENS ONLY */}
 <div className="hidden md:flex items-center gap-20 ml-auto">
 
-  {/* NAAC */}
+ 
   <img
     src="/pictures/PNG[1] 1.png"
     alt="NAAC A Grade"
     className="h-[85px] lg:h-[110px] xl:h-[120px] w-auto object-contain"
   />
 
-  {/* Dr. Ambedkar */}
+ 
   <div
     className="rounded-full overflow-hidden border
                h-[90px] w-[90px]
@@ -311,7 +309,7 @@ const Header = () => {
     />
   </div>
 
-  {/* Telangana Rising */}
+
   <img
     src="/pictures/Group 88.png"
     alt="Telangana Rising"

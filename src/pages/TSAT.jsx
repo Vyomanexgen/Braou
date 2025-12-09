@@ -1,8 +1,85 @@
 import React from "react";
 import Footer from "../components/Footer";
+import { useEffect, useState } from "react";
+
+const DEFAULT_VIDYA = {
+  timings: "1:00–2:00 PM",
+  logo: "/pictures/VIDYA.png",
+  schedule_pdf: null
+};
+
+const DEFAULT_NIPUNA = {
+  timings: "2:00–3:00 PM",
+  logo: "/pictures/NIPUNA.png",
+  schedule_pdf: null
+};
+
 
 const TSAT = () => {
+ const [vidya, setVidya] = useState(DEFAULT_VIDYA);
+const [nipuna, setNipuna] = useState(DEFAULT_NIPUNA);
+
+
+  const BASE_API = import.meta.env.VITE_BASE_API;
+
+
+  useEffect(() => {
+  const fetchTSAT = async () => {
+   try {
+  const [vidyaRes, nipunaRes] = await Promise.all([
+    fetch(`${BASE_API}/tsat/vidya`),
+    fetch(`${BASE_API}/tsat/nipuna`)
+  ]);
+
+  // ✅ VIDYA (object, not array)
+  if (vidyaRes.ok) {
+    const v = await vidyaRes.json();
+
+    if (v?.data) {
+  setVidya({
+    ...DEFAULT_VIDYA,
+    timings: v.data.timings,
+    date: v.data.date,
+    logo:
+      typeof v.data.logo === "string" && v.data.logo.trim() !== ""
+        ? v.data.logo
+        : DEFAULT_VIDYA.logo,
+    schedule_pdf:
+      typeof v.data.schedule_pdf === "string" &&
+      v.data.schedule_pdf.trim() !== ""
+        ? v.data.schedule_pdf
+        : null,
+  });
+}
+
+  }
+
+  // ✅ NIPUNA (object, not array)
+  if (nipunaRes.ok) {
+    const n = await nipunaRes.json();
+
+    if (n?.data) {
+      setNipuna({
+        ...DEFAULT_NIPUNA,
+        timings: n.data.timings,
+        date: n.data.date,
+        logo: n.data.logo || DEFAULT_NIPUNA.logo,
+        schedule_pdf: n.data.schedule_pdf || null,
+      });
+    }
+  }
+} catch (error) {
+  // backend failed → defaults stay
+  console.warn("TSAT API failed, using defaults", error);
+}
+
+  };
+
+  fetchTSAT();
+}, []);
+
   return (
+    
     <>
       <main
         className="w-full flex flex-col min-h-screen bg-cover bg-center bg-no-repeat font-[Arial]"
@@ -100,17 +177,23 @@ const TSAT = () => {
               }}
             >
               <img
-                src="/pictures/VIDYA.png"
-                className="w-16 h-20 md:w-20 md:h-24 mb-3"
-              />
+  src={vidya.logo}
+  className="w-16 h-20 md:w-20 md:h-24 mb-3"
+  onError={(e) => {
+    e.currentTarget.src = DEFAULT_VIDYA.logo;
+  }}
+/>
 
               <h2 className="text-2xl md:text-3xl font-bold text-black leading-tight">
                 T-SAT (Vidya)
               </h2>
-
+<p className="mt-2 md:mt-3 text-lg md:text-2xl font-bold text-black">
+ Date:{vidya.date}
+</p>
               <p className="mt-2 md:mt-3 text-lg md:text-2xl font-bold text-black">
-                Timings: 1:00–2:00PM
-              </p>
+  Timings: {vidya.timings}
+</p>
+
 
               {/* RESPONSIVE BUTTON (hover + mobile tap fix) */}
               <button
@@ -131,7 +214,10 @@ const TSAT = () => {
                       #000000 100%
                     )
                   `,
-                }}
+                }}  onClick={() =>
+    vidya.schedule_pdf &&
+    window.open(vidya.schedule_pdf, "_blank")
+  }
               >
                 Schedule
               </button>
@@ -163,9 +249,11 @@ const TSAT = () => {
               <h2 className="text-2xl md:text-3xl font-bold text-black leading-tight">
                 T-SAT (Nipuna)
               </h2>
-
+               <p className="mt-2 md:mt-3 text-lg md:text-2xl font-bold text-black">
+  Date:{nipuna.date}
+</p>
               <p className="mt-2 md:mt-3 text-lg md:text-2xl font-bold text-black">
-                Timings: 2:00–3:00PM
+                Timings: {nipuna.timings}
               </p>
 
               {/* RESPONSIVE BUTTON (hover + mobile tap fix) */}
@@ -187,7 +275,10 @@ const TSAT = () => {
                       #000000 100%
                     )
                   `,
-                }}
+                }}  onClick={() =>
+    nipuna.schedule_pdf &&
+    window.open(nipuna.schedule_pdf, "_blank")
+  }
               >
                 Schedule
               </button>
