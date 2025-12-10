@@ -548,27 +548,17 @@ const [infoServices, setInfoServices] = useState(DEFAULT_INFO_SERVICES);
       setLoading(true);
 
       const sliderRes = await fetch(ADMIN_SLIDER_API_URL).catch(() => null);
-    //   if (sliderRes?.ok) {
-    //      const result = await sliderRes.json();
-    //      if (Array.isArray(result.data) && result.data.length > 0) {
-    //       const sortedImages = result.data
-    //   .sort((a, b) => a.priority - b.priority)
-    //   .map(item => item.url);
-
-    // setSliderImages(sortedImages);
-    //     }
-    //   }
-if (sliderRes.ok) {
-  const result = await sliderRes.json();
-
-  if (Array.isArray(result.data) && result.data.length > 0) {
-    const images = result.data
+      if (sliderRes?.ok) {
+         const result = await sliderRes.json();
+         if (Array.isArray(result.data) && result.data.length > 0) {
+          const sortedImages = result.data
       .sort((a, b) => a.priority - b.priority)
       .map(item => item.url);
 
-    setSliderImages(images);
-  }
-}
+    setSliderImages(sortedImages);
+        }
+      }
+
       // const tickerRes = await fetch(ADMIN_TICKER_API_URL).catch(() => null);
       // if (tickerRes?.ok) {
       //   const tData = await tickerRes.json();
