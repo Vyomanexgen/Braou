@@ -55,19 +55,35 @@ const [nipuna, setNipuna] = useState(DEFAULT_NIPUNA);
   }
 
   // ✅ NIPUNA (object, not array)
-  if (nipunaRes.ok) {
-    const n = await nipunaRes.json();
+if (nipunaRes.ok) {
+  const n = await nipunaRes.json();
+console.log("NIPUNA STATE:", nipuna);
 
-    if (n?.data) {
-      setNipuna({
-        ...DEFAULT_NIPUNA,
-        timings: n.data.timings,
-        date: n.data.date,
-        logo: n.data.logo || DEFAULT_NIPUNA.logo,
-        schedule_pdf: n.data.schedule_pdf || null,
-      });
-    }
+  let latestNipuna = null;
+
+  // ✅ Case 1: backend returns array
+  if (Array.isArray(n?.data) && n.data.length > 0) {
+    latestNipuna = n.data.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    )[0];
   }
+
+  // ✅ Case 2: backend returns single object
+  if (!Array.isArray(n?.data) && n?.data?.schedule_pdf) {
+    latestNipuna = n.data;
+  }
+
+  if (latestNipuna) {
+    setNipuna({
+      ...DEFAULT_NIPUNA,
+      timings: latestNipuna.timings,
+      date: latestNipuna.date,
+      logo: latestNipuna.logo || DEFAULT_NIPUNA.logo,
+      schedule_pdf: latestNipuna.schedule_pdf,
+    });
+  }
+}
+
 } catch (error) {
   // backend failed → defaults stay
   console.warn("TSAT API failed, using defaults", error);
@@ -275,9 +291,10 @@ const [nipuna, setNipuna] = useState(DEFAULT_NIPUNA);
                       #000000 100%
                     )
                   `,
-                }}  onClick={() =>
+                }} 
+                 onClick={() =>
     nipuna.schedule_pdf &&
-    window.open(nipuna.schedule_pdf, "_blank")
+   window.open(`${nipuna.schedule_pdf}?v=${Date.now()}`, "_blank")
   }
               >
                 Schedule

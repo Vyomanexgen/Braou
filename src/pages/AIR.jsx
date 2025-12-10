@@ -131,35 +131,32 @@ const AIR = () => {
   const [pdfUrl, setPdfUrl] = useState("");
 
   useEffect(() => {
-    const fetchAirData = async () => {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_BASE_API}/air`
+  const fetchAirData = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BASE_API}/air`);
+      if (!res.ok) return;
+
+      const result = await res.json();
+      const airData = result?.data;
+
+      if (Array.isArray(airData) && airData.length > 0) {
+        const latestAir = airData.reduce((latest, item) =>
+          new Date(item.updatedAt) > new Date(latest.updatedAt)
+            ? item
+            : latest
         );
 
-        if (!res.ok) return;
-
-        const result = await res.json();
-        const airData = result?.data;
-
-        if (Array.isArray(airData) && airData.length > 0) {
-          // ✅ pick latest updated record
-          const latestAir = airData.reduce((latest, item) =>
-            new Date(item.updatedAt) > new Date(latest.updatedAt)
-              ? item
-              : latest
-          );
-
-          setScrollText(latestAir.scrolling_text || "");
-          setPdfUrl(latestAir.pdf || "");
-        }
-      } catch (error) {
-        console.error("Failed to load AIR data:", error);
+        setScrollText(latestAir.scrolling_text || "");
+        setPdfUrl(latestAir.pdf_url || ""); // ✅ FIXED
       }
-    };
+    } catch (error) {
+      console.error("Failed to load AIR data:", error);
+    }
+  };
 
-    fetchAirData();
-  }, []);
+  fetchAirData();
+}, []);
+
 
   return (
     <>

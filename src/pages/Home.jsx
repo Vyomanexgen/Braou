@@ -540,26 +540,42 @@ const Home = ({ onInitialLoadDone }) => {
 const [tickerItems, setTickerItems] = useState(DEFAULT_TICKER_NEWS);
 const [infoServices, setInfoServices] = useState(DEFAULT_INFO_SERVICES);
 
+
+
   useEffect(() => {
   const fetchData = async () => {
     try {
       setLoading(true);
 
       const sliderRes = await fetch(ADMIN_SLIDER_API_URL).catch(() => null);
-      if (sliderRes?.ok) {
-        const sData = await sliderRes.json();
-        if (Array.isArray(sData) && sData.length > 0) {
-          setSliderImages(sData);
-        }
-      }
+    //   if (sliderRes?.ok) {
+    //      const result = await sliderRes.json();
+    //      if (Array.isArray(result.data) && result.data.length > 0) {
+    //       const sortedImages = result.data
+    //   .sort((a, b) => a.priority - b.priority)
+    //   .map(item => item.url);
 
-      const tickerRes = await fetch(ADMIN_TICKER_API_URL).catch(() => null);
-      if (tickerRes?.ok) {
-        const tData = await tickerRes.json();
-        if (Array.isArray(tData) && tData.length > 0) {
-          setTickerItems(tData);
-        }
-      }
+    // setSliderImages(sortedImages);
+    //     }
+    //   }
+if (sliderRes.ok) {
+  const result = await sliderRes.json();
+
+  if (Array.isArray(result.data) && result.data.length > 0) {
+    const images = result.data
+      .sort((a, b) => a.priority - b.priority)
+      .map(item => item.url);
+
+    setSliderImages(images);
+  }
+}
+      // const tickerRes = await fetch(ADMIN_TICKER_API_URL).catch(() => null);
+      // if (tickerRes?.ok) {
+      //   const tData = await tickerRes.json();
+      //   if (Array.isArray(tData) && tData.length > 0) {
+      //     setTickerItems(tData);
+      //   }
+      // }
 
             // ---------- HOME HEADING ----------
       try {
@@ -568,12 +584,77 @@ const [infoServices, setInfoServices] = useState(DEFAULT_INFO_SERVICES);
           const homeJson = await homeRes.json();
 
           // Postman shows: { status, message, data: { heading: "...", ... } }
-          if (homeJson?.data) {
-            setHomeContent((prev) => ({
-              ...prev,         // keep DEFAULT_HOME values
-              ...homeJson.data // backend overrides heading or adds more
-            }));
-          }
+         if (homeJson?.data) {
+  setHomeContent((prev) => ({
+    ...prev,
+    ...homeJson.data,
+  }));
+
+  // ✅ OPTION 2: Derive popup descriptions from heading_cat_*
+setInfoServices((prev) =>
+  prev.map((item) => {
+    switch (item.id) {
+      case 1:
+        return {
+          ...item,
+          fullDesc: `${homeJson.data.heading_cat_live} programs are conducted regularly with expert faculty through interactive live sessions.`,
+        };
+
+      case 2:
+        return {
+          ...item,
+          fullDesc: `${homeJson.data.heading_cat_vidyagani} provides digital learning resources including audio lessons, video lectures, and recorded sessions.`,
+        };
+
+      case 3:
+        return {
+          ...item,
+          fullDesc: [
+            `${homeJson.data.heading_cat_youtube} offers subject-wise video lessons.`,
+            `Recorded university programs and special lectures.`,
+            `Academic updates and student guidance content.`,
+          ],
+        };
+
+      case 4:
+        return {
+          ...item,
+          fullDesc: `${homeJson.data.heading_cat_tsat} broadcasts EMR&RC lessons through Vidya and Nipuna channels with scheduled telecasts.`,
+        };
+
+      case 5:
+        return {
+          ...item,
+          fullDesc: `${homeJson.data.heading_cat_air}`,
+        };
+
+      case 6:
+        return {
+          ...item,
+          fullDesc: `${homeJson.data.heading_cat_web_radio} streams live radio programs, podcasts, and real-time academic updates for students.`,
+        };
+
+      default:
+        return item;
+    }
+  })
+);
+
+// demo
+  // ✅ IMPORTANT: Replace popup content from backend
+if (Array.isArray(homeJson.data.info_services)) {
+  setInfoServices(homeJson.data.info_services);
+}
+
+  // ✅ USE heading_description as ticker
+  if (
+    Array.isArray(homeJson.data.heading_description) &&
+    homeJson.data.heading_description.length > 0
+  ) {
+    setTickerItems(homeJson.data.heading_description);
+  }
+}
+
         }
       } catch (e) {
         console.warn("Failed to load /home. Using default heading.");
