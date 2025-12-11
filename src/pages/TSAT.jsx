@@ -32,27 +32,44 @@ const [nipuna, setNipuna] = useState(DEFAULT_NIPUNA);
   ]);
 
   // ✅ VIDYA (object, not array)
-  if (vidyaRes.ok) {
-    const v = await vidyaRes.json();
+ // VIDYA (handle array or object)
+// VIDYA (handle array or object)
+if (vidyaRes.ok) {
+  const v = await vidyaRes.json();
 
-    if (v?.data) {
-  setVidya({
-    ...DEFAULT_VIDYA,
-    timings: v.data.timings,
-    date: v.data.date,
-    logo:
-      typeof v.data.logo === "string" && v.data.logo.trim() !== ""
-        ? v.data.logo
-        : DEFAULT_VIDYA.logo,
-    schedule_pdf:
-      typeof v.data.schedule_pdf === "string" &&
-      v.data.schedule_pdf.trim() !== ""
-        ? v.data.schedule_pdf
-        : null,
-  });
+  let latestVidya = null;
+
+  // Case 1: data is array → pick the newest record
+  if (Array.isArray(v?.data) && v.data.length > 0) {
+    latestVidya = v.data
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+  }
+
+  // Case 2: data is single object
+  if (!Array.isArray(v?.data) && v?.data) {
+    latestVidya = v.data;
+  }
+
+  if (latestVidya) {
+    setVidya({
+      ...DEFAULT_VIDYA,
+      timings: latestVidya.timings,
+      date: latestVidya.date,
+
+      // SWAPPED FIELDS
+      logo:
+        typeof latestVidya.schedule_pdf === "string"
+          ? latestVidya.schedule_pdf
+          : DEFAULT_VIDYA.logo,
+
+      schedule_pdf:
+        typeof latestVidya.logo === "string"
+          ? latestVidya.logo
+          : null,
+    });
+  }
 }
 
-  }
 
   // ✅ NIPUNA (object, not array)
 if (nipunaRes.ok) {

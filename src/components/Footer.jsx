@@ -304,6 +304,21 @@ import { FaFacebookF, FaLinkedinIn, FaYoutube, FaInstagram, FaEnvelope, FaPhoneA
 import { FaXTwitter } from 'react-icons/fa6';
 
 const CONTACT_API_URL = `${import.meta.env.VITE_BASE_API}/footer-contact`;
+const decodeHtml = (str) => {
+  if (!str) return "";
+  const txt = document.createElement("textarea");
+  txt.innerHTML = str;
+  return txt.value;
+};
+
+
+const DEFAULT_CONTACT = {
+  name: "Director Name Not Available",
+  designation: "Designation will appear here",
+  email: "contact@example.com",
+  phone: "000-000-0000"
+};
+
 
 const Footer = () => {
   const [contactData, setContactData] = useState({
@@ -312,6 +327,7 @@ const Footer = () => {
     email: "",
     phone: ""
   });
+
 
   useEffect(() => {
     const fetchContactDetails = async () => {
@@ -326,9 +342,35 @@ const Footer = () => {
         const result = await response.json();
 
         // Backend response is: { status: "success", data: {...} }
-        if (result?.data) {
-          setContactData(result.data);
-        }
+      let contact = null;
+
+// Case 1: { data: { ... } }
+if (result?.data && !Array.isArray(result.data)) {
+  contact = result.data;
+}
+
+// Case 2: { data: [ { ... } ] }
+else if (Array.isArray(result.data) && result.data.length > 0) {
+  contact = result.data[0];
+}
+
+// Case 3: { footer: { ... } }
+else if (result?.footer) {
+  contact = result.footer;
+}
+
+// Case 4: No backend content → use defaults
+if (!contact) {
+  setContactData(DEFAULT_CONTACT);
+} else {
+  setContactData({
+    name: decodeHtml(contact.name || DEFAULT_CONTACT.name),
+    designation: decodeHtml(contact.designation || DEFAULT_CONTACT.designation),
+    email: decodeHtml(contact.email || DEFAULT_CONTACT.email),
+    phone: decodeHtml(contact.phone || DEFAULT_CONTACT.phone),
+  });
+}
+
       } catch (error) {
         console.error("Error fetching contact data:", error);
       }
