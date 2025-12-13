@@ -437,32 +437,23 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
 const ADMIN_SLIDER_API_URL = `${import.meta.env.VITE_BASE_API}/carousel`;
-const ADMIN_TICKER_API_URL = "http://localhost:5000/api/ticker-news";
-const ADMIN_INFO_API_URL = "http://localhost:5000/api/info-services";
 
-
+// --- DEFAULTS ---
 const DEFAULT_IMAGES = [
-  "https://placehold.co/1920x543/000000/ffffff?text=Slide+1+(1920x543)",
+   "https://placehold.co/1920x543/000000/ffffff?text=Slide+1+(1920x543)",
   "https://placehold.co/1920x543/004d4d/ffffff?text=Slide+2+Educational+Broadcasting",
   "https://placehold.co/1920x543/00aaaa/ffffff?text=Slide+3+EMR%26RC+Events",
   "https://placehold.co/1920x543/000000/ffffff?text=Slide+4+Student+Resources",
   "https://placehold.co/1920x543/004d4d/ffffff?text=Slide+5+Research+Initiatives",
   "https://placehold.co/1920x543/00aaaa/ffffff?text=Slide+6+Community+Outreach",
+
+
 ];
-
-const decodeHtml = (text = "") => {
-  const txt = document.createElement("textarea");
-  txt.innerHTML = text;
-  return txt.value;
-};
-
 
 const DEFAULT_TICKER_NEWS = [
   "Admission notifications for the academic year 2025 are now officially open online",
-  "New video lectures regarding advanced data science have been uploaded to the portal",
-  "Live teleconference sessions will be held every Thursday from 2 PM to 3 PM",
-  "Students can now download the latest examination schedule from the university website",
 ];
 
 const DEFAULT_INFO_SERVICES = [
@@ -479,8 +470,8 @@ const DEFAULT_INFO_SERVICES = [
     fullDesc:
       "Vidyagani (vidyagani.braou.ac.in) is Dr. B.R. Ambedkar Open University’s digital learning portal. It offers students audio lessons, video lectures, and teleconference recordings to support flexible, open-distance learning. The platform enables learners to access and download multimedia study materials anytime, forming an integral part of the university’s online academic support system.",
     mobileColor: "bg-[#fca51f]",
-    layout: { top: "17%", right: "11%", width: "23%", height: "11%" },
-    buttonLayout: { bottom: "6%", left: "30%", width: "36%", height: "22px" },
+    layout: { top: "16.5%", right: "11%", width: "23%", height: "11%" },
+    buttonLayout: { bottom: "8%", left: "30%", width: "36%", height: "22px" },
   },
   {
     id: 3,
@@ -525,238 +516,141 @@ const DEFAULT_HOME = {
   heading: "Welcome To EMR&RC - Educational Broadcasting",
 };
 
-
+const decodeHtml = (text = "") => {
+  const txt = document.createElement("textarea");
+  txt.innerHTML = text;
+  return txt.value;
+};
 
 // ============================================================================
 // HOME COMPONENT
 // ============================================================================
-const Home = ({ onInitialLoadDone }) => {
+const Home = () => {
   const [sliderImages, setSliderImages] = useState(DEFAULT_IMAGES);
-  const [loading, setLoading] = useState(() => {
-    return sessionStorage.setItem("home_loaded", "true");
-
-  });
   const [homeContent, setHomeContent] = useState(DEFAULT_HOME);
-const [tickerItems, setTickerItems] = useState(DEFAULT_TICKER_NEWS);
-const [infoServices, setInfoServices] = useState(DEFAULT_INFO_SERVICES);
+  const [tickerItems, setTickerItems] = useState(DEFAULT_TICKER_NEWS);
+  const [infoServices, setInfoServices] = useState(DEFAULT_INFO_SERVICES);
 
-
-
+  // Fetch Data (Quietly in background while App.jsx loader is spinning)
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-
-      const sliderRes = await fetch(ADMIN_SLIDER_API_URL).catch(() => null);
-      if (sliderRes?.ok) {
-         const result = await sliderRes.json();
-         if (Array.isArray(result.data) && result.data.length > 0) {
-          const sortedImages = result.data
-      .sort((a, b) => a.priority - b.priority)
-      .map(item => item.url);
-
-    setSliderImages(sortedImages);
-        }
-      }
-
-      // const tickerRes = await fetch(ADMIN_TICKER_API_URL).catch(() => null);
-      // if (tickerRes?.ok) {
-      //   const tData = await tickerRes.json();
-      //   if (Array.isArray(tData) && tData.length > 0) {
-      //     setTickerItems(tData);
-      //   }
-      // }
-
-            // ---------- HOME HEADING ----------
+    const fetchData = async () => {
       try {
+        // 1. Fetch Carousel
+        const sliderRes = await fetch(ADMIN_SLIDER_API_URL).catch(() => null);
+        if (sliderRes?.ok) {
+          const result = await sliderRes.json();
+          if (Array.isArray(result.data)) {
+            const sortedImages = result.data
+              .sort((a, b) => a.priority - b.priority)
+              .map((item) => item.url?.trim())
+              // ✅ FIX: Remove empty or null images here
+              .filter(url => url && url.length > 5); 
+
+            if (sortedImages.length > 0) {
+              setSliderImages(sortedImages);
+            }
+          }
+        }
+
+        // 2. Fetch Home Content
         const homeRes = await fetch(`${import.meta.env.VITE_BASE_API}/home`);
         if (homeRes.ok) {
           const homeJson = await homeRes.json();
+        if (homeJson?.data) {
+  const h = homeJson.data;
 
-          // Postman shows: { status, message, data: { heading: "...", ... } }
-         if (homeJson?.data) {
-  setHomeContent((prev) => ({
-    ...prev,
-    ...homeJson.data,
-  }));
+  setHomeContent((prev) => ({ ...prev, ...h }));
 
-  // ✅ OPTION 2: Derive popup descriptions from heading_cat_*
-setInfoServices((prev) =>
-  prev.map((item) => {
-    switch (item.id) {
-      case 1:
-        return {
-          ...item,
-          fullDesc: `${homeJson.data.heading_cat_live} programs are conducted regularly with expert faculty through interactive live sessions.`,
-        };
+  // 🔥 Build Info Services dynamically from backend headings
+ const updatedInfo = [
+            {
+              ...DEFAULT_INFO_SERVICES[0],
+              fullDesc: decodeHtml(h.heading_cat_live || DEFAULT_INFO_SERVICES[0].fullDesc)
+            },
+            {
+              ...DEFAULT_INFO_SERVICES[1],
+              fullDesc: decodeHtml(h.heading_cat_vidyagani || DEFAULT_INFO_SERVICES[1].fullDesc)
+            },
+            {
+              ...DEFAULT_INFO_SERVICES[2],
+              fullDesc: decodeHtml(h.heading_cat_youtube || DEFAULT_INFO_SERVICES[2].fullDesc)
+            },
+            {
+              ...DEFAULT_INFO_SERVICES[3],
+              fullDesc: decodeHtml(h.heading_cat_tsat || DEFAULT_INFO_SERVICES[3].fullDesc)
+            },
+            {
+              ...DEFAULT_INFO_SERVICES[4],
+              fullDesc: decodeHtml(h.heading_cat_air || DEFAULT_INFO_SERVICES[4].fullDesc)
+            },
+            {
+              ...DEFAULT_INFO_SERVICES[5],
+              fullDesc: decodeHtml(h.heading_cat_web_radio || DEFAULT_INFO_SERVICES[5].fullDesc)
+            }
+          ];
 
-      case 2:
-        return {
-          ...item,
-          fullDesc: `${homeJson.data.heading_cat_vidyagani} provides digital learning resources including audio lessons, video lectures, and recorded sessions.`,
-        };
+          setInfoServices(updatedInfo);
 
-      case 3:
-        return {
-          ...item,
-          fullDesc: [
-            `${homeJson.data.heading_cat_youtube} offers subject-wise video lessons.`,
-            `Recorded university programs and special lectures.`,
-            `Academic updates and student guidance content.`,
-          ],
-        };
-
-      case 4:
-        return {
-          ...item,
-          fullDesc: `${homeJson.data.heading_cat_tsat} broadcasts EMR&RC lessons through Vidya and Nipuna channels with scheduled telecasts.`,
-        };
-
-      case 5:
-        return {
-          ...item,
-          fullDesc: `${homeJson.data.heading_cat_air}`,
-        };
-
-      case 6:
-        return {
-          ...item,
-          fullDesc: `${homeJson.data.heading_cat_web_radio} streams live radio programs, podcasts, and real-time academic updates for students.`,
-        };
-
-      default:
-        return item;
-    }
-  })
-);
-
-// demo
-  // ✅ IMPORTANT: Replace popup content from backend
-if (Array.isArray(homeJson.data.info_services)) {
-  setInfoServices(homeJson.data.info_services);
-}
-
-  // ✅ USE heading_description as ticker
-  if (
-    Array.isArray(homeJson.data.heading_description) &&
-    homeJson.data.heading_description.length > 0
-  ) {
-    setTickerItems(homeJson.data.heading_description);
-  }
-}
-
+          if (Array.isArray(h.heading_description)) {
+            setTickerItems(h.heading_description);
+          }
         }
-      } catch (e) {
-        console.warn("Failed to load /home. Using default heading.");
       }
-
-    } catch (err) {
-      console.warn("Home Data API failed, using defaults.");
-    } finally {
-      setTimeout(() => {
-        setLoading(false);
-        onInitialLoadDone?.();
-      }, 500);
+    } catch (error) {
+      console.warn("Home Data fetch failed, using defaults.");
     }
   };
 
   fetchData();
 }, []);
 
-useEffect(() => {
-  const fetchHome = async () => {
-    try {
-      const res = await fetch(`${import.meta.env.VITE_BASE_API}/home`);
-      if (!res.ok) return;
-      const json = await res.json();
-      if (json?.data) setHomeData(json.data);
-    } catch {}
-  };
-  fetchHome();
-}, []);
-
-
-  if (loading) {
-    return <PageLoader />;
-  }
-
   return (
     <main
       className="w-full overflow-x-hidden flex flex-col min-h-screen bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: "url('/pictures/website BG Final.jpg')" }}
     >
-      {sliderImages && sliderImages.length > 0 && (
-        <HeroSlider images={sliderImages} />
-      )}
+      <HeroSlider images={sliderImages} />
 
       <section className="w-full py-6 md:py-10 px-4 text-center">
-         <h1
-    className="font-black uppercase tracking-wide text-slate-900 text-[clamp(18px,4vw,32px)]"
-    style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
-  >
-    {decodeHtml(homeContent.heading)}
-  </h1>
-
-
+        <h1
+          className="font-black uppercase tracking-wide text-slate-900 text-[clamp(18px,4vw,32px)]"
+          style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
+        >
+          {decodeHtml(homeContent.heading)}
+        </h1>
       </section>
 
       <NewsTicker news={tickerItems} />
-      {/* 🔹 Pass dynamic infoServices to InfographicSection */}
       <InfographicSection infoServices={infoServices} />
     </main>
   );
 };
 
-// --- SUB-COMPONENTS ---
-
-const PageLoader = () => (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
-    <motion.div
-      className="w-16 h-16 border-4 border-cyan-200 border-t-cyan-600 rounded-full"
-      animate={{ rotate: 360 }}
-      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-    />
-  </div>
-);
-
-
+// --- SUB-COMPONENTS (HeroSlider, NewsTicker, InfographicSection) ---
+// (Keep these exactly as they were in your code, they are fine)
 
 const HeroSlider = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const timeoutRef = useRef(null);
-  const safeImages = images && images.length > 0 ? images : DEFAULT_IMAGES;
+  const safeImages = Array.isArray(images) && images.length > 0 ? images : DEFAULT_IMAGES;
 
   useEffect(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
-      setCurrentIndex((prev) =>
-        prev === safeImages.length - 1 ? 0 : prev + 1
-      );
+      setCurrentIndex((prev) => (prev === safeImages.length - 1 ? 0 : prev + 1));
     }, 5000);
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
+    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
   }, [currentIndex, safeImages.length]);
 
   return (
-    <div
-      className="
-        relative
-        w-full
-        h-[55vw]
-        sm:h-[40vw]
-        md:aspect-[1920/543]
-        max-h-[540px]
-        overflow-hidden
-        shadow-lg
-        bg-gray-900
-      "
-    >
+    <div className="relative w-full overflow-hidden bg-black h-[80vw] max-h-[700px] sm:h-[50vw] sm:max-h-[550px] md:aspect-[1920/543] md:h-auto">
       <AnimatePresence mode="wait">
         <motion.img
           key={currentIndex}
           src={safeImages[currentIndex]}
-          className="absolute inset-0 w-full h-full object-cover"
+          // ✅ FIX: Hide broken images instantly
+          onError={(e) => { e.target.style.display = 'none'; }}
+          className="absolute inset-0 w-full h-full object-contain md:object-cover"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -765,192 +659,83 @@ const HeroSlider = ({ images }) => {
       </AnimatePresence>
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
         {safeImages.map((_, i) => (
-          <div
-            key={i}
-            onClick={() => setCurrentIndex(i)}
-            className={`h-3 w-3 rounded-full cursor-pointer transition-all ${
-              currentIndex === i ? "bg-cyan-400 w-8" : "bg-white/50"
-            }`}
-          ></div>
+          <div key={i} onClick={() => setCurrentIndex(i)} className={`h-3 w-3 rounded-full cursor-pointer transition-all ${currentIndex === i ? "bg-cyan-400 w-8" : "bg-white/50"}`}></div>
         ))}
       </div>
     </div>
   );
 };
 
+// ... Include NewsTicker and InfographicSection as per your original file ...
+// (I am skipping pasting them here to save space, but you keep them exactly as is)
 
 const NewsTicker = ({ news }) => {
-  const rawNews = news && news.length > 0 ? news : DEFAULT_TICKER_NEWS;
-
- 
-  const repeatedNews = rawNews.length < 10 
-    ? [...rawNews, ...rawNews, ...rawNews, ...rawNews] 
-    : rawNews;
-
-  
-  const [duration, setDuration] = useState(300); 
-
-  useEffect(() => {
-    const handleResize = () => {
-      
-      setDuration(window.innerWidth < 768 ? 200 : 250);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  return (
-    <div className="w-full overflow-hidden py-2 bg-white/20 backdrop-blur-sm">
-      <motion.div
-        className="flex items-center w-max"
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{
-          duration: duration,
-          repeat: Infinity,
-          ease: "linear",
-        }}
-        key={duration}
-      >
-        {/* Block 1 */}
-        <div className="flex items-center">
-          {repeatedNews.map((item, index) => (
-            <span
-              key={`a-${index}`}
-              className="px-10 font-black text-slate-900 text-sm md:text-lg capitalize whitespace-nowrap"
-              style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
-            >
-              {item}
-            </span>
-          ))}
-        </div>
-
-        {/* Block 2 (Duplicate for seamless loop) */}
-        <div className="flex items-center">
-          {repeatedNews.map((item, index) => (
-            <span
-              key={`b-${index}`}
-              className="px-10 font-black text-slate-900 text-sm md:text-lg capitalize whitespace-nowrap"
-              style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
-            >
-              {item}
-            </span>
-          ))}
-        </div>
-      </motion.div>
-    </div>
-  );
-};
-
-const InfographicSection = ({ infoServices }) => {
-  const [selectedFeature, setSelectedFeature] = useState(null);
-
-  return (
-    <section className="w-full py-8 px-2 relative">
-      <div className="max-w-[1200px] mx-auto relative">
-        <img
-          src="/pictures/second.png"
-          className="w-full object-contain select-none"
-          alt="infographic"
-        />
-{infoServices.map((item) => (
-  <div
-    key={item.id}
-    style={item.layout}
-    onClick={() => setSelectedFeature(item)}
-    className="absolute cursor-pointer group"
-  >
-    {/* Desktop only: Know More */}
-    <button
-      className="
-        hidden md:flex
-        absolute
-        bottom-[10%]
-        left-[30%]
-
-        h-[28px]
-        px-3
-
-        items-center justify-center
-        text-[12px]
-        font-bold
-
-        bg-white/50
-        text-white
-        backdrop-blur-md
-        border border-white/30
-        rounded
-
-        transition
-        hover:bg-red-600
-        hover:text-white
-      "
-    >
-      Know more
-    </button>
-  </div>
-))}
-
-
+    const rawNews = news && news.length > 0 ? news : DEFAULT_TICKER_NEWS;
+    const repeatedNews = rawNews.length < 10 
+      ? [...rawNews, ...rawNews, ...rawNews, ...rawNews] 
+      : rawNews;
+    const [duration, setDuration] = useState(300); 
+    useEffect(() => {
+      const handleResize = () => setDuration(window.innerWidth < 768 ? 200 : 250);
+      handleResize();
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
+    return (
+      <div className="w-full overflow-hidden py-2 bg-white/20 backdrop-blur-sm">
+        <motion.div
+          className="flex items-center w-max"
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{ duration: duration, repeat: Infinity, ease: "linear" }}
+          key={duration}
+        >
+          <div className="flex items-center">
+            {repeatedNews.map((item, index) => (
+              <span key={`a-${index}`} className="px-10 font-black text-slate-900 text-sm md:text-lg capitalize whitespace-nowrap" style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}>
+                {item}
+              </span>
+            ))}
+          </div>
+          <div className="flex items-center">
+            {repeatedNews.map((item, index) => (
+              <span key={`b-${index}`} className="px-10 font-black text-slate-900 text-sm md:text-lg capitalize whitespace-nowrap" style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}>
+                {item}
+              </span>
+            ))}
+          </div>
+        </motion.div>
       </div>
-
-      {/* Popup */}
-      <AnimatePresence>
-        {selectedFeature && (
-          <motion.div
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedFeature(null)}
-          >
-            <motion.div
-              className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden"
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className={`${selectedFeature.mobileColor} p-4 flex justify-end`}>
-                <button
-                  onClick={() => setSelectedFeature(null)}
-                  className="text-white bg-white/20 rounded-full w-8 h-8 flex items-center justify-center hover:bg-white/30"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="p-8">
-                <div className="text-slate-700 text-sm sm:text-lg leading-relaxed">
-                  {Array.isArray(selectedFeature.fullDesc) ? (
-                    <ul className="list-disc pl-6 space-y-2">
-                      {selectedFeature.fullDesc.map((point, index) => (
-                        <li key={index}>{point}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p>{selectedFeature.fullDesc}</p>
-                  )}
+    );
+  };
+  
+  const InfographicSection = ({ infoServices }) => {
+    const [selectedFeature, setSelectedFeature] = useState(null);
+    const safeServices = Array.isArray(infoServices) && infoServices.length > 0 ? infoServices : DEFAULT_INFO_SERVICES;
+    return (
+      <section className="w-full py-8 px-2 relative">
+        <div className="max-w-[1200px] mx-auto relative">
+          <img src="/pictures/second.png" className="w-full object-contain select-none" alt="infographic" />
+          {safeServices.map((item) => (
+            <div key={item.id} style={item.layout} onClick={() => setSelectedFeature(item)} className="absolute cursor-pointer group">
+              <button className="hidden md:flex absolute bottom-[10%] left-[30%] h-[28px] px-3 items-center justify-center text-[12px] font-bold bg-white/50 text-white backdrop-blur-md border border-white/30 rounded transition hover:bg-red-600 hover:text-white">Know more</button>
+            </div>
+          ))}
+        </div>
+        <AnimatePresence>
+          {selectedFeature && (
+            <motion.div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedFeature(null)}>
+              <motion.div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden" initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} onClick={(e) => e.stopPropagation()}>
+                <div className={`${selectedFeature.mobileColor || 'bg-blue-500'} p-4 flex justify-end`}><button onClick={() => setSelectedFeature(null)} className="text-white bg-white/20 rounded-full w-8 h-8 flex items-center justify-center hover:bg-white/30">✕</button></div>
+                <div className="p-8">
+                  <div className="text-slate-700 text-sm sm:text-lg leading-relaxed">{Array.isArray(selectedFeature.fullDesc) ? (<ul className="list-disc pl-6 space-y-2">{selectedFeature.fullDesc.map((point, index) => <li key={index}>{point}</li>)}</ul>) : (<p>{selectedFeature.fullDesc}</p>)}</div>
+                  <div className="mt-6 text-right"><button onClick={() => setSelectedFeature(null)} className="px-5 py-2 bg-slate-200 rounded-lg font-bold hover:bg-slate-300 text-slate-800">Close</button></div>
                 </div>
-
-                <div className="mt-6 text-right">
-                  <button
-                    onClick={() => setSelectedFeature(null)}
-                    className="px-5 py-2 bg-slate-200 rounded-lg font-bold hover:bg-slate-300 text-slate-800"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </section>
-  );
-};
-
+          )}
+        </AnimatePresence>
+      </section>
+    );
+  };
 
 export default Home;
-

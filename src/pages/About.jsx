@@ -320,6 +320,174 @@
 
 
 
+// import React, { useState, useEffect } from "react";
+
+// // ---------- HTML DECODE HELPER ----------
+// const decodeHtml = (text = "") => {
+//   const txt = document.createElement("textarea");
+//   txt.innerHTML = text;
+//   return txt.value;
+// };
+
+// // ---------- DEFAULT FALLBACK DATA ----------
+// const defaultActivities = [
+//   {
+//     title: "Educational Content Production",
+//     points: [
+//       "Video and Audio lessons for UG, PG, and distance education students.",
+//     ],
+//   },
+//   {
+//     title: "T-SAT",
+//     points: [
+//       "Telecasting video lessons on T-SAT Vidya and T-SAT Nipuna.",
+//     ],
+//   },
+//   {
+//     title: "Broadcasting in AIR",
+//     points: [
+//       "Audio lessons aired daily in All India Radio, Hyderabad A.",
+//     ],
+//   },
+//   {
+//     title: "University Website",
+//     points: [
+//       "Uploading all video and audio lessons on the university website.",
+//     ],
+//   },
+//   {
+//     title: "YouTube Channel",
+//     points: [
+//       "Uploading video lessons and hosting live teleconferences.",
+//     ],
+//   },
+//   {
+//     title: "Web Radio",
+//     points: [
+//       "Broadcasting radio lessons and interactive phone-in programs.",
+//     ],
+//   },
+// ];
+
+// const defaultAboutText =
+//   "The Electronic Media Resources & Research Centre (EMR&RC) was established in 1985 as a part of the Material Production Directorate.";
+
+// const About = () => {
+//   const [activities, setActivities] = useState(defaultActivities);
+//   const [aboutText, setAboutText] = useState(defaultAboutText);
+
+//   useEffect(() => {
+//     const fetchAboutData = async () => {
+//       try {
+//         const response = await fetch(
+//           "https://emrc-pi.vercel.app/api/about"
+//         );
+
+//         if (!response.ok) return;
+
+//         const result = await response.json();
+//         const apiData = result?.data;
+
+//         if (apiData?.about_text) {
+//           setAboutText(apiData.about_text);
+//         }
+
+//         if (apiData?.activities) {
+//           const updatedActivities = Object.values(apiData.activities).map(
+//             item => ({
+//               title: item.title,
+//               points: item.bullet_points ?? [],
+//             })
+//           );
+
+//           if (updatedActivities.length) {
+//             setActivities(updatedActivities);
+//           }
+//         }
+//       } catch (err) {
+//         console.warn("Backend unreachable. Using default content.", err);
+//       }
+//     };
+
+//     fetchAboutData();
+//   }, []);
+
+//   return (
+//     <main
+//       className="w-full min-h-screen bg-cover bg-center bg-no-repeat font-[Arial]"
+//       style={{ backgroundImage: "url('/pictures/website BG Final.jpg')" }}
+//     >
+//       {/* ABOUT SECTION */}
+//       <section className="w-full max-w-5xl mx-auto text-center px-4 pt-10 pb-3">
+//         <h2 className="text-3xl md:text-4xl font-bold text-[#004B52] mb-3">
+//           ABOUT EMR&RC
+//         </h2>
+
+//         <p className="text-gray-800 text-lg leading-relaxed font-bold text-justify">
+//           {decodeHtml(aboutText)}
+//         </p>
+//       </section>
+
+//       {/* IMAGE */}
+//       <div className="w-full flex justify-center mt-2 px-4">
+//         <img
+//           src="/pictures/MISSION VISION  INFOGRAPHICS.png"
+//           alt="Mission Vision"
+//           className="w-full max-w-4xl"
+//         />
+//       </div>
+
+//       {/* ACTIVITIES */}
+//       <section className="w-full max-w-6xl mx-auto px-4 pb-12">
+//         <h2 className="text-3xl md:text-4xl text-center font-bold text-[#004B52] mb-10">
+//           Activities
+//         </h2>
+
+//         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+//           {activities.map((item, index) => (
+//             <div
+//               key={index}
+//               className="
+//                 group bg-[#D9D9D966] rounded-[28px] p-8 shadow-md
+//                 transition-all duration-700 ease-in-out
+//                 hover:scale-[1.03] hover:shadow-xl
+//                 hover:bg-gradient-to-b hover:from-[#00828D] hover:via-[#004B52] hover:to-black
+//               "
+//             >
+//               <h4
+//                 className="
+//                   text-2xl font-bold text-[#004F56] mb-4 text-center
+//                   transition-all duration-700 group-hover:text-white
+//                 "
+//               >
+//                 {item.title}
+//               </h4>
+
+//               <ul className="list-disc pl-6 space-y-2 text-[15px] leading-relaxed">
+//                 {item.points.map((pt, i) => (
+//                   <li
+//                     key={i}
+//                     className="
+//                       text-justify font-semibold text-[#004F56]
+//                       transition-all duration-700 group-hover:text-white
+//                     "
+//                   >
+//                     {decodeHtml(pt)}
+//                   </li>
+//                 ))}
+//               </ul>
+//             </div>
+//           ))}
+//         </div>
+//       </section>
+//     </main>
+//   );
+// };
+
+// export default About;
+
+
+
 import React, { useState, useEffect } from "react";
 
 // ---------- HTML DECODE HELPER ----------
@@ -375,12 +543,16 @@ const defaultAboutText =
 const About = () => {
   const [activities, setActivities] = useState(defaultActivities);
   const [aboutText, setAboutText] = useState(defaultAboutText);
+  
+  // ✅ 1. Add Loading State
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAboutData = async () => {
       try {
+        setLoading(true); // Ensure loading starts
         const response = await fetch(
-          "https://emrc-pi.vercel.app/api/about"
+          `${import.meta.env.VITE_BASE_API}/about`
         );
 
         if (!response.ok) return;
@@ -406,11 +578,25 @@ const About = () => {
         }
       } catch (err) {
         console.warn("Backend unreachable. Using default content.", err);
+      } finally {
+        // ✅ 2. Stop Loading (whether success or error, show content)
+        setLoading(false);
       }
     };
 
     fetchAboutData();
   }, []);
+
+  // ✅ 3. Show Loading Screen
+  if (loading) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center bg-gray-50">
+        <h2 className="text-2xl md:text-3xl font-bold text-[#004B52] animate-pulse">
+          Loading About Page ...
+        </h2>
+      </div>
+    );
+  }
 
   return (
     <main

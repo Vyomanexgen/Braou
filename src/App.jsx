@@ -1,149 +1,3 @@
-// // Simple placeholder component for pages you haven't built yet
-// const PageTitle = ({ title }) => (
-//   <div className="mt-10 max-w-[1200px] mx-auto p-10 bg-white shadow-md rounded-lg text-center border border-gray-200">
-//     <h1 className="text-3xl font-bold text-gray-800">{title}</h1>
-//     <p className="text-gray-500 mt-2">Content for {title} goes here.</p>
-//   </div>
-// );
-
-// export default App;
-
-// import React from 'react';
-// import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-
-// // 1. Import Pages
-// import Home from './pages/Home';
-
-// // 2. Import Components
-// import Header from "./components/Header";
-// import Navbar from "./components/Navbar";
-// import Footer from "./components/Footer"; // <--- ADDED IMPORT
-
-// function App() {
-//   return (
-//     <Router>
-//       {/* Main Container: Flex column ensures vertical stacking */}
-//       <div className="flex flex-col min-h-screen bg-gray-50">
-
-//         {/* Header appears first at the very top */}
-//         <Header />
-
-//         {/* Navbar appears second, naturally sitting below the Header */}
-//         <Navbar />
-
-//         {/* Main Content Area */}
-//         <main className="flex-grow w-full">
-//           <Routes>
-//             {/* Redirect root "/" to "/home" */}
-//             <Route path="/" element={<Navigate to="/home" replace />} />
-
-//             {/* 3. Use the actual Home component here */}
-//             <Route path="/home" element={<Home />} />
-
-//             {/* Placeholders for other pages */}
-//             <Route path="/about" element={<PageTitle title="About Us" />} />
-//             <Route path="/live" element={<PageTitle title="Live Streaming" />} />
-//             <Route path="/youtube" element={<PageTitle title="Youtube (EMR&RC)" />} />
-//             <Route path="/webradio" element={<PageTitle title="Web Radio" />} />
-//             <Route path="/vidyagani" element={<PageTitle title="Vidyagani" />} />
-//             <Route path="/tsat" element={<PageTitle title="T-SAT Vidya/Nipuna" />} />
-//             <Route path="/air" element={<PageTitle title="All India Radio (AIR)" />} />
-//             <Route path="/events" element={<PageTitle title="BRAOU Events" />} />
-//           </Routes>
-//         </main>
-
-//         {/* --- FOOTER ADDED HERE --- */}
-//         <Footer />
-
-//       </div>
-//     </Router>
-//   );
-// }
-
-// // Simple placeholder component for pages you haven't built yet
-// const PageTitle = ({ title }) => (
-//   <div className="mt-10 max-w-[1200px] mx-auto p-10 bg-white shadow-md rounded-lg text-center border border-gray-200">
-//     <h1 className="text-3xl font-bold text-gray-800">{title}</h1>
-//     <p className="text-gray-500 mt-2">Content for {title} goes here.</p>
-//   </div>
-// );
-
-// export default App;
-
-// import React from 'react';
-// import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-
-// // Pages
-// import Home from './pages/Home';
-
-// // Components
-// import Header from "./components/Header";
-// import Navbar from "./components/Navbar";
-// import Footer from "./components/Footer";     // The big footer
-// import BottomBar from "./components/BottomBar"; // The copyright bar
-
-// function App() {
-//   return (
-//     <Router>
-//       <MainLayout />
-//     </Router>
-//   );
-// }
-
-// // We need a separate component here to use the 'useLocation' hook
-// const MainLayout = () => {
-//   const location = useLocation();
-
-//   // LOGIC: Show Big Footer ONLY on '/home' and '/tsat'
-//   const showBigFooter = location.pathname === '/home' || location.pathname === '/tsat';
-
-//   return (
-//     <div className="flex flex-col min-h-screen bg-gray-50">
-
-//       {/* Fixed Header & Navbar */}
-//       <Header />
-//       <Navbar />
-
-//       {/* Main Content Area */}
-//       <main className="flex-grow w-full">
-//         <Routes>
-//           <Route path="/" element={<Navigate to="/home" replace />} />
-
-//           {/* Real Pages */}
-//           <Route path="/home" element={<Home />} />
-
-//           {/* Placeholder Pages (You will replace these with real components later) */}
-//           <Route path="/about" element={<PageTitle title="About Us" />} />
-//           <Route path="/live" element={<PageTitle title="Live Streaming" />} />
-//           <Route path="/youtube" element={<PageTitle title="Youtube (EMR&RC)" />} />
-//           <Route path="/webradio" element={<PageTitle title="Web Radio" />} />
-//           <Route path="/vidyagani" element={<PageTitle title="Vidyagani" />} />
-//           <Route path="/tsat" element={<PageTitle title="T-SAT Vidya/Nipuna" />} />
-//           <Route path="/air" element={<PageTitle title="All India Radio (AIR)" />} />
-//           <Route path="/events" element={<PageTitle title="BRAOU Events" />} />
-//         </Routes>
-//       </main>
-
-//       {/* CONDITIONAL: Big Footer (Only Home & TSAT) */}
-//       {showBigFooter && <Footer />}
-
-//       {/* UNCONDITIONAL: Bottom Bar (All Pages) */}
-//       <BottomBar />
-
-//     </div>
-//   );
-// };
-
-// // Placeholder Component for pages you haven't built yet
-// const PageTitle = ({ title }) => (
-//   <div className="mt-10 max-w-[1200px] mx-auto p-10 bg-white shadow-md rounded-lg text-center border border-gray-200">
-//     <h1 className="text-3xl font-bold text-gray-800">{title}</h1>
-//     <p className="text-gray-500 mt-2">Content for {title} goes here.</p>
-//   </div>
-// );
-
-// export default App;
-
 // import React, { useState, useEffect } from "react";
 // import {
 //   BrowserRouter as Router,
@@ -364,6 +218,153 @@
 
 
 
+// import React, { useState, useEffect } from "react";
+// import {
+//   BrowserRouter as Router,
+//   Routes,
+//   Route,
+//   Navigate,
+//   useLocation,
+// } from "react-router-dom";
+// import { motion, AnimatePresence } from "framer-motion";
+
+// // Pages
+// import Home from "./pages/Home";
+// import About from "./pages/About";
+// import Live from "./pages/Live";
+// import TSAT from "./pages/TSAT";
+// import AIR from "./pages/AIR";
+// import Events from "./pages/Events";
+
+// // Components
+// import Header from "./components/Header";
+// import Navbar from "./components/Navbar";
+// import Footer from "./components/Footer";
+// import BottomBar from "./components/BottomBar";
+
+// // ✅ Correct API URL (from .env)
+// const BANNER_API_URL = `${import.meta.env.VITE_BASE_API}/banner`;
+
+// function App() {
+//   return (
+//     <Router>
+//       <MainLayout />
+//     </Router>
+//   );
+// }
+
+// const MainLayout = () => {
+//   const location = useLocation();
+
+//   const [bannerImage, setBannerImage] = useState(null);
+//   const [isBannerOpen, setIsBannerOpen] = useState(false);
+//   const [isInitialLoadDone, setIsInitialLoadDone] = useState(false);
+
+//   // ✅ Fetch banner ONLY after loader finishes
+//   useEffect(() => {
+//     if (!isInitialLoadDone) return;
+
+//     const fetchBanner = async () => {
+//       try {
+//         const response = await fetch(BANNER_API_URL);
+//         if (!response.ok) return;
+
+//         const result = await response.json();
+
+//         // ✅ EXACT backend response handling
+//         const imageUrl = result?.data?.[0]?.image_url;
+
+//         if (imageUrl) {
+//           setBannerImage(imageUrl);
+//           setIsBannerOpen(true);
+//         }
+//       } catch (err) {
+//         console.error("Failed to fetch banner", err);
+//       }
+//     };
+
+//     fetchBanner();
+//   }, [isInitialLoadDone]);
+
+//   return (
+//     <div className="flex flex-col min-h-screen bg-gray-50 relative">
+//       {/* Popup Banner */}
+//       <PopupBanner
+//         isOpen={isBannerOpen}
+//         onClose={() => setIsBannerOpen(false)}
+//         imageSrc={bannerImage}
+//       />
+
+//       <Header />
+//       <Navbar />
+
+//       <main className="flex-grow w-full">
+//         <Routes>
+//           <Route path="/" element={<Navigate to="/home" replace />} />
+//           <Route
+//             path="/home"
+//             element={
+//               <Home onInitialLoadDone={() => setIsInitialLoadDone(true)} />
+//             }
+//           />
+//           <Route path="/about" element={<About />} />
+//           <Route path="/live" element={<Live />} />
+//           <Route path="/tsat" element={<TSAT />} />
+//           <Route path="/air" element={<AIR />} />
+//           <Route path="/events" element={<Events />} />
+//         </Routes>
+//       </main>
+
+//       <Footer />
+//       <BottomBar />
+//     </div>
+//   );
+// };
+
+// const PopupBanner = ({ isOpen, onClose, imageSrc }) => {
+//   return (
+//     <AnimatePresence>
+//       {isOpen && imageSrc && (
+//         <motion.div
+//           className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 px-1 py-6"
+//           initial={{ opacity: 0 }}
+//           animate={{ opacity: 1 }}
+//           exit={{ opacity: 0 }}
+//           onClick={onClose}
+//         >
+//           <motion.div
+//             className="relative bg-white rounded-lg shadow-2xl w-full max-w-3xl"
+//             initial={{ scale: 0.9 }}
+//             animate={{ scale: 1 }}
+//             exit={{ scale: 0.9 }}
+//             onClick={(e) => e.stopPropagation()}
+//           >
+//             {/* ✅ Close button */}
+//             <button
+//               onClick={onClose}
+//               className="absolute top-3 right-3 z-50 bg-black/70 text-white rounded-full w-9 h-9 flex items-center justify-center text-lg font-bold hover:bg-black"
+//             >
+//               ✕
+//             </button>
+
+//             {/* ✅ Controlled height container */}
+//             <div className="max-h-[80vh] w-full overflow-hidden flex items-center justify-center bg-gray-100 rounded-lg">
+//               <img
+//                 src={imageSrc}
+//                 alt="Popup Banner"
+//                 className="max-h-[80vh] max-w-[90vw]  object-contain"
+//               />
+//             </div>
+//           </motion.div>
+//         </motion.div>
+//       )}
+//     </AnimatePresence>
+//   );
+// };
+
+// export default App;
+
+
 import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
@@ -388,7 +389,6 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import BottomBar from "./components/BottomBar";
 
-// ✅ Correct API URL (from .env)
 const BANNER_API_URL = `${import.meta.env.VITE_BASE_API}/banner`;
 
 function App() {
@@ -400,59 +400,87 @@ function App() {
 }
 
 const MainLayout = () => {
-  const location = useLocation();
+  // --- STATE MANAGEMENT ---
+  // 1. Loader starts TRUE. It only runs on Refresh/First Load.
+  //    Since 'App' doesn't unmount on route change, this won't run when switching pages.
+  const [isLoading, setIsLoading] = useState(true);
 
+  // 2. Banner State
   const [bannerImage, setBannerImage] = useState(null);
   const [isBannerOpen, setIsBannerOpen] = useState(false);
-  const [isInitialLoadDone, setIsInitialLoadDone] = useState(false);
 
-  // ✅ Fetch banner ONLY after loader finishes
+  // --- LOGIC: INITIAL LOAD & BANNER FETCH ---
   useEffect(() => {
-    if (!isInitialLoadDone) return;
-
-    const fetchBanner = async () => {
+    const initApp = async () => {
       try {
-        const response = await fetch(BANNER_API_URL);
-        if (!response.ok) return;
+        // Run Banner Fetch and a Minimum Timer in parallel
+        // This ensures the loader shows for at least 1.5 seconds so it looks smooth
+        const [bannerRes] = await Promise.all([
+          fetch(BANNER_API_URL).catch(() => null),
+          new Promise((resolve) => setTimeout(resolve, 1500)), // Min wait time
+        ]);
 
-        const result = await response.json();
-
-        // ✅ EXACT backend response handling
-        const imageUrl = result?.data?.[0]?.image_url;
-
-        if (imageUrl) {
-          setBannerImage(imageUrl);
-          setIsBannerOpen(true);
+        if (bannerRes?.ok) {
+          const result = await bannerRes.json();
+          const imageUrl = result?.data?.[0]?.image_url;
+          if (imageUrl) {
+            setBannerImage(imageUrl);
+          }
         }
       } catch (err) {
-        console.error("Failed to fetch banner", err);
+        console.error("App Init Error:", err);
+      } finally {
+        // 1. Stop Loader
+        setIsLoading(false);
+        
+        // 2. If we found a banner, show it immediately after loader
+        // We use a slight delay (100ms) to let the loader fade out first
+        setTimeout(() => {
+            setBannerImage((prev) => {
+                if(prev) setIsBannerOpen(true);
+                return prev;
+            })
+        }, 100);
       }
     };
 
-    fetchBanner();
-  }, [isInitialLoadDone]);
+    initApp();
+  }, []); // Empty dependency = Runs once on Refresh/Mount
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 relative">
-      {/* Popup Banner */}
+      
+      {/* --- GLOBAL COMPONENTS (Overlay on top of everything) --- */}
+      
+      {/* 1. Global Loader */}
+      <AnimatePresence>
+        {isLoading && (
+          <motion.div
+            className="fixed inset-0 z-[99999] flex items-center justify-center bg-white"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="w-16 h-16 border-4 border-cyan-200 border-t-cyan-600 rounded-full animate-spin"></div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 2. Popup Banner */}
       <PopupBanner
         isOpen={isBannerOpen}
         onClose={() => setIsBannerOpen(false)}
         imageSrc={bannerImage}
       />
 
+      {/* --- MAIN APP STRUCTURE --- */}
       <Header />
       <Navbar />
 
       <main className="flex-grow w-full">
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route
-            path="/home"
-            element={
-              <Home onInitialLoadDone={() => setIsInitialLoadDone(true)} />
-            }
-          />
+          <Route path="/home" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/live" element={<Live />} />
           <Route path="/tsat" element={<TSAT />} />
@@ -467,6 +495,7 @@ const MainLayout = () => {
   );
 };
 
+// --- SUB-COMPONENT: POPUP BANNER ---
 const PopupBanner = ({ isOpen, onClose, imageSrc }) => {
   return (
     <AnimatePresence>
@@ -485,20 +514,18 @@ const PopupBanner = ({ isOpen, onClose, imageSrc }) => {
             exit={{ scale: 0.9 }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* ✅ Close button */}
             <button
               onClick={onClose}
-              className="absolute top-3 right-3 z-50 bg-black/70 text-white rounded-full w-9 h-9 flex items-center justify-center text-lg font-bold hover:bg-black"
+              className="absolute top-3 right-3 z-50 bg-red-700 text-white rounded-full w-9 h-9 flex items-center justify-center text-lg font-bold hover:bg-black "
             >
               ✕
             </button>
 
-            {/* ✅ Controlled height container */}
             <div className="max-h-[80vh] w-full overflow-hidden flex items-center justify-center bg-gray-100 rounded-lg">
               <img
                 src={imageSrc}
                 alt="Popup Banner"
-                className="max-h-[80vh] max-w-[90vw]  object-contain"
+                className="max-h-[80vh] max-w-[90vw] object-contain"
               />
             </div>
           </motion.div>

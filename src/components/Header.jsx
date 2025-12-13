@@ -144,18 +144,21 @@ const Header = () => {
             Electronic Media Resources & Research Centre
           </h2>
 
-          <h3
-            className="
-              font-bold text-black mt-1 uppercase
-              text-[10px] sm:text-[13px] md:text-[18px]
-            "
-          >
-            (EMR&RC)
-          </h3>
+         <h3
+  className="
+    font-bold text-black mt-1 uppercase
+    text-[10px] sm:text-[13px] md:text-[18px]
+    ml-1 sm:ml-8 md:ml-8 lg:ml-[245px]
+  "
+>
+  (EMR&RC)
+</h3>
+
         </div>
 
         {/* Right Logos */}
-        <div className="hidden md:flex items-center gap-20 ml-auto">
+      <div className="hidden md:flex items-center gap-10 lg:gap-16 ml-auto">
+
           <img
             src="/pictures/PNG[1] 1.png"
             alt="NAAC A Grade"
