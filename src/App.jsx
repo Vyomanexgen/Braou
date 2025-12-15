@@ -388,7 +388,8 @@ import Header from "./components/Header";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import BottomBar from "./components/BottomBar";
-
+import NetworkStatus from "./components/NetworkStatus";
+import Updates from "./pages/Updates";
 const BANNER_API_URL = `${import.meta.env.VITE_BASE_API}/banner`;
 
 function App() {
@@ -451,7 +452,7 @@ const MainLayout = () => {
     <div className="flex flex-col min-h-screen bg-gray-50 relative">
       
       {/* --- GLOBAL COMPONENTS (Overlay on top of everything) --- */}
-      
+      <NetworkStatus />
       {/* 1. Global Loader */}
       <AnimatePresence>
         {isLoading && (
@@ -486,6 +487,7 @@ const MainLayout = () => {
           <Route path="/tsat" element={<TSAT />} />
           <Route path="/air" element={<AIR />} />
           <Route path="/events" element={<Events />} />
+           <Route path="/updates" element={<Updates />} />
         </Routes>
       </main>
 
