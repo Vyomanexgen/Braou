@@ -382,7 +382,7 @@ import Live from "./pages/Live";
 import TSAT from "./pages/TSAT";
 import AIR from "./pages/AIR";
 import Events from "./pages/Events";
-
+import EventDetails from "./pages/EventDetails";
 // Components
 import Header from "./components/Header";
 import Navbar from "./components/Navbar";
@@ -487,6 +487,7 @@ const MainLayout = () => {
           <Route path="/tsat" element={<TSAT />} />
           <Route path="/air" element={<AIR />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/events/:id" element={<EventDetails />} />
            <Route path="/updates" element={<Updates />} />
         </Routes>
       </main>

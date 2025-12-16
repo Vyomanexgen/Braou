@@ -667,57 +667,67 @@ const HeroSlider = ({ images }) => {
   );
 };
 
-// ... Include NewsTicker and InfographicSection as per your original file ...
-// (I am skipping pasting them here to save space, but you keep them exactly as is)
+
+
+
 
 // const NewsTicker = ({ news }) => {
-//     const rawNews = news && news.length > 0 ? news : DEFAULT_TICKER_NEWS;
-//     const repeatedNews = rawNews.length < 10 
-//       ? [...rawNews, ...rawNews, ...rawNews, ...rawNews] 
+//   const navigate = useNavigate();
+
+//   const rawNews = news && news.length > 0 ? news : DEFAULT_TICKER_NEWS;
+//   const repeatedNews =
+//     rawNews.length < 10
+//       ? [...rawNews, ...rawNews, ...rawNews, ...rawNews]
 //       : rawNews;
-//     const [duration, setDuration] = useState(300); 
-//     useEffect(() => {
-//       const handleResize = () => setDuration(window.innerWidth < 768 ? 200 : 250);
-//       handleResize();
-//       window.addEventListener("resize", handleResize);
-//       return () => window.removeEventListener("resize", handleResize);
-//     }, []);
-//     return (
-//       <div className="w-full overflow-hidden py-2 bg-white/20 backdrop-blur-sm">
-//         <motion.div
-//           className="flex items-center w-max"
-//           animate={{ x: ["0%", "-50%"] }}
-//           transition={{ duration: duration, repeat: Infinity, ease: "linear" }}
-//           key={duration}
-//         >
-//           <div className="flex items-center">
+
+//   const [duration, setDuration] = useState(300);
+
+//   useEffect(() => {
+//     const handleResize = () =>
+//       setDuration(window.innerWidth < 768 ? 200 : 250);
+//     handleResize();
+//     window.addEventListener("resize", handleResize);
+//     return () => window.removeEventListener("resize", handleResize);
+//   }, []);
+
+//   return (
+//     <div className="w-full overflow-hidden py-2 bg-white/20 backdrop-blur-sm">
+//       <motion.div
+//         className="flex items-center w-max"
+//         animate={{ x: ["0%", "-50%"] }}
+//         transition={{ duration, repeat: Infinity, ease: "linear" }}
+//         key={duration}
+//       >
+//         {[0, 1].map(block => (
+//           <div key={block} className="flex items-center">
 //             {repeatedNews.map((item, index) => (
-//               <span key={`a-${index}`} className="px-10 font-black text-slate-900 text-sm md:text-lg capitalize whitespace-nowrap" style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}>
+//               <span
+//                 key={`${block}-${index}`}
+//                 onClick={() => navigate("/updates")}
+//                 className="px-10 font-black text-slate-900 text-sm md:text-lg capitalize whitespace-nowrap cursor-pointer hover:text-red-600"
+//                 style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
+//               >
 //                 {item}
 //               </span>
 //             ))}
 //           </div>
-//           <div className="flex items-center">
-//             {repeatedNews.map((item, index) => (
-//               <span key={`b-${index}`} className="px-10 font-black text-slate-900 text-sm md:text-lg capitalize whitespace-nowrap" style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}>
-//                 {item}
-//               </span>
-//             ))}
-//           </div>
-//         </motion.div>
-//       </div>
-//     );
-//   };
+//         ))}
+//       </motion.div>
+//     </div>
+//   );
+// };
 
-
-const NewsTicker = ({ news }) => {
+  const NewsTicker = ({ news }) => {
   const navigate = useNavigate();
 
-  const rawNews = news && news.length > 0 ? news : DEFAULT_TICKER_NEWS;
+  // ✅ 1. Slice ONLY the first 5 items for the home page ticker
+  const visibleNews = (news && news.length > 0 ? news : DEFAULT_TICKER_NEWS).slice(0, 5);
+
+  // Repeat for smooth infinite scroll
   const repeatedNews =
-    rawNews.length < 10
-      ? [...rawNews, ...rawNews, ...rawNews, ...rawNews]
-      : rawNews;
+    visibleNews.length < 10
+      ? [...visibleNews, ...visibleNews, ...visibleNews, ...visibleNews]
+      : visibleNews;
 
   const [duration, setDuration] = useState(300);
 
@@ -742,9 +752,11 @@ const NewsTicker = ({ news }) => {
             {repeatedNews.map((item, index) => (
               <span
                 key={`${block}-${index}`}
+                // ✅ 2. Navigate to /updates (where ALL items are shown)
                 onClick={() => navigate("/updates")}
-                className="px-10 font-black text-slate-900 text-sm md:text-lg capitalize whitespace-nowrap cursor-pointer hover:text-red-600"
+                className="px-10 font-black text-slate-900 text-sm md:text-lg capitalize whitespace-nowrap cursor-pointer hover:text-red-600 transition-colors"
                 style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
+                title="Click to view all updates"
               >
                 {item}
               </span>
@@ -756,7 +768,6 @@ const NewsTicker = ({ news }) => {
   );
 };
 
-  
   const InfographicSection = ({ infoServices }) => {
     const [selectedFeature, setSelectedFeature] = useState(null);
     const safeServices = Array.isArray(infoServices) && infoServices.length > 0 ? infoServices : DEFAULT_INFO_SERVICES;
