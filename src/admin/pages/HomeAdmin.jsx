@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { adminFetch } from "../utils/adminFetch";
 
 const BASE = import.meta.env.VITE_BASE_API;
-const CAROUSEL_API = `${BASE}/carousel`;
-const HOME_API = `${BASE}/home`;
+const CAROUSEL_API = "/carousel";
+const HOME_API = "/home";
 
 /* =====================================================
-   HOME ADMIN
+   HOME ADMIN (SECURED)
 ===================================================== */
 export default function HomeAdmin() {
   const [home, setHome] = useState(null);
   const [carouselSlots, setCarouselSlots] = useState(Array(6).fill(null));
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     loadAll();
@@ -25,14 +27,16 @@ export default function HomeAdmin() {
     }
   };
 
+  /* ================= FETCH HOME ================= */
   const fetchHome = async () => {
-    const res = await fetch(HOME_API);
+    const res = await adminFetch(HOME_API);
     const json = await res.json();
     setHome(json.data);
   };
 
+  /* ================= FETCH CAROUSEL ================= */
   const fetchCarousel = async () => {
-    const res = await fetch(CAROUSEL_API);
+    const res = await adminFetch(CAROUSEL_API);
     const json = await res.json();
 
     const slots = Array(6).fill(null);
@@ -45,15 +49,26 @@ export default function HomeAdmin() {
     setCarouselSlots(slots);
   };
 
+  /* ================= UPDATE HOME FIELD ================= */
   const updateHomeField = async (field, value) => {
-    const updated = { ...home, [field]: value };
-    setHome(updated);
+    if (saving) return;
 
-    await fetch(HOME_API, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updated),
-    });
+    try {
+      setSaving(true);
+
+      const updated = { ...home, [field]: value };
+      setHome(updated);
+
+      await adminFetch(HOME_API, {
+        method: "PUT",
+        body: JSON.stringify(updated),
+      });
+    } catch (err) {
+      console.error("Update home failed", err);
+      alert("Failed to update home content");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading || !home) {
@@ -61,54 +76,45 @@ export default function HomeAdmin() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 w-full">
       <h1 className="text-2xl font-extrabold text-blue-900 mb-6">Home</h1>
 
-      <PhotoGrid slots={carouselSlots} refresh={fetchCarousel} />
+      <PhotoGrid
+        slots={carouselSlots}
+        refresh={fetchCarousel}
+        disabled={saving}
+      />
 
       <EditableSection
         title="Heading"
         value={home.heading}
+        disabled={saving}
         onSave={(v) => updateHomeField("heading", v)}
       />
 
-      {/* ✅ UPDATED SCROLLING */}
       <ScrollingEditor
         items={home.heading_description || []}
+        disabled={saving}
         onSave={(v) => updateHomeField("heading_description", v)}
       />
 
       <div className="grid md:grid-cols-2 gap-6">
-        <EditableSection
-          title="Live"
-          value={home.heading_cat_live}
-          onSave={(v) => updateHomeField("heading_cat_live", v)}
-        />
-        <EditableSection
-          title="Youtube"
-          value={home.heading_cat_youtube}
-          onSave={(v) => updateHomeField("heading_cat_youtube", v)}
-        />
-        <EditableSection
-          title="T-SAT"
-          value={home.heading_cat_tsat}
-          onSave={(v) => updateHomeField("heading_cat_tsat", v)}
-        />
-        <EditableSection
-          title="AIR"
-          value={home.heading_cat_air}
-          onSave={(v) => updateHomeField("heading_cat_air", v)}
-        />
-        <EditableSection
-          title="Vidyagani"
-          value={home.heading_cat_vidyagani}
-          onSave={(v) => updateHomeField("heading_cat_vidyagani", v)}
-        />
-        <EditableSection
-          title="Web Radio"
-          value={home.heading_cat_web_radio}
-          onSave={(v) => updateHomeField("heading_cat_web_radio", v)}
-        />
+        {[
+          ["Live", "heading_cat_live"],
+          ["Youtube", "heading_cat_youtube"],
+          ["T-SAT", "heading_cat_tsat"],
+          ["AIR", "heading_cat_air"],
+          ["Vidyagani", "heading_cat_vidyagani"],
+          ["Web Radio", "heading_cat_web_radio"],
+        ].map(([label, key]) => (
+          <EditableSection
+            key={key}
+            title={label}
+            value={home[key]}
+            disabled={saving}
+            onSave={(v) => updateHomeField(key, v)}
+          />
+        ))}
       </div>
     </div>
   );
@@ -117,13 +123,19 @@ export default function HomeAdmin() {
 /* =====================================================
    EDITABLE SECTION
 ===================================================== */
-function EditableSection({ title, value, onSave }) {
+function EditableSection({ title, value, onSave, disabled }) {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState("");
+  const [backup, setBackup] = useState("");
 
   useEffect(() => {
     setText(value || "");
   }, [value]);
+
+  const cancelEdit = () => {
+    setText(backup);
+    setEditing(false);
+  };
 
   return (
     <div className="mb-6">
@@ -134,30 +146,47 @@ function EditableSection({ title, value, onSave }) {
           <>
             <p className="font-semibold pr-10 whitespace-pre-wrap">{value}</p>
             <button
-              onClick={() => setEditing(true)}
-              className="absolute top-4 right-4 text-cyan-700"
+              disabled={disabled}
+              onClick={() => {
+                setBackup(text);
+                setEditing(true);
+              }}
+              className="absolute top-4 right-4 text-cyan-700 disabled:opacity-50"
             >
               <FaEdit />
             </button>
           </>
         ) : (
-          <>
+          <div className="flex flex-col gap-3">
             <textarea
               className="w-full rounded-lg p-3"
               rows={4}
               value={text}
+              disabled={disabled}
               onChange={(e) => setText(e.target.value)}
             />
-            <button
-              onClick={() => {
-                onSave(text);
-                setEditing(false);
-              }}
-              className="mt-2 bg-cyan-700 text-white px-4 py-1 rounded-lg"
-            >
-              Save
-            </button>
-          </>
+
+            <div className="flex gap-3">
+              <button
+                disabled={disabled}
+                onClick={() => {
+                  onSave(text);
+                  setEditing(false);
+                }}
+                className="flex-1 bg-cyan-700 text-white py-2 rounded-lg disabled:opacity-60"
+              >
+                Save
+              </button>
+
+              <button
+                onClick={cancelEdit}
+                disabled={disabled}
+                className="flex-1 border border-cyan-700 text-cyan-700 py-2 rounded-lg hover:bg-cyan-200 disabled:opacity-60"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -165,9 +194,9 @@ function EditableSection({ title, value, onSave }) {
 }
 
 /* =====================================================
-   SCROLLING EDITOR (DIRTY STATE + ICON DELETE)
+   SCROLLING EDITOR
 ===================================================== */
-function ScrollingEditor({ items, onSave }) {
+function ScrollingEditor({ items, onSave, disabled }) {
   const [list, setList] = useState([]);
   const [original, setOriginal] = useState([]);
   const [dirty, setDirty] = useState(false);
@@ -183,20 +212,15 @@ function ScrollingEditor({ items, onSave }) {
     setDirty(JSON.stringify(updated) !== JSON.stringify(original));
   };
 
-  const updateItem = (i, value) => {
-    const updated = [...list];
-    updated[i] = value;
-    markDirty(updated);
-  };
-
-  const addItem = () => markDirty([...list, ""]);
-
-  const removeItem = (i) => markDirty(list.filter((_, idx) => idx !== i));
-
   const save = async () => {
     const clean = list.filter(Boolean);
     await onSave(clean);
     setOriginal(clean);
+    setDirty(false);
+  };
+
+  const cancel = () => {
+    setList(original);
     setDirty(false);
   };
 
@@ -209,15 +233,18 @@ function ScrollingEditor({ items, onSave }) {
           <div key={i} className="flex gap-2 items-center">
             <input
               value={item}
-              onChange={(e) => updateItem(i, e.target.value)}
-              placeholder={`Point ${i + 1}`}
+              disabled={disabled}
+              onChange={(e) =>
+                markDirty(
+                  list.map((v, idx) => (idx === i ? e.target.value : v))
+                )
+              }
               className="flex-1 rounded-lg p-2 font-semibold"
             />
-
             <button
-              onClick={() => removeItem(i)}
-              className="text-red-600"
-              title="Delete"
+              disabled={disabled}
+              onClick={() => markDirty(list.filter((_, idx) => idx !== i))}
+              className="text-red-600 disabled:opacity-50"
             >
               <FaTrash />
             </button>
@@ -225,17 +252,32 @@ function ScrollingEditor({ items, onSave }) {
         ))}
 
         <div className="flex justify-between pt-2 items-center">
-          <button onClick={addItem} className="text-cyan-800 font-bold">
+          <button
+            disabled={disabled}
+            onClick={() => markDirty([...list, ""])}
+            className="text-cyan-800 font-bold disabled:opacity-50"
+          >
             + Add Point
           </button>
 
           {dirty && (
-            <button
-              onClick={save}
-              className="bg-cyan-700 text-white px-4 py-1 rounded-lg"
-            >
-              Save
-            </button>
+            <div className="flex gap-3">
+              <button
+                disabled={disabled}
+                onClick={save}
+                className="bg-cyan-700 text-white px-4 py-1 rounded-lg disabled:opacity-60"
+              >
+                Save
+              </button>
+
+              <button
+                disabled={disabled}
+                onClick={cancel}
+                className="border border-cyan-700 text-cyan-700 px-4 py-1 rounded-lg hover:bg-cyan-200 disabled:opacity-60"
+              >
+                Cancel
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -244,17 +286,27 @@ function ScrollingEditor({ items, onSave }) {
 }
 
 /* =====================================================
-   PHOTO GRID (UNCHANGED)
+   PHOTO GRID (SECURED)
 ===================================================== */
-function PhotoGrid({ slots, refresh }) {
+function PhotoGrid({ slots, refresh, disabled }) {
   const upload = async (slide, file) => {
-    if (!file) return;
+    if (!file || !slide?.priority || disabled) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Only image files allowed");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image must be under 5MB");
+      return;
+    }
 
     const form = new FormData();
     form.append("image", file);
     form.append("priority", slide.priority);
 
-    await fetch(`${CAROUSEL_API}/${slide._id}`, {
+    await adminFetch(`${CAROUSEL_API}?id=${slide._id || ""}`, {
       method: "PUT",
       body: form,
     });
@@ -263,9 +315,10 @@ function PhotoGrid({ slots, refresh }) {
   };
 
   const remove = async (slide) => {
-    await fetch(`${CAROUSEL_API}/${slide._id}`, {
+    if (disabled) return;
+
+    await adminFetch(`${CAROUSEL_API}?id=${slide._id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url: "" }),
     });
 
@@ -286,43 +339,46 @@ function PhotoGrid({ slots, refresh }) {
               #{i + 1}
             </div>
 
-            {slide && slide.url ? (
+            {slide?.url ? (
               <>
-                <img
-                  src={slide.url}
-                  className="w-full h-full object-cover"
-                  alt="carousel"
-                />
-                <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 flex items-center justify-center gap-4 transition">
-                  <label className="px-4 py-1 bg-yellow-600 text-white rounded-md font-semibold cursor-pointer">
-                    Replace
-                    <input
-                      type="file"
-                      hidden
-                      accept="image/*"
-                      onChange={(e) => upload(slide, e.target.files[0])}
-                    />
-                  </label>
-                  <button
-                    onClick={() => remove(slide)}
-                    className="text-white text-xl"
-                  >
-                    <FaTrash />
-                  </button>
-                </div>
+                <img src={slide.url} className="w-full h-full object-cover" />
+                {!disabled && (
+                  <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 flex items-center justify-center gap-4 transition">
+                    <label className="px-4 py-1 bg-yellow-600 text-white rounded-md font-semibold cursor-pointer">
+                      Replace
+                      <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        onChange={(e) => upload(slide, e.target.files[0])}
+                      />
+                    </label>
+                    {/* <button
+                      onClick={() => remove(slide)}
+                      className="text-white text-xl"
+                    >
+                      <FaTrash />
+                    </button> */}
+                  </div>
+                )}
               </>
             ) : (
-              <label className="flex items-center justify-center h-full text-cyan-700 font-bold text-lg cursor-pointer">
-                + Add Image
-                <input
-                  type="file"
-                  hidden
-                  accept="image/*"
-                  onChange={(e) =>
-                    upload({ ...slide, priority: i + 1 }, e.target.files[0])
-                  }
-                />
-              </label>
+              !disabled && (
+                <label className="flex items-center justify-center h-full text-cyan-700 font-bold text-lg cursor-pointer">
+                  + Add Image
+                  <input
+                    type="file"
+                    hidden
+                    accept="image/*"
+                    onChange={(e) =>
+                      upload(
+                        { _id: slide?._id, priority: i + 1 },
+                        e.target.files[0]
+                      )
+                    }
+                  />
+                </label>
+              )
             )}
           </div>
         ))}

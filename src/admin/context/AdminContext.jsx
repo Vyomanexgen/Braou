@@ -1,28 +1,77 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { logoutAllTabs } from "../utils/adminSession";
 
 const AdminContext = createContext();
+const BASE_API = import.meta.env.VITE_BASE_API;
 
 export const AdminProvider = ({ children }) => {
-  const [content, setContent] = useState({
-    heading: "Welcome To EMR&RC-Educational Broadcasting",
-    scrolling: "Lorem ipsum scrolling text",
-    liveHeading: "BRAOU conducts interactive live programs...",
-    liveLink: "https://www.youtube.com/@BRAOU/",
-    ytLink: "https://www.youtube.com/@BRAOU/streams",
-    radioLink: "https://www.youtube.com/",
-    tsatScrolling: "T-SAT scrolling text",
-    tsatLink: "https://www.youtube.com/",
-    airScrolling: "AIR scrolling text",
-    airSchedule: null,
-    bannerFile: null,
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const updateField = (field, value) => {
-    setContent((prev) => ({ ...prev, [field]: value }));
+  /* ================= CHECK AUTH ================= */
+  const checkAuth = async () => {
+    try {
+      const res = await fetch(`${BASE_API}/auth/refresh`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error("Not authenticated");
+
+      setIsAuthenticated(true);
+    } catch {
+      setIsAuthenticated(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ================= INITIAL CHECK ================= */
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  /* ================= CROSS-TAB LOGOUT ================= */
+  useEffect(() => {
+    const handleStorage = (e) => {
+      if (e.key === "admin-logout") {
+        setIsAuthenticated(false);
+      }
+    };
+
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  /* ================= LOGIN ================= */
+  const loginSuccess = () => {
+    setIsAuthenticated(true);
+  };
+
+  /* ================= LOGOUT ================= */
+  const logout = async () => {
+    try {
+      await fetch(`${BASE_API}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch {
+      // ignore backend failure
+    } finally {
+      setIsAuthenticated(false);
+      logoutAllTabs(); // 🔥 sync logout across tabs
+    }
   };
 
   return (
-    <AdminContext.Provider value={{ content, updateField }}>
+    <AdminContext.Provider
+      value={{
+        isAuthenticated,
+        loading,
+        loginSuccess,
+        logout,
+      }}
+    >
       {children}
     </AdminContext.Provider>
   );

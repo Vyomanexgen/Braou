@@ -2,10 +2,13 @@ import React, { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { adminFetch } from "../utils/adminFetch";
 
-export default function LiveAdmin() {
-  const [liveId, setLiveId] = useState(null);
-  const [title, setTitle] = useState("");
-  const [liveLink, setLiveLink] = useState("");
+export default function ContactAdmin() {
+  const [contactId, setContactId] = useState(null);
+
+  const [name, setName] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
 
   const [editing, setEditing] = useState(null);
   const [tempValue, setTempValue] = useState("");
@@ -14,46 +17,56 @@ export default function LiveAdmin() {
   const [fetching, setFetching] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  /* ---------------- FETCH LIVE DATA ---------------- */
-  const fetchLiveData = async () => {
+  /* ---------- FETCH CONTACT DATA ---------- */
+  const fetchContact = async () => {
     try {
       setFetching(true);
 
-      const res = await adminFetch("/live", {
+      const res = await adminFetch("/footer-contact", {
         cache: "no-store",
       });
 
       const result = await res.json();
 
       if (Array.isArray(result?.data) && result.data.length > 0) {
-        const lastLive = result.data[result.data.length - 1];
-        setLiveId(lastLive._id);
-        setTitle(lastLive.title || "");
-        setLiveLink(lastLive.live_link || "");
+        const lastItem = result.data[result.data.length - 1];
+
+        setContactId(lastItem._id);
+        setName(lastItem.name || "");
+        setDesignation(lastItem.designation || "");
+        setEmail(lastItem.email || "");
+        setPhone(lastItem.phone || "");
       }
     } catch (err) {
-      console.error("Failed to fetch live data", err);
+      console.error("Fetch contact failed", err);
     } finally {
       setFetching(false);
     }
   };
 
   useEffect(() => {
-    fetchLiveData();
+    fetchContact();
   }, []);
 
-  /* ---------------- VALIDATION ---------------- */
+  /* ---------- VALIDATION ---------- */
   const validateField = (field, value) => {
     if (!value.trim()) {
       alert("Value cannot be empty");
       return false;
     }
 
-    if (field === "live_link") {
-      try {
-        new URL(value);
-      } catch {
-        alert("Invalid live link URL");
+    if (field === "email") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) {
+        alert("Invalid email address");
+        return false;
+      }
+    }
+
+    if (field === "phone") {
+      const phoneRegex = /^[0-9+\-\s]{7,15}$/;
+      if (!phoneRegex.test(value)) {
+        alert("Invalid phone number");
         return false;
       }
     }
@@ -61,9 +74,9 @@ export default function LiveAdmin() {
     return true;
   };
 
-  /* ---------------- SAVE FIELD ---------------- */
+  /* ---------- SAVE FIELD ---------- */
   const saveField = async (field, value) => {
-    if (!liveId || saving) return;
+    if (!contactId || saving) return;
 
     if (!validateField(field, value)) return;
 
@@ -71,39 +84,44 @@ export default function LiveAdmin() {
       setSaving(true);
 
       const payload = {
-        title,
-        live_link: liveLink,
+        name,
+        designation,
+        email,
+        phone,
         [field]: value,
       };
 
-      await adminFetch(`/live/${liveId}`, {
+      await adminFetch("/footer-contact", {
         method: "PUT",
         body: JSON.stringify(payload),
       });
 
-      if (field === "title") setTitle(value);
-      if (field === "live_link") setLiveLink(value);
+      if (field === "name") setName(value);
+      if (field === "designation") setDesignation(value);
+      if (field === "email") setEmail(value);
+      if (field === "phone") setPhone(value);
 
       setEditing(null);
       setTempValue("");
       setBackupValue("");
     } catch (err) {
-      console.error("Save failed", err);
-      alert("Failed to save live data");
+      console.error("Update contact failed", err);
+      alert("Failed to update contact");
     } finally {
       setSaving(false);
     }
   };
 
-  /* ---------------- CANCEL EDIT ---------------- */
+  /* ---------- CANCEL EDIT ---------- */
   const cancelEdit = () => {
     if (saving) return;
+
     setTempValue(backupValue);
     setEditing(null);
     setBackupValue("");
   };
 
-  /* ---------------- CARD ---------------- */
+  /* ---------- CARD ---------- */
   const Card = ({ label, value, field }) => (
     <div className="mb-6">
       <h3 className="font-bold text-lg text-blue-900 mb-2">{label}</h3>
@@ -131,8 +149,8 @@ export default function LiveAdmin() {
             <input
               type="text"
               value={tempValue}
-              disabled={saving}
               onChange={(e) => setTempValue(e.target.value)}
+              disabled={saving}
               className="w-full rounded-lg p-3 border
               focus:outline-none focus:ring-2 focus:ring-cyan-600"
             />
@@ -162,7 +180,7 @@ export default function LiveAdmin() {
     </div>
   );
 
-  /* ---------------- LOADING ---------------- */
+  /* ---------- LOADING ---------- */
   if (fetching) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
@@ -173,10 +191,12 @@ export default function LiveAdmin() {
 
   return (
     <div className="w-full px-6">
-      <h1 className="text-2xl font-extrabold mb-6">Live</h1>
+      <h1 className="text-2xl font-extrabold mb-6">Contact Info</h1>
 
-      <Card label="Live Description" value={title} field="title" />
-      <Card label="Live Link" value={liveLink} field="live_link" />
+      <Card label="Name" value={name} field="name" />
+      <Card label="Designation" value={designation} field="designation" />
+      <Card label="Email" value={email} field="email" />
+      <Card label="Phone" value={phone} field="phone" />
     </div>
   );
 }

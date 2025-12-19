@@ -34,7 +34,12 @@ import WebRadioAdmin from "./admin/pages/WebRadioAdmin";
 import VidyaganiAdmin from "./admin/pages/VidyaganiAdmin";
 import TSATAdmin from "./admin/pages/TSATAdmin";
 import EventsAdmin from "./admin/pages/EventsAdmin";
+import ContactAdmin from "./admin/pages/ContactAdmin";
+
 import AdminLogin from "./admin/pages/AdminLogin";
+import AdminForgotPassword from "./admin/pages/AdminForgotPassword";
+import AdminResetPassword from "./admin/pages/AdminResetPassword";
+
 import RequireAdminAuth from "./admin/components/RequireAdminAuth";
 
 /* ========= CONFIG ========= */
@@ -73,7 +78,10 @@ const AppInitializer = () => {
 
         if (bannerRes?.ok) {
           const result = await bannerRes.json();
-          fetchedBanner = result?.data?.[0]?.image_url || null;
+          const banners = result?.data || [];
+          const lastBanner = banners[banners.length - 1];
+          fetchedBanner = lastBanner?.image_url || null;
+
           if (fetchedBanner) setBannerImage(fetchedBanner);
         }
       } catch (err) {
@@ -81,7 +89,7 @@ const AppInitializer = () => {
       } finally {
         setIsLoading(false);
 
-        // ✅ Show banner ONLY for public routes
+        // Show banner only for public routes
         if (fetchedBanner && !isAdminRoute) {
           setTimeout(() => setIsBannerOpen(true), 100);
         }
@@ -130,11 +138,27 @@ const AppInitializer = () => {
           <Route path="/events" element={<Events />} />
           <Route path="/events/:id" element={<EventDetails />} />
           <Route path="/updates" element={<Updates />} />
+
+          {/* ADMIN AUTH (PUBLIC ACCESS) */}
           <Route path="/admin/login" element={<AdminLogin />} />
+          <Route
+            path="/admin/forgot-password"
+            element={<AdminForgotPassword />}
+          />
         </Route>
 
-        {/* -------- ADMIN ROUTES -------- */}
-        <Route path="/admin" element={<AdminLayout />}>
+        {/* 🔐 RESET PASSWORD (ADMIN, BUT NOT PROTECTED) */}
+        <Route path="/admin/reset-password" element={<AdminResetPassword />} />
+
+        {/* -------- ADMIN PROTECTED ROUTES -------- */}
+        <Route
+          path="/admin"
+          element={
+            <RequireAdminAuth>
+              <AdminLayout />
+            </RequireAdminAuth>
+          }
+        >
           <Route index element={<Navigate to="home" replace />} />
           <Route path="home" element={<HomeAdmin />} />
           <Route path="about" element={<AboutAdmin />} />
@@ -146,13 +170,14 @@ const AppInitializer = () => {
           <Route path="air" element={<AIRAdmin />} />
           <Route path="events" element={<EventsAdmin />} />
           <Route path="banner" element={<BannerAdmin />} />
+          <Route path="footer-contact" element={<ContactAdmin />} />
         </Route>
       </Routes>
     </>
   );
 };
 
-/* ========= POPUP BANNER COMPONENT ========= */
+/* ========= POPUP BANNER ========= */
 const PopupBanner = ({ isOpen, onClose, imageSrc }) => {
   return (
     <AnimatePresence>
