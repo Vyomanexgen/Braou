@@ -19,6 +19,7 @@ export default function AdminResetPassword() {
     e.preventDefault();
     setError("");
 
+    /* ================= VALIDATIONS ================= */
     if (!email || !tempPassword) {
       setError("Email and temporary password are required");
       return;
@@ -39,6 +40,7 @@ export default function AdminResetPassword() {
     setLoading(true);
 
     try {
+      /* ================= API CALL ================= */
       const res = await adminFetch("/auth/reset-password", {
         method: "POST",
         body: JSON.stringify({
@@ -54,10 +56,15 @@ export default function AdminResetPassword() {
         throw new Error(data?.message || "Password reset failed");
       }
 
+      /* ================= SUCCESS ================= */
       localStorage.removeItem("FORCE_PASSWORD_RESET");
 
-      alert("Password reset successful. Please login with your new password.");
-      navigate("/admin/login", { replace: true });
+      alert("Password reset successful. Please login again.");
+
+      // ✅ SAFE REDIRECT
+      setTimeout(() => {
+        navigate("/admin/login", { replace: true });
+      }, 300);
     } catch (err) {
       setError(err.message || "Something went wrong");
     } finally {
@@ -73,8 +80,8 @@ export default function AdminResetPassword() {
 
         {/* DIAGONAL OVERLAY */}
         <div
-          className="hidden md:block absolute top-[-40%] right-[-65%] w-[140%] h-[160%]
-          bg-gradient-to-b from-teal-700 via-teal-800 to-black rotate-[60deg] z-10"
+          className="hidden md:block absolute top-[-40%] right-[-65%] w-[170%] h-[160%]
+          bg-gradient-to-b from-teal-700 via-teal-800 to-black rotate-[70deg] z-10"
         />
 
         {/* CONTENT */}

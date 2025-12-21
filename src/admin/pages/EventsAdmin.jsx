@@ -4,6 +4,7 @@ import { adminFetch } from "../utils/adminFetch";
 
 export default function EventsAdmin() {
   const [events, setEvents] = useState([]);
+  const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // ✅ SAFE UI STATE (INDEX BASED)
@@ -14,6 +15,7 @@ export default function EventsAdmin() {
   /* ================= FETCH EVENTS ================= */
   useEffect(() => {
     fetchEvents();
+    fetchGallery();
   }, []);
 
   const fetchEvents = async () => {
@@ -29,7 +31,7 @@ export default function EventsAdmin() {
         date: e.date ? e.date.split("T")[0] : "",
         img: e.image_url ?? "",
         event_link: e.event_link ?? "",
-        imageFile: null, // 🔑 only set when user selects new image
+        imageFile: null,
       }));
 
       setEvents(formatted);
@@ -39,6 +41,48 @@ export default function EventsAdmin() {
     } finally {
       setLoading(false);
     }
+  };
+
+  /* ================= FETCH GALLERY ================= */
+  const fetchGallery = async () => {
+    try {
+      const res = await adminFetch("/braou/gallery");
+      const json = await res.json();
+      setGallery(json.data || []);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load gallery");
+    }
+  };
+
+  /* ================= REPLACE GALLERY IMAGE ================= */
+  const replaceGalleryImage = async (galleryId, file) => {
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Only image files allowed");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image must be less than 5MB");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const res = await adminFetch(`/braou/gallery/${galleryId}`, {
+      method: "PUT",
+      body: formData,
+    });
+
+    if (!res.ok) {
+      alert("Failed to replace image");
+      return;
+    }
+
+    fetchGallery();
   };
 
   /* ================= LOCAL UPDATE ================= */
@@ -109,7 +153,6 @@ export default function EventsAdmin() {
       formData.append("date", event.date);
       formData.append("event_link", event.event_link || "");
 
-      // ✅ IMAGE IS OPTIONAL ON UPDATE
       if (event.imageFile) {
         formData.append("image", event.imageFile);
       }
@@ -119,7 +162,6 @@ export default function EventsAdmin() {
         body: formData,
       });
 
-      // ❌ do NOT touch state if backend failed
       if (!res.ok) {
         const err = await res.json();
         alert(err.message || "Update failed");
@@ -138,7 +180,7 @@ export default function EventsAdmin() {
                 date: json.data.date.split("T")[0],
                 img: json.data.image_url,
                 event_link: json.data.event_link ?? "",
-                imageFile: null, // reset after save
+                imageFile: null,
               }
             : ev
         )
@@ -170,6 +212,45 @@ export default function EventsAdmin() {
     <div>
       <h1 className="text-3xl font-extrabold mb-8">BRAOU Events</h1>
 
+      <h2 className="text-lg font-bold text-blue-900 mb-4 ml-4">
+        Gallery Images
+      </h2>
+
+      {/* ================= GALLERY GRID (3 PER ROW) ================= */}
+      <div className="bg-white/40 p-6 rounded-2xl mb-10">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+          {gallery.map((item) => (
+            <div
+              key={item._id}
+              className="relative h-40 rounded-xl bg-white/60 overflow-hidden border-2 border-dashed border-cyan-600"
+            >
+              <img
+                src={item.image_url}
+                alt="gallery"
+                className="w-full h-full object-cover"
+              />
+
+              <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 flex items-center justify-center transition">
+                <label className="px-4 py-1 bg-yellow-600 text-white rounded-md font-semibold cursor-pointer">
+                  Replace
+                  <input
+                    type="file"
+                    hidden
+                    accept="image/*"
+                    onChange={(e) =>
+                      replaceGalleryImage(item._id, e.target.files[0])
+                    }
+                  />
+                </label>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ================= EVENTS ================= */}
+      <h2 className="text-lg font-bold text-blue-900 mb-4 ml-4">Events</h2>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 p-8 rounded-3xl">
         {events.map((event, index) => {
           if (!event) return null;
@@ -182,7 +263,6 @@ export default function EventsAdmin() {
               key={event._id ?? `event-${index}`}
               className="bg-cyan-100 rounded-2xl shadow-md flex flex-col overflow-hidden"
             >
-              {/* IMAGE */}
               <label
                 className={`relative h-44 bg-cyan-200 flex items-center justify-center ${
                   isEditing && !isSaving
@@ -217,7 +297,6 @@ export default function EventsAdmin() {
                 />
               </label>
 
-              {/* CONTENT */}
               <div className="p-5 flex flex-col gap-4">
                 <div className="flex justify-between items-start">
                   <h3 className="font-bold text-lg text-cyan-900 line-clamp-1">
@@ -281,7 +360,6 @@ export default function EventsAdmin() {
                 </div>
               </div>
 
-              {/* ACTION BAR */}
               {isEditing && (
                 <div className="px-5 py-4 bg-cyan-100 border-t border-cyan-200 flex justify-between">
                   <button

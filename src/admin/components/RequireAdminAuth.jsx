@@ -1,18 +1,19 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAdmin } from "../context/AdminContext";
 
 export default function RequireAdminAuth({ children }) {
   const { isAuthenticated, loading } = useAdmin();
+  const location = useLocation();
 
   const forceReset = localStorage.getItem("FORCE_PASSWORD_RESET") === "true";
 
-  // Not logged in
+  if (loading) return null;
+
   if (!isAuthenticated) {
     return <Navigate to="/admin/login" replace />;
   }
 
-  // Logged in but forced reset
-  if (forceReset) {
+  if (forceReset && location.pathname !== "/admin/reset-password") {
     return <Navigate to="/admin/reset-password" replace />;
   }
 

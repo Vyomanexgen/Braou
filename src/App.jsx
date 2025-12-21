@@ -40,11 +40,14 @@ import AdminLogin from "./admin/pages/AdminLogin";
 import AdminForgotPassword from "./admin/pages/AdminForgotPassword";
 import AdminResetPassword from "./admin/pages/AdminResetPassword";
 
+/* ========= ROUTE GUARDS ========= */
 import RequireAdminAuth from "./admin/components/RequireAdminAuth";
+import PublicAdminRoute from "./admin/components/PublicAdminRoute";
 
 /* ========= CONFIG ========= */
 const BANNER_API_URL = `${import.meta.env.VITE_BASE_API}/banner`;
 
+/* ========= APP ROOT ========= */
 export default function App() {
   return (
     <Router>
@@ -63,41 +66,46 @@ const AppInitializer = () => {
   const [bannerImage, setBannerImage] = useState(null);
   const [isBannerOpen, setIsBannerOpen] = useState(false);
 
-  // ✅ Detect admin route
   const isAdminRoute = location.pathname.startsWith("/admin");
 
+  /* 🔥 RUN ONLY ONCE */
   useEffect(() => {
+    let mounted = true;
+
     const initApp = async () => {
       let fetchedBanner = null;
 
       try {
-        const [bannerRes] = await Promise.all([
-          fetch(BANNER_API_URL).catch(() => null),
-          new Promise((res) => setTimeout(res, 1500)),
-        ]);
+        const bannerRes = await fetch(BANNER_API_URL).catch(() => null);
 
         if (bannerRes?.ok) {
           const result = await bannerRes.json();
           const banners = result?.data || [];
-          const lastBanner = banners[banners.length - 1];
-          fetchedBanner = lastBanner?.image_url || null;
+          fetchedBanner = banners[banners.length - 1]?.image_url || null;
 
-          if (fetchedBanner) setBannerImage(fetchedBanner);
+          if (mounted) setBannerImage(fetchedBanner);
         }
       } catch (err) {
         console.error("Init error:", err);
       } finally {
-        setIsLoading(false);
-
-        // Show banner only for public routes
-        if (fetchedBanner && !isAdminRoute) {
-          setTimeout(() => setIsBannerOpen(true), 100);
-        }
+        if (mounted) setIsLoading(false);
       }
     };
 
     initApp();
-  }, [isAdminRoute]);
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  /* 🔥 OPEN BANNER ONLY WHEN ROUTE CHANGES TO PUBLIC */
+  useEffect(() => {
+    if (bannerImage && !isAdminRoute) {
+      const timer = setTimeout(() => setIsBannerOpen(true), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [bannerImage, isAdminRoute]);
 
   return (
     <>
@@ -106,8 +114,6 @@ const AppInitializer = () => {
         {isLoading && (
           <motion.div
             className="fixed inset-0 z-[99999] flex items-center justify-center bg-white"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
           >
@@ -127,7 +133,7 @@ const AppInitializer = () => {
 
       {/* ===== ROUTES ===== */}
       <Routes>
-        {/* -------- PUBLIC ROUTES -------- */}
+        {/* ---------- PUBLIC ---------- */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<Home />} />
@@ -138,19 +144,37 @@ const AppInitializer = () => {
           <Route path="/events" element={<Events />} />
           <Route path="/events/:id" element={<EventDetails />} />
           <Route path="/updates" element={<Updates />} />
-
-          {/* ADMIN AUTH (PUBLIC ACCESS) */}
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route
-            path="/admin/forgot-password"
-            element={<AdminForgotPassword />}
-          />
         </Route>
 
-        {/* 🔐 RESET PASSWORD (ADMIN, BUT NOT PROTECTED) */}
-        <Route path="/admin/reset-password" element={<AdminResetPassword />} />
+        {/* ---------- ADMIN AUTH (PUBLIC) ---------- */}
+        <Route
+          path="/admin/login"
+          element={
+            <PublicAdminRoute>
+              <AdminLogin />
+            </PublicAdminRoute>
+          }
+        />
 
-        {/* -------- ADMIN PROTECTED ROUTES -------- */}
+        <Route
+          path="/admin/forgot-password"
+          element={
+            <PublicAdminRoute>
+              <AdminForgotPassword />
+            </PublicAdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/reset-password"
+          element={
+            <PublicAdminRoute>
+              <AdminResetPassword />
+            </PublicAdminRoute>
+          }
+        />
+
+        {/* ---------- ADMIN PROTECTED ---------- */}
         <Route
           path="/admin"
           element={
@@ -184,16 +208,10 @@ const PopupBanner = ({ isOpen, onClose, imageSrc }) => {
       {isOpen && imageSrc && (
         <motion.div
           className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 px-2 py-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
           onClick={onClose}
         >
           <motion.div
             className="relative bg-white rounded-lg shadow-2xl w-full max-w-3xl"
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0.9 }}
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -203,13 +221,11 @@ const PopupBanner = ({ isOpen, onClose, imageSrc }) => {
               ✕
             </button>
 
-            <div className="max-h-[80vh] w-full flex items-center justify-center bg-gray-100 rounded-lg">
-              <img
-                src={imageSrc}
-                alt="Popup Banner"
-                className="max-h-[80vh] max-w-[90vw] object-contain"
-              />
-            </div>
+            <img
+              src={imageSrc}
+              alt="Popup Banner"
+              className="max-h-[80vh] max-w-[90vw] object-contain mx-auto"
+            />
           </motion.div>
         </motion.div>
       )}

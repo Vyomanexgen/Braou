@@ -69,7 +69,9 @@ export default function AdminLogin() {
             className="w-full md:w-[55%] px-6 sm:px-10 md:px-20 py-10 md:py-16
               bg-gradient-to-b from-teal-700 via-teal-800 to-black md:bg-none text-white"
           >
-            <h1 className="text-3xl sm:text-4xl font-bold mb-8 pt-6">Login</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-8 pt-6">
+              Admin Login
+            </h1>
 
             {error && <p className="text-red-300 mb-6 text-sm">{error}</p>}
 

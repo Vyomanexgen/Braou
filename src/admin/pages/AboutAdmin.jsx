@@ -2,125 +2,40 @@ import React, { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { adminFetch } from "../utils/adminFetch";
 
-export default function AboutAdmin() {
-  const [aboutText, setAboutText] = useState("");
-  const [activities, setActivities] = useState({});
-  const [editingKey, setEditingKey] = useState(null);
-
-  const [tempText, setTempText] = useState("");
-  const [tempTitle, setTempTitle] = useState("");
-
-  const [backupText, setBackupText] = useState("");
-  const [backupTitle, setBackupTitle] = useState("");
-
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  /* ---------------- FETCH ABOUT ---------------- */
-  useEffect(() => {
-    const fetchAbout = async () => {
-      try {
-        const res = await adminFetch("/about");
-        const result = await res.json();
-
-        if (result?.data) {
-          setAboutText(result.data.about_text || "");
-          setActivities(result.data.activities || {});
-        }
-      } catch (err) {
-        console.error("Failed to load about data", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAbout();
-  }, []);
-
-  /* ---------------- UPDATE API ---------------- */
-  const updateAbout = async (payload) => {
-    setSaving(true);
-    try {
-      const res = await adminFetch("/about", {
-        method: "PUT",
-        body: JSON.stringify(payload),
-      });
-
-      const result = await res.json();
-      return result;
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  /* ---------------- SAVE ABOUT TEXT ---------------- */
-  const saveAboutText = async () => {
-    try {
-      const res = await updateAbout({
-        about_text: tempText,
-        activities,
-      });
-
-      setAboutText(res.data.about_text);
-      setActivities(res.data.activities);
-      setEditingKey(null);
-    } catch (err) {
-      console.error("Save about failed", err);
-    }
-  };
-
-  /* ---------------- SAVE ACTIVITY ---------------- */
-  const saveActivity = async (key) => {
-    try {
-      const bulletPoints = tempText
-        .split("\n")
-        .map((t) => t.trim())
-        .filter(Boolean);
-
-      const updatedActivities = {
-        ...activities,
-        [key]: {
-          ...activities[key],
-          title: tempTitle,
-          bullet_points: bulletPoints,
-        },
-      };
-
-      const res = await updateAbout({
-        about_text: aboutText,
-        activities: updatedActivities,
-      });
-
-      setActivities(res.data.activities);
-      setAboutText(res.data.about_text);
-      setEditingKey(null);
-    } catch (err) {
-      console.error("Save activity failed", err);
-    }
-  };
-
-  /* ---------------- CANCEL EDIT ---------------- */
-  const cancelEdit = () => {
-    setTempText(backupText);
-    setTempTitle(backupTitle);
-    setEditingKey(null);
-  };
-
-  /* ---------------- CARD ---------------- */
-  const Card = ({ title, content, onEdit, onSave, isEditing, isActivity }) => (
+/* =========================
+   EDITABLE CARD (OUTSIDE)
+   ========================= */
+function EditableCard({
+  title,
+  content,
+  isEditing,
+  isActivity,
+  tempTitle,
+  tempText,
+  saving,
+  onEdit,
+  onTitleChange,
+  onTextChange,
+  onSave,
+  onCancel,
+}) {
+  return (
     <div className="mb-6">
-      {!isEditing ? (
+      {/* Title */}
+      {!isEditing || !isActivity ? (
         <h3 className="font-bold text-lg text-blue-900 mb-2">{title}</h3>
-      ) : isActivity ? (
-        <input
-          className="w-full mb-2 p-2 rounded-lg font-bold text-lg border focus:outline-none focus:ring-2 focus:ring-cyan-600"
-          value={tempTitle}
-          onChange={(e) => setTempTitle(e.target.value)}
-        />
       ) : (
-        <h3 className="font-bold text-lg text-blue-900 mb-2">{title}</h3>
+        <input
+          autoFocus
+          className="w-full mb-2 p-2 rounded-lg font-bold text-lg border
+          focus:outline-none focus:ring-2 focus:ring-cyan-600"
+          value={tempTitle}
+          onChange={(e) => onTitleChange(e.target.value)}
+          disabled={saving}
+        />
       )}
 
+      {/* Content */}
       <div className="relative bg-cyan-100 rounded-xl p-5">
         {!isEditing ? (
           <>
@@ -140,7 +55,8 @@ export default function AboutAdmin() {
 
             <button
               onClick={onEdit}
-              className="absolute top-4 right-4 text-cyan-700 hover:scale-110 transition"
+              className="absolute top-4 right-4 text-cyan-700
+              hover:scale-110 transition"
             >
               <FaEdit />
             </button>
@@ -148,9 +64,11 @@ export default function AboutAdmin() {
         ) : (
           <div className="flex flex-col gap-3">
             <textarea
-              className="w-full rounded-lg p-3 min-h-[120px] border focus:outline-none focus:ring-2 focus:ring-cyan-600"
+              autoFocus
+              className="w-full rounded-lg p-3 min-h-[120px] border
+              focus:outline-none focus:ring-2 focus:ring-cyan-600"
               value={tempText}
-              onChange={(e) => setTempText(e.target.value)}
+              onChange={(e) => onTextChange(e.target.value)}
               disabled={saving}
             />
 
@@ -165,7 +83,7 @@ export default function AboutAdmin() {
               </button>
 
               <button
-                onClick={cancelEdit}
+                onClick={onCancel}
                 disabled={saving}
                 className="flex-1 border border-cyan-700 text-cyan-700 py-2 rounded-lg
                 hover:bg-cyan-200 transition disabled:opacity-60"
@@ -178,6 +96,103 @@ export default function AboutAdmin() {
       </div>
     </div>
   );
+}
+
+/* =========================
+   MAIN COMPONENT
+   ========================= */
+export default function AboutAdmin() {
+  const [aboutText, setAboutText] = useState("");
+  const [activities, setActivities] = useState({});
+  const [editingKey, setEditingKey] = useState(null);
+
+  const [tempText, setTempText] = useState("");
+  const [tempTitle, setTempTitle] = useState("");
+
+  const [backupText, setBackupText] = useState("");
+  const [backupTitle, setBackupTitle] = useState("");
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  /* ---------------- FETCH ---------------- */
+  useEffect(() => {
+    const fetchAbout = async () => {
+      try {
+        const res = await adminFetch("/about");
+        const result = await res.json();
+
+        if (result?.data) {
+          setAboutText(result.data.about_text || "");
+          setActivities(result.data.activities || {});
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAbout();
+  }, []);
+
+  /* ---------------- UPDATE API ---------------- */
+  const updateAbout = async (payload) => {
+    setSaving(true);
+    try {
+      const res = await adminFetch("/about", {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
+      return await res.json();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* ---------------- SAVE ABOUT ---------------- */
+  const saveAboutText = async () => {
+    const res = await updateAbout({
+      about_text: tempText,
+      activities,
+    });
+
+    setAboutText(res.data.about_text);
+    setActivities(res.data.activities);
+    setEditingKey(null);
+  };
+
+  /* ---------------- SAVE ACTIVITY ---------------- */
+  const saveActivity = async (key) => {
+    const bulletPoints = tempText
+      .split("\n")
+      .map((t) => t.trim())
+      .filter(Boolean);
+
+    const updatedActivities = {
+      ...activities,
+      [key]: {
+        ...activities[key],
+        title: tempTitle,
+        bullet_points: bulletPoints,
+      },
+    };
+
+    const res = await updateAbout({
+      about_text: aboutText,
+      activities: updatedActivities,
+    });
+
+    setActivities(res.data.activities);
+    setEditingKey(null);
+  };
+
+  /* ---------------- CANCEL ---------------- */
+  const cancelEdit = () => {
+    setTempText(backupText);
+    setTempTitle(backupTitle);
+    setEditingKey(null);
+  };
 
   /* ---------------- LOADER ---------------- */
   if (loading) {
@@ -192,28 +207,37 @@ export default function AboutAdmin() {
     <div className="w-full px-6">
       <h1 className="text-2xl font-extrabold mb-6">About</h1>
 
-      <Card
+      {/* ABOUT */}
+      <EditableCard
         title="About EMR&RC"
         content={aboutText}
         isEditing={editingKey === "about"}
+        tempText={tempText}
+        saving={saving}
         onEdit={() => {
           setTempText(aboutText);
           setBackupText(aboutText);
           setEditingKey("about");
         }}
+        onTextChange={setTempText}
         onSave={saveAboutText}
+        onCancel={cancelEdit}
       />
 
       <h2 className="text-xl font-bold text-center my-10">Activities</h2>
 
+      {/* ACTIVITIES */}
       <div className="grid md:grid-cols-2 gap-6">
         {Object.entries(activities).map(([key, item]) => (
-          <Card
+          <EditableCard
             key={key}
             title={item.title}
             content={item.bullet_points || []}
             isEditing={editingKey === key}
             isActivity
+            tempTitle={tempTitle}
+            tempText={tempText}
+            saving={saving}
             onEdit={() => {
               setTempTitle(item.title || "");
               setTempText((item.bullet_points || []).join("\n"));
@@ -221,7 +245,10 @@ export default function AboutAdmin() {
               setBackupText((item.bullet_points || []).join("\n"));
               setEditingKey(key);
             }}
+            onTitleChange={setTempTitle}
+            onTextChange={setTempText}
             onSave={() => saveActivity(key)}
+            onCancel={cancelEdit}
           />
         ))}
       </div>

@@ -2,126 +2,31 @@ import React, { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { adminFetch } from "../utils/adminFetch";
 
-export default function AIRAdmin() {
-  const [airId, setAirId] = useState(null);
-  const [scrollingText, setScrollingText] = useState("");
-  const [pdfUrl, setPdfUrl] = useState("");
-
-  const [editKey, setEditKey] = useState(null); // scrolling_text | pdf
-  const [tempText, setTempText] = useState("");
-  const [tempPdf, setTempPdf] = useState(null);
-  const [backupText, setBackupText] = useState("");
-
-  const [fetching, setFetching] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  /* ================= FETCH AIR ================= */
-  useEffect(() => {
-    fetchAir();
-  }, []);
-
-  const fetchAir = async () => {
-    try {
-      setFetching(true);
-
-      const res = await adminFetch("/air", {
-        cache: "no-store",
-      });
-
-      const result = await res.json();
-      const list = result?.data || [];
-
-      if (list.length > 0) {
-        const last = list[list.length - 1];
-        setAirId(last._id);
-        setScrollingText(last.scrolling_text || "");
-        setPdfUrl(last.pdf_url || "");
-      }
-    } catch (err) {
-      console.error("Failed to fetch AIR", err);
-    } finally {
-      setFetching(false);
-    }
-  };
-
-  /* ================= SAVE SCROLLING ================= */
-  const saveScrolling = async () => {
-    if (!airId || saving) return;
-
-    try {
-      setSaving(true);
-
-      await adminFetch(`/air/${airId}`, {
-        method: "PUT",
-        body: JSON.stringify({ scrolling_text: tempText }),
-      });
-
-      setScrollingText(tempText);
-      setEditKey(null);
-      setBackupText("");
-    } catch (err) {
-      console.error("Scrolling update failed", err);
-      alert("Failed to update scrolling text");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  /* ================= SAVE PDF ================= */
-  const savePdf = async () => {
-    if (!airId || !tempPdf || saving) return;
-
-    // 🔐 File validation
-    if (tempPdf.type !== "application/pdf") {
-      alert("Only PDF files are allowed");
-      return;
-    }
-
-    if (tempPdf.size > 10 * 1024 * 1024) {
-      alert("PDF must be less than 10MB");
-      return;
-    }
-
-    try {
-      setSaving(true);
-
-      const formData = new FormData();
-      formData.append("pdf", tempPdf);
-      formData.append("scrolling_text", scrollingText);
-
-      await adminFetch(`/air/${airId}`, {
-        method: "PUT",
-        body: formData,
-      });
-
-      setTempPdf(null);
-      setEditKey(null);
-      fetchAir();
-    } catch (err) {
-      console.error("PDF upload failed", err);
-      alert("Failed to upload PDF");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  /* ================= CANCEL EDIT ================= */
-  const cancelEdit = () => {
-    if (saving) return;
-
-    setTempText(backupText);
-    setTempPdf(null);
-    setEditKey(null);
-    setBackupText("");
-  };
-
-  /* ================= CARD ================= */
-  const Card = ({ title, type }) => (
+/* =========================
+   EDITABLE CARD (OUTSIDE)
+   ========================= */
+function EditableCard({
+  title,
+  type,
+  scrollingText,
+  pdfUrl,
+  isEditing,
+  tempText,
+  tempPdf,
+  saving,
+  onEdit,
+  onTextChange,
+  onPdfChange,
+  onSaveScrolling,
+  onSavePdf,
+  onCancel,
+}) {
+  return (
     <div className="mb-6">
       <h3 className="font-bold text-lg text-blue-900 mb-2">{title}</h3>
 
       <div className="relative bg-cyan-100 rounded-xl p-5 w-full">
-        {editKey !== type ? (
+        {!isEditing ? (
           <>
             {type === "scrolling_text" && (
               <p className="font-semibold pr-10 break-all">
@@ -146,12 +51,9 @@ export default function AIRAdmin() {
             <button
               type="button"
               disabled={saving}
-              onClick={() => {
-                setEditKey(type);
-                setTempText(scrollingText);
-                setBackupText(scrollingText);
-              }}
-              className="absolute top-4 right-4 text-cyan-700 hover:scale-110 transition disabled:opacity-50"
+              onClick={onEdit}
+              className="absolute top-4 right-4 text-cyan-700
+              hover:scale-110 transition disabled:opacity-50"
             >
               <FaEdit />
             </button>
@@ -160,10 +62,11 @@ export default function AIRAdmin() {
           <div className="flex flex-col gap-3">
             {type === "scrolling_text" && (
               <textarea
+                autoFocus
                 className="w-full rounded-lg p-3 min-h-[100px] border
                 focus:outline-none focus:ring-2 focus:ring-cyan-600"
                 value={tempText}
-                onChange={(e) => setTempText(e.target.value)}
+                onChange={(e) => onTextChange(e.target.value)}
                 disabled={saving}
               />
             )}
@@ -177,11 +80,7 @@ export default function AIRAdmin() {
                     accept="application/pdf"
                     hidden
                     disabled={saving}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      setTempPdf(file);
-                    }}
+                    onChange={(e) => onPdfChange(e.target.files?.[0] || null)}
                   />
                 </label>
 
@@ -197,7 +96,7 @@ export default function AIRAdmin() {
               {type === "scrolling_text" && (
                 <button
                   type="button"
-                  onClick={saveScrolling}
+                  onClick={onSaveScrolling}
                   disabled={saving}
                   className="flex-1 bg-cyan-700 text-white py-2 rounded-lg
                   hover:bg-cyan-800 transition disabled:opacity-50"
@@ -209,7 +108,7 @@ export default function AIRAdmin() {
               {type === "pdf" && (
                 <button
                   type="button"
-                  onClick={savePdf}
+                  onClick={onSavePdf}
                   disabled={saving || !tempPdf}
                   className="flex-1 bg-cyan-700 text-white py-2 rounded-lg
                   hover:bg-cyan-800 transition disabled:opacity-50"
@@ -220,7 +119,7 @@ export default function AIRAdmin() {
 
               <button
                 type="button"
-                onClick={cancelEdit}
+                onClick={onCancel}
                 disabled={saving}
                 className="flex-1 border border-cyan-700 text-cyan-700 py-2 rounded-lg
                 hover:bg-cyan-200 transition disabled:opacity-50"
@@ -233,8 +132,104 @@ export default function AIRAdmin() {
       </div>
     </div>
   );
+}
 
-  /* ================= LOADING ================= */
+/* =========================
+   MAIN COMPONENT
+   ========================= */
+export default function AIRAdmin() {
+  const [airId, setAirId] = useState(null);
+  const [scrollingText, setScrollingText] = useState("");
+  const [pdfUrl, setPdfUrl] = useState("");
+
+  const [editKey, setEditKey] = useState(null);
+  const [tempText, setTempText] = useState("");
+  const [tempPdf, setTempPdf] = useState(null);
+  const [backupText, setBackupText] = useState("");
+
+  const [fetching, setFetching] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  /* ---------------- FETCH ---------------- */
+  useEffect(() => {
+    fetchAir();
+  }, []);
+
+  const fetchAir = async () => {
+    try {
+      setFetching(true);
+      const res = await adminFetch("/air", { cache: "no-store" });
+      const result = await res.json();
+      const list = result?.data || [];
+
+      if (list.length) {
+        const last = list[list.length - 1];
+        setAirId(last._id);
+        setScrollingText(last.scrolling_text || "");
+        setPdfUrl(last.pdf_url || "");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  /* ---------------- SAVE SCROLLING ---------------- */
+  const saveScrolling = async () => {
+    if (!airId || saving) return;
+
+    try {
+      setSaving(true);
+      await adminFetch(`/air/${airId}`, {
+        method: "PUT",
+        body: JSON.stringify({ scrolling_text: tempText }),
+      });
+
+      setScrollingText(tempText);
+      setEditKey(null);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* ---------------- SAVE PDF ---------------- */
+  const savePdf = async () => {
+    if (!airId || !tempPdf || saving) return;
+
+    if (tempPdf.type !== "application/pdf") {
+      alert("Only PDF allowed");
+      return;
+    }
+
+    try {
+      setSaving(true);
+      const formData = new FormData();
+      formData.append("pdf", tempPdf);
+      formData.append("scrolling_text", scrollingText);
+
+      await adminFetch(`/air/${airId}`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      setTempPdf(null);
+      setEditKey(null);
+      fetchAir();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* ---------------- CANCEL ---------------- */
+  const cancelEdit = () => {
+    if (saving) return;
+    setTempText(backupText);
+    setTempPdf(null);
+    setEditKey(null);
+  };
+
+  /* ---------------- LOADING ---------------- */
   if (fetching) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
@@ -246,8 +241,36 @@ export default function AIRAdmin() {
   return (
     <div className="w-full px-6">
       <h1 className="text-2xl font-extrabold mb-6">AIR</h1>
-      <Card title="Scrolling Text" type="scrolling_text" />
-      <Card title="PDF" type="pdf" />
+
+      <EditableCard
+        title="Scrolling Text"
+        type="scrolling_text"
+        scrollingText={scrollingText}
+        isEditing={editKey === "scrolling_text"}
+        tempText={tempText}
+        saving={saving}
+        onEdit={() => {
+          setEditKey("scrolling_text");
+          setTempText(scrollingText);
+          setBackupText(scrollingText);
+        }}
+        onTextChange={setTempText}
+        onSaveScrolling={saveScrolling}
+        onCancel={cancelEdit}
+      />
+
+      <EditableCard
+        title="PDF"
+        type="pdf"
+        pdfUrl={pdfUrl}
+        isEditing={editKey === "pdf"}
+        tempPdf={tempPdf}
+        saving={saving}
+        onEdit={() => setEditKey("pdf")}
+        onPdfChange={setTempPdf}
+        onSavePdf={savePdf}
+        onCancel={cancelEdit}
+      />
     </div>
   );
 }

@@ -18,19 +18,26 @@ export default function WebRadioAdmin() {
     try {
       setFetching(true);
 
-      const res = await adminFetch("/web-radio", {
+      const res = await adminFetch("/web-radio/", {
         cache: "no-store",
       });
 
       const result = await res.json();
-      const list = result?.data || [];
 
-      if (Array.isArray(list) && list.length > 0) {
-        const last = list[list.length - 1];
-        setRadioId(last._id);
-        setRadioLink(last.radio_link || "");
-        setTempValue(last.radio_link || "");
+      const list = result?.data;
+
+      if (!Array.isArray(list) || list.length === 0) {
+        setRadioId(null);
+        setRadioLink("");
+        return;
       }
+
+      // backend stores as array → take latest or first
+      const item = list[list.length - 1];
+
+      setRadioId(item._id);
+      setRadioLink(item.web_radio_link || "");
+      setTempValue(item.web_radio_link || "");
     } catch (err) {
       console.error("Failed to load Web Radio", err);
     } finally {
@@ -61,7 +68,10 @@ export default function WebRadioAdmin() {
 
   /* ================= SAVE RADIO LINK ================= */
   const saveRadioLink = async () => {
-    if (!radioId || saving) return;
+    if (!radioId || saving) {
+      alert("Radio ID not found");
+      return;
+    }
 
     if (!validateLink(tempValue)) return;
 
@@ -71,7 +81,7 @@ export default function WebRadioAdmin() {
       await adminFetch(`/web-radio/${radioId}`, {
         method: "PUT",
         body: JSON.stringify({
-          radio_link: tempValue,
+          web_radio_link: tempValue, // ✅ EXACT MATCH
         }),
       });
 
@@ -133,12 +143,12 @@ export default function WebRadioAdmin() {
           ) : (
             <div className="flex flex-col gap-3">
               <textarea
-                disabled={saving}
-                className="w-full rounded-lg p-3 border
-                focus:outline-none focus:ring-2 focus:ring-cyan-600"
                 rows={3}
+                disabled={saving}
                 value={tempValue}
                 onChange={(e) => setTempValue(e.target.value)}
+                className="w-full rounded-lg p-3 border
+                focus:outline-none focus:ring-2 focus:ring-cyan-600"
               />
 
               <div className="flex gap-3">

@@ -8,30 +8,33 @@ export const AdminProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  /* ================= CHECK AUTH ================= */
-  const checkAuth = async () => {
-    try {
-      const res = await fetch(`${BASE_API}/auth/refresh`, {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (!res.ok) throw new Error("Not authenticated");
-
-      setIsAuthenticated(true);
-    } catch {
-      setIsAuthenticated(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /* ================= INITIAL CHECK ================= */
   useEffect(() => {
+    let mounted = true;
+
+    const checkAuth = async () => {
+      try {
+        const res = await fetch(`${BASE_API}/auth/refresh`, {
+          method: "POST",
+          credentials: "include",
+        });
+
+        if (!res.ok) throw new Error("Not authenticated");
+
+        if (mounted) setIsAuthenticated(true);
+      } catch {
+        if (mounted) setIsAuthenticated(false);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
     checkAuth();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  /* ================= CROSS-TAB LOGOUT ================= */
   useEffect(() => {
     const handleStorage = (e) => {
       if (e.key === "admin-logout") {
@@ -43,12 +46,10 @@ export const AdminProvider = ({ children }) => {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
-  /* ================= LOGIN ================= */
   const loginSuccess = () => {
     setIsAuthenticated(true);
   };
 
-  /* ================= LOGOUT ================= */
   const logout = async () => {
     try {
       await fetch(`${BASE_API}/auth/logout`, {
@@ -56,25 +57,26 @@ export const AdminProvider = ({ children }) => {
         credentials: "include",
       });
     } catch {
-      // ignore backend failure
+      // ignore
     } finally {
       setIsAuthenticated(false);
-      logoutAllTabs(); // 🔥 sync logout across tabs
+      logoutAllTabs();
     }
   };
 
   return (
     <AdminContext.Provider
-      value={{
-        isAuthenticated,
-        loading,
-        loginSuccess,
-        logout,
-      }}
+      value={{ isAuthenticated, loading, loginSuccess, logout }}
     >
       {children}
     </AdminContext.Provider>
   );
 };
 
-export const useAdmin = () => useContext(AdminContext);
+export const useAdmin = () => {
+  const ctx = useContext(AdminContext);
+  if (!ctx) {
+    throw new Error("useAdmin must be used inside AdminProvider");
+  }
+  return ctx;
+};

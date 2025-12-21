@@ -12,7 +12,6 @@ import { adminFetch } from "../utils/adminFetch";
 const SCROLLING_API = "/tsat/scrolling";
 const NIPUNA_API = "/tsat/nipuna";
 const VIDYA_API = "/tsat/vidya";
-const TSAT_LINK_API = "/tsat/link";
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
@@ -24,10 +23,6 @@ export default function TSATAdmin() {
 
       <Section title="Scrolling Text">
         <ScrollingAdmin />
-      </Section>
-
-      <Section title="TSAT Live Link">
-        <TSATLinkAdmin />
       </Section>
 
       <Section title="Schedules">
@@ -71,7 +66,7 @@ function EditableCard({ title, view, edit, onSave, onCancel }) {
           {view}
           <button
             onClick={() => setEditing(true)}
-            className="absolute top-3 right-3 text-cyan-700"
+            className="absolute top-3 right-3 text-cyan-700 hover:scale-110 transition"
           >
             <FaEdit />
           </button>
@@ -103,7 +98,7 @@ function EditableCard({ title, view, edit, onSave, onCancel }) {
   );
 }
 
-/* ========================= SCROLLING (BOOLEAN FIX) ========================= */
+/* ========================= SCROLLING ========================= */
 function ScrollingAdmin() {
   const [item, setItem] = useState(null);
   const [original, setOriginal] = useState(null);
@@ -112,14 +107,13 @@ function ScrollingAdmin() {
     adminFetch(SCROLLING_API)
       .then((r) => r.json())
       .then((j) => {
-        const list = j?.data?.data || [];
-        const last = list[list.length - 1];
-        if (!last) return;
+        const scrollingItem = j?.data?.data;
+        if (!scrollingItem) return;
 
-        // ✅ normalize show as BOOLEAN
         const normalized = {
-          ...clone(last),
-          show: Boolean(last.show),
+          ...clone(scrollingItem),
+          show: Boolean(scrollingItem.show),
+          schedule_text: j?.data?.schedule_text || "",
         };
 
         setItem(normalized);
@@ -134,14 +128,15 @@ function ScrollingAdmin() {
       method: "PUT",
       body: JSON.stringify({
         title: item.title,
+        date: item.date,
         start_time: item.start_time,
         end_time: item.end_time,
         join_now_link: item.join_now_link,
-        show: item.show, // ✅ BOOLEAN (true/false)
+        schedule_text: item.schedule_text,
+        show: item.show ? 1 : 0,
       }),
     });
 
-    // keep state synced
     setOriginal(clone(item));
   };
 
@@ -149,22 +144,32 @@ function ScrollingAdmin() {
     <EditableCard
       title="Scrolling Content"
       view={
-        <div className="space-y-3 pr-10">
+        <div className="space-y-4 pr-10">
           <Info label="Title" value={item.title} />
+          {item.schedule_text && (
+            <Info label="Schedule Text" value={item.schedule_text} />
+          )}
 
-          <IconRow
-            icon={<FaClock />}
-            label="Time"
-            value={`${item.start_time} – ${item.end_time}`}
-          />
+          <div className="grid grid-cols-2 gap-3">
+            <IconRow
+              icon={<FaClock />}
+              label="Start Time"
+              value={item.start_time}
+            />
+            <IconRow
+              icon={<FaClock />}
+              label="End Time"
+              value={item.end_time}
+            />
+          </div>
 
           <StatusBox show={item.show} />
 
-          {item.join_now_link && (
+          {item.join_now_link && item.show && (
             <a
               href={item.join_now_link}
               target="_blank"
-              className="flex items-center gap-2 text-cyan-700 underline break-all"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-semibold"
             >
               <FaLink /> Join Now
             </a>
@@ -177,6 +182,17 @@ function ScrollingAdmin() {
             label="Title"
             value={item.title}
             onChange={(v) => setItem({ ...item, title: v })}
+          />
+          <Input
+            label="Schedule Text"
+            value={item.schedule_text}
+            onChange={(v) => setItem({ ...item, schedule_text: v })}
+          />
+          <Input
+            type="date"
+            label="Date"
+            value={item.date}
+            onChange={(v) => setItem({ ...item, date: v })}
           />
           <Input
             label="Start Time"
@@ -193,61 +209,12 @@ function ScrollingAdmin() {
             value={item.join_now_link || ""}
             onChange={(v) => setItem({ ...item, join_now_link: v })}
           />
-
-          {/* ✅ CORRECT CHECKBOX */}
           <Toggle
             label="Show scrolling"
             checked={item.show}
-            onChange={(checked) => setItem({ ...item, show: checked })}
+            onChange={(v) => setItem({ ...item, show: v })}
           />
         </div>
-      }
-      onSave={save}
-      onCancel={() => setItem(clone(original))}
-    />
-  );
-}
-
-/* ========================= TSAT LINK ========================= */
-function TSATLinkAdmin() {
-  const [item, setItem] = useState(null);
-  const [original, setOriginal] = useState(null);
-
-  useEffect(() => {
-    adminFetch(TSAT_LINK_API)
-      .then((r) => r.json())
-      .then((j) => {
-        const last = j?.data?.slice(-1)[0];
-        if (!last) return;
-        setItem(clone(last));
-        setOriginal(clone(last));
-      });
-  }, []);
-
-  if (!item) return <Empty />;
-
-  const save = async () => {
-    await adminFetch(`${TSAT_LINK_API}/${item._id}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        tsat_link: item.tsat_link,
-      }),
-    });
-    setOriginal(clone(item));
-  };
-
-  return (
-    <EditableCard
-      title="TSAT Live Link"
-      view={
-        <IconRow icon={<FaLink />} label="Live Link" value={item.tsat_link} />
-      }
-      edit={
-        <Input
-          label="TSAT Link"
-          value={item.tsat_link}
-          onChange={(v) => setItem({ ...item, tsat_link: v })}
-        />
       }
       onSave={save}
       onCancel={() => setItem(clone(original))}
@@ -266,8 +233,7 @@ function MediaAdmin({ api, title }) {
     adminFetch(api)
       .then((r) => r.json())
       .then((j) => {
-        const list = j?.data || [];
-        const last = list[list.length - 1];
+        const last = j?.data?.slice(-1)[0];
         if (!last) return;
         setItem(clone(last));
         setOriginal(clone(last));
@@ -304,15 +270,12 @@ function MediaAdmin({ api, title }) {
             value={item.timings || "—"}
           />
           <IconRow icon="📅" label="Date" value={item.date || "—"} />
-
           {item.logo && (
             <img
               src={item.logo}
-              alt="Logo"
               className="h-16 bg-white p-2 rounded object-contain"
             />
           )}
-
           {item.schedule_pdf && (
             <a
               href={item.schedule_pdf}
@@ -325,7 +288,44 @@ function MediaAdmin({ api, title }) {
         </div>
       }
       edit={
-        <div className="space-y-3">
+        <div className="space-y-4">
+          {item.logo && (
+            <div className="bg-white p-3 rounded shadow-sm">
+              <p className="text-xs text-gray-500 mb-1">Existing Logo</p>
+              <img
+                src={item.logo}
+                className="h-16 object-contain bg-gray-50 p-2 rounded"
+              />
+            </div>
+          )}
+
+          <FileInput
+            label="Upload New Logo"
+            accept="image/*"
+            onChange={setLogoFile}
+          />
+
+          {item.schedule_pdf && (
+            <div className="bg-white p-3 rounded shadow-sm">
+              <p className="text-xs text-gray-500 mb-1">
+                Existing Schedule PDF
+              </p>
+              <a
+                href={item.schedule_pdf}
+                target="_blank"
+                className="flex items-center gap-2 text-red-600 font-semibold"
+              >
+                <FaFilePdf /> View Current PDF
+              </a>
+            </div>
+          )}
+
+          <FileInput
+            label="Upload New Schedule PDF"
+            accept="application/pdf"
+            onChange={setPdfFile}
+          />
+
           <Input
             label="Timings"
             value={item.timings || ""}
@@ -336,16 +336,6 @@ function MediaAdmin({ api, title }) {
             label="Date"
             value={item.date || ""}
             onChange={(v) => setItem({ ...item, date: v })}
-          />
-          <FileInput
-            label="Upload Logo"
-            accept="image/*"
-            onChange={setLogoFile}
-          />
-          <FileInput
-            label="Upload Schedule PDF"
-            accept="application/pdf"
-            onChange={setPdfFile}
           />
         </div>
       }
@@ -360,7 +350,7 @@ function Info({ label, value }) {
   return (
     <div className="bg-white p-3 rounded shadow-sm">
       <p className="text-xs text-gray-500">{label}</p>
-      <p className="font-semibold">{value}</p>
+      <p className="font-semibold break-all">{value}</p>
     </div>
   );
 }
@@ -415,7 +405,6 @@ function FileInput({ label, accept, onChange }) {
   );
 }
 
-/* ✅ BOOLEAN SAFE TOGGLE */
 function Toggle({ label, checked, onChange }) {
   return (
     <label className="flex items-center gap-2 font-semibold">
