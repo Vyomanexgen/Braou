@@ -5,6 +5,11 @@ import { adminFetch } from "../utils/adminFetch";
 const BASE = import.meta.env.VITE_BASE_API;
 const CAROUSEL_API = "/carousel";
 const HOME_API = "/home";
+const decodeHtml = (text = "") => {
+  const txt = document.createElement("textarea");
+  txt.innerHTML = text;
+  return txt.value;
+};
 
 /* =====================================================
    HOME ADMIN (SECURED)
@@ -144,7 +149,10 @@ function EditableSection({ title, value, onSave, disabled }) {
       <div className="relative bg-cyan-100 rounded-xl p-5">
         {!editing ? (
           <>
-            <p className="font-semibold pr-10 whitespace-pre-wrap">{value}</p>
+            <p className="font-semibold pr-10 whitespace-pre-wrap">
+  {decodeHtml(value)}
+</p>
+
             <button
               disabled={disabled}
               onClick={() => {
