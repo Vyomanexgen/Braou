@@ -235,9 +235,10 @@ const AIR = () => {
       {/* Marquee Animation */}
       <style>
         {`
-          .marquee {
-            animation: scrollText 30s linear infinite;
-          }
+         .marquee {
+  animation: scrollText 60s linear infinite;
+}
+
 
           @keyframes scrollText {
             0% { transform: translateX(100%); }

@@ -842,6 +842,14 @@ const DEFAULT_NIPUNA = {
   logo: "/pictures/NIPUNA.png",
   schedule_pdf: null,
 };
+const pickLatest = (list) => {
+  if (!Array.isArray(list) || list.length === 0) return null;
+
+  return list.reduce((latest, item) =>
+    new Date(item.updatedAt) > new Date(latest.updatedAt) ? item : latest
+  );
+};
+
 
 // ✅ FIXED parseTime: Treats date and time strictly as Local (IST)
 const parseTime = (timeStr, dateStr) => {
@@ -878,17 +886,42 @@ const TSAT = () => {
           fetch(`${BASE_API}/tsat/scrolling`).catch(() => null)
         ]);
 
+        // if (vidyaRes?.ok) {
+        //   const v = await vidyaRes.json();
+        //   const latest = Array.isArray(v?.data) ? v.data[0] : v.data;
+        //   if (latest) setVidya({ ...DEFAULT_VIDYA, ...latest, logo: latest.schedule_pdf || DEFAULT_VIDYA.logo, schedule_pdf: latest.logo });
+        // }
         if (vidyaRes?.ok) {
-          const v = await vidyaRes.json();
-          const latest = Array.isArray(v?.data) ? v.data[0] : v.data;
-          if (latest) setVidya({ ...DEFAULT_VIDYA, ...latest, logo: latest.schedule_pdf || DEFAULT_VIDYA.logo, schedule_pdf: latest.logo });
-        }
+  const v = await vidyaRes.json();
+  const latestVidya = pickLatest(v?.data);
 
-        if (nipunaRes?.ok) {
-          const n = await nipunaRes.json();
-          const latest = Array.isArray(n?.data) ? n.data[0] : n.data;
-          if (latest) setNipuna({ ...DEFAULT_NIPUNA, ...latest });
-        }
+  if (latestVidya) {
+    setVidya({
+      timings: latestVidya.timings || DEFAULT_VIDYA.timings,
+      logo: latestVidya.logo || DEFAULT_VIDYA.logo,
+      schedule_pdf: latestVidya.schedule_pdf || null,
+    });
+  }
+}
+if (nipunaRes?.ok) {
+  const n = await nipunaRes.json();
+  const latestNipuna = pickLatest(n?.data);
+
+  if (latestNipuna) {
+    setNipuna({
+      timings: latestNipuna.timings || DEFAULT_NIPUNA.timings,
+      logo: latestNipuna.logo || DEFAULT_NIPUNA.logo,
+      schedule_pdf: latestNipuna.schedule_pdf || null,
+    });
+  }
+}
+
+
+        // if (nipunaRes?.ok) {
+        //   const n = await nipunaRes.json();
+        //   const latest = Array.isArray(n?.data) ? n.data[0] : n.data;
+        //   if (latest) setNipuna({ ...DEFAULT_NIPUNA, ...latest });
+        // }
 
         if (scrollingRes?.ok) {
           const s = await scrollingRes.json();
@@ -905,74 +938,50 @@ const TSAT = () => {
   }, [BASE_API]);
 
   // ✅ IMPROVED LOGIC: Reliable Local Date Comparison
-  useEffect(() => {
-    if (tickerData.length === 0) return;
+// ✅ REFINED LOGIC: Reliable Local Date Comparison based on Postman Data
+useEffect(() => {
+  if (tickerData.length === 0) return;
 
-    // const checkLiveStatus = () => {
-    //   const now = new Date();
-      
-    //   const activeEvent = tickerData.find((item) => {
-    //     if (!item.start_time || !item.end_time || !item.join_now_link || !item.date) {
-    //       return false;
-    //     }
-
-    //     // 1. Manually parse event date to avoid UTC issues
-    //     const [y, m, d] = item.date.split("-").map(Number);
-        
-    //     // 2. Compare local Day/Month/Year
-    //     const isSameDay = 
-    //       y === now.getFullYear() && 
-    //       (m - 1) === now.getMonth() && 
-    //       d === now.getDate();
-
-    //     if (!isSameDay) return false;
-
-    //     // 3. Check if current local time is within range
-    //     const start = parseTime(item.start_time, item.date);
-    //     const end = parseTime(item.end_time, item.date);
-
-    //     return now >= start && now <= end;
-    //   });
-
-    //   setLiveBroadcast(activeEvent || null);
-    // };
 const checkLiveStatus = () => {
   const now = new Date();
+  console.log("NOW (IST):", now.toString());
+console.log("tickerData from backend:", tickerData);
 
-  const activeEvent = [...tickerData]
-    .reverse()
-    .find((item) => {
-      if (
-        !item.date ||
-        !item.start_time ||
-        !item.end_time ||
-        !item.join_now_link
-      ) {
-        return false;
-      }
+  // LOGIC FIX: If you want to strictly check the [0] position:
+  // Use tickerData[0] instead of find() if the backend only sends one active item.
+  // Otherwise, use find() to search the list.
+  
+ const activeEvent = [...tickerData].reverse().find((item) => {
+  const event = item.data;   // ⭐ THIS IS THE KEY FIX
 
-      const [y, m, d] = item.date.split("-").map(Number);
-      if (
-        y !== now.getFullYear() ||
-        m - 1 !== now.getMonth() ||
-        d !== now.getDate()
-      ) {
-        return false;
-      }
+  if (!event) return false;
 
-      const start = parseTime(item.start_time, item.date);
-      const end = parseTime(item.end_time, item.date);
+  const now = new Date();
 
-      return now >= start && now <= end;
-    });
+  // check date
+  if (event.date !== now.toISOString().slice(0, 10)) return false;
 
-  setLiveBroadcast(activeEvent || null);
+  const start = parseTime(event.start_time, event.date);
+  const end = parseTime(event.end_time, event.date);
+
+  console.log("LIVE CHECK:", {
+    now: now.toString(),
+    start: start.toString(),
+    end: end.toString()
+  });
+
+  return now >= start && now <= end;
+});
+
+setLiveBroadcast(activeEvent?.data || null);
+
 };
 
-    checkLiveStatus();
-    const interval = setInterval(checkLiveStatus, 5000);
-    return () => clearInterval(interval);
-  }, [tickerData]);
+  checkLiveStatus();
+  // Poll every 5 seconds to automatically show/hide the bar when time passes
+  const interval = setInterval(checkLiveStatus, 5000);
+  return () => clearInterval(interval);
+}, [tickerData]);
 
   if (loading) {
     return (
@@ -996,31 +1005,33 @@ const checkLiveStatus = () => {
         </section>
 
         {/* ✅ DYNAMIC BROADCAST BAR */}
-        {liveBroadcast && (
-          <section className="w-full flex justify-center mt-4 px-4">
-            <div className="w-full max-w-3xl bg-[#D6F2F5] border border-[#0A8EC5] shadow-md px-4 py-3 rounded-2xl flex flex-col md:flex-row items-center justify-center text-center gap-3">
-              <div className="text-xs md:text-sm font-semibold leading-tight pr-5 text-[#00383D] flex flex-wrap items-center justify-center gap-2">
-                <span className="text-red-600 font-bold animate-pulse flex items-center gap-1">
-                  ● LIVE NOW
-                </span>
-                {liveBroadcast.channel && (
-                  <span className="bg-[#00383D] text-white px-2 py-0.5 rounded text-[10px] md:text-xs uppercase tracking-wide">
-                    {liveBroadcast.channel}
-                  </span>
-                )}
-                <span>
-                  : {liveBroadcast.title} ({liveBroadcast.start_time} - {liveBroadcast.end_time})
-                </span>
-              </div>
-              <button
-                onClick={() => window.open(liveBroadcast.join_now_link, "_blank")}
-                className="bg-[#C62828] text-white px-6 py-1.5 rounded-full text-xs md:text-sm shadow border border-[#8B0000] transition-all hover:bg-[#b72222] hover:scale-105 animate-wiggle"
-              >
-                ⚪ Join Now...
-              </button>
-            </div>
-          </section>
+       
+{liveBroadcast && (
+  <section className="w-full flex justify-center mt-4 px-4">
+    <div className="w-full max-w-3xl bg-[#D6F2F5] border border-[#0A8EC5] shadow-md px-4 py-3 rounded-2xl flex flex-col md:flex-row items-center justify-center text-center gap-3">
+      <div className="text-xs md:text-sm font-semibold leading-tight pr-5 text-[#00383D] flex flex-wrap items-center justify-center gap-2">
+        <span className="text-red-600 font-bold animate-pulse flex items-center gap-1">
+          ● LIVE NOW
+        </span>
+        {/* Only show channel tag if the field exists in your API */}
+        {liveBroadcast.channel && (
+          <span className="bg-[#00383D] text-white px-2 py-0.5 rounded text-[10px] md:text-xs uppercase tracking-wide">
+            {liveBroadcast.channel}
+          </span>
         )}
+        <span>
+          : {liveBroadcast.title} ({liveBroadcast.start_time} - {liveBroadcast.end_time})
+        </span>
+      </div>
+      <button
+        onClick={() => window.open(liveBroadcast.join_now_link, "_blank")}
+        className="bg-[#C62828] text-white px-6 py-1.5 rounded-full text-xs md:text-sm shadow border border-[#8B0000] transition-all hover:bg-[#b72222] hover:scale-105 animate-wiggle"
+      >
+        ⚪ Join Now...
+      </button>
+    </div>
+  </section>
+)}
 
         <style>
           {`
@@ -1043,7 +1054,7 @@ const checkLiveStatus = () => {
             >
               <img src={vidya.logo} alt="Vidya Logo" className="w-16 h-20 md:w-20 md:h-24 mb-3" onError={(e) => { e.currentTarget.src = DEFAULT_VIDYA.logo; }} />
               <h2 className="text-2xl md:text-3xl font-bold text-black leading-tight">T-SAT (Vidya)</h2>
-              {vidya.date && <p className="mt-2 md:mt-3 text-lg md:text-xl font-bold text-black">Date: {new Date(vidya.date).toLocaleDateString()}</p>}
+              {/* {vidya.date && <p className="mt-2 md:mt-3 text-lg md:text-xl font-bold text-black">Date: {new Date(vidya.date).toLocaleDateString()}</p>} */}
               <p className="mt-1 md:mt-2 text-lg md:text-xl font-bold text-black">Timings: {vidya.timings}</p>
               <button
                 className="mt-5 md:mt-6 px-10 md:px-14 py-2.5 md:py-3 text-white text-lg md:text-xl font-semibold rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
@@ -1060,9 +1071,16 @@ const checkLiveStatus = () => {
             <div className="rounded-[36px] bg-cover bg-center p-6 md:p-10 min-h-[280px] flex flex-col items-center justify-center text-center"
               style={{ backgroundImage: "url('/pictures/T-SAT Card.png')", backgroundSize: "200%", backgroundRepeat: "no-repeat", backgroundPosition: "center" }}
             >
-              <img src="/pictures/NIPUNA.png" alt="Nipuna Logo" className="w-16 h-20 md:w-20 md:h-24 mb-3" />
+              {/* <img src="/pictures/NIPUNA.png" alt="Nipuna Logo" className="w-16 h-20 md:w-20 md:h-24 mb-3" /> */}
+              <img
+  src={nipuna.logo}
+  alt="Nipuna Logo"
+  className="w-16 h-10 md:w-20 md:h-24 mb-3"
+  onError={(e) => (e.currentTarget.src = DEFAULT_NIPUNA.logo)}
+/>
+
               <h2 className="text-2xl md:text-3xl font-bold text-black leading-tight">T-SAT (Nipuna)</h2>
-              {nipuna.date && <p className="mt-2 md:mt-3 text-lg md:text-xl font-bold text-black">Date: {new Date(nipuna.date).toLocaleDateString()}</p>}
+              {/* {nipuna.date && <p className="mt-2 md:mt-3 text-lg md:text-xl font-bold text-black">Date: {new Date(nipuna.date).toLocaleDateString()}</p>} */}
               <p className="mt-1 md:mt-2 text-lg md:text-xl font-bold text-black">Timings: {nipuna.timings}</p>
               <button
                 className="mt-5 md:mt-6 px-10 md:px-14 py-2.5 md:py-3 text-white text-lg md:text-xl font-semibold rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
@@ -1081,7 +1099,7 @@ const checkLiveStatus = () => {
           </div>
         </section>
       </main>
-      <Footer />
+    
     </>
   );
 };

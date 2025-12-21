@@ -465,6 +465,15 @@ const IMAGE_BASE_URL = "https://emrc-pi.vercel.app";
 
 const GALLERY_API_URL = `${BASE_API}/braou/gallery`;
 const EVENTS_API_URL = `${BASE_API}/braou/events`;
+const DEFAULT_GALLERY_IMAGES = [
+  "https://placehold.co/600x400?text=Gallery+Image+1",
+  "https://placehold.co/600x400?text=Gallery+Image+2",
+  "https://placehold.co/600x400?text=Gallery+Image+3",
+  "https://placehold.co/600x400?text=Gallery+Image+4",
+  "https://placehold.co/600x400?text=Gallery+Image+5",
+  "https://placehold.co/600x400?text=Gallery+Image+6",
+];
+
 
 const Events = () => {
   const navigate = useNavigate();
@@ -475,6 +484,8 @@ const Events = () => {
   const [selectedGalleryImage, setSelectedGalleryImage] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const galleryRef = useRef(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
 
   const getFullImageUrl = (path) => {
     if (!path) return "https://placehold.co/600x400?text=No+Image";
@@ -515,13 +526,27 @@ const Events = () => {
             fetch(EVENTS_API_URL).catch(err => null)
         ]);
 
-        if (galleryRes && galleryRes.ok) {
-            const gData = await galleryRes.json();
-            if (Array.isArray(gData.data)) {
-                const images = gData.data.map(item => getFullImageUrl(item.image || item.image_url)).filter(Boolean);
-                setGallery(images);
-            }
-        }
+       if (galleryRes && galleryRes.ok) {
+  const gData = await galleryRes.json();
+
+  if (Array.isArray(gData.data)) {
+    const images = gData.data
+      .map(item => getFullImageUrl(item.image || item.image_url))
+      .filter(Boolean)
+      .slice(0, 6);
+
+    if (images.length > 0) {
+      setGallery(images);
+    } else {
+      setGallery(DEFAULT_GALLERY_IMAGES);
+    }
+  } else {
+    setGallery(DEFAULT_GALLERY_IMAGES);
+  }
+} else {
+  setGallery(DEFAULT_GALLERY_IMAGES);
+}
+
 
         if (eventsRes && eventsRes.ok) {
             const eData = await eventsRes.json();
@@ -535,14 +560,20 @@ const Events = () => {
                     eventLink: evt.event_link || "" 
                 }));
                 
-                formattedEvents.sort((a, b) => {
-                    const hasLinkA = a.eventLink ? 1 : 0;
-                    const hasLinkB = b.eventLink ? 1 : 0;
-                    if (hasLinkB !== hasLinkA) return hasLinkB - hasLinkA;
-                    return new Date(b.date) - new Date(a.date);
-                });
+                // formattedEvents.sort((a, b) => {
+                //     const hasLinkA = a.eventLink ? 1 : 0;
+                //     const hasLinkB = b.eventLink ? 1 : 0;
+                //     if (hasLinkB !== hasLinkA) return hasLinkB - hasLinkA;
+                //     return new Date(b.date) - new Date(a.date);
+                // });
 
-                setEvents(formattedEvents);
+                formattedEvents.sort(
+  (a, b) => new Date(b.date) - new Date(a.date)
+);
+
+
+                setEvents(formattedEvents.slice(0, 4));
+
             }
         }
 
@@ -571,7 +602,8 @@ const Events = () => {
   }
 
   const mainEvent = events.length > 0 ? events[0] : null;
-  const sideEvents = events.length > 1 ? events.slice(1) : [];
+  const sideEvents = events.length > 1 ? events.slice(1, 4) : [];
+
 
   return (
     <main
@@ -622,7 +654,12 @@ const Events = () => {
         
         {/* Main Event: Reduced Height but Wide */}
         {mainEvent ? (
-            <div className="col-span-1 md:col-span-2 p-3 rounded-xl bg-white/30 backdrop-blur-md border border-white/40 shadow-xl flex flex-col transition-all hover:scale-[1.01] hover:bg-white/40">
+            // <div className="col-span-1 md:col-span-2 p-3 rounded-xl bg-white/30 backdrop-blur-md border border-white/40 shadow-xl flex flex-col transition-all hover:scale-[1.01] hover:bg-white/40">
+            <div
+  onClick={() => setSelectedEvent(mainEvent)}
+  className="cursor-pointer col-span-1 md:col-span-2 p-3 rounded-xl bg-white/30 backdrop-blur-md border border-white/40 shadow-xl flex flex-col transition-all hover:scale-[1.01] hover:bg-white/40"
+>
+
                 {/* ✅ Reduced Image Height: h-[250px] instead of h-[350px] */}
                 <img src={mainEvent.img} alt={mainEvent.title} className="w-full h-[200px] md:h-[250px] object-cover rounded-lg" onError={(e) => e.target.src = "https://placehold.co/600x400?text=No+Image"} />
                 
@@ -635,7 +672,17 @@ const Events = () => {
                 {/* Reduced margin and clamping lines to save height */}
                 <p className="mt-2 text-gray-800 text-sm line-clamp-3 flex-grow">{mainEvent.content}</p>
                 
-                <button onClick={() => handleReadMore(mainEvent.id)} className="mt-3 self-start px-4 py-2 bg-red-600 text-white font-bold text-sm rounded-lg hover:bg-red-700 transition-all shadow-md">Read More →</button>
+                {/* <button onClick={() => handleReadMore(mainEvent.id)} className="mt-3 self-start px-4 py-2 bg-red-600 text-white font-bold text-sm rounded-lg hover:bg-red-700 transition-all shadow-md">Read More →</button> */}
+                <button
+  onClick={(e) => {
+    e.stopPropagation();
+    handleReadMore(mainEvent.id);
+  }}
+  className="mt-3 self-start px-4 py-2 bg-red-600 text-white font-bold text-sm rounded-lg hover:bg-red-700 transition-all shadow-md"
+>
+  Read More →
+</button>
+
             </div>
         ) : (
             <div className="col-span-1 md:col-span-2 flex items-center justify-center bg-white/20 rounded-xl h-[300px]"><p className="text-[#00383D] font-bold">No upcoming events found.</p></div>
@@ -645,7 +692,12 @@ const Events = () => {
         <div className="flex flex-col gap-4">
           {sideEvents.length > 0 ? (
             sideEvents.map((ev) => (
-                <div key={ev.id} className="flex flex-col p-3 rounded-xl bg-white/30 backdrop-blur-md border border-white/40 shadow-lg transition-all hover:scale-[1.02] hover:bg-white/50">
+               <div
+  key={ev.id}
+  onClick={() => setSelectedEvent(ev)}
+  className="cursor-pointer flex flex-col p-3 rounded-xl bg-white/30 backdrop-blur-md border border-white/40 shadow-lg transition-all hover:scale-[1.02] hover:bg-white/50"
+>
+
                     <div className="flex gap-3 mb-3">
                         <img src={ev.img} alt={ev.title} className="w-[80px] h-[60px] object-cover rounded-lg flex-shrink-0" onError={(e) => e.target.src = "https://placehold.co/100x100?text=No+Image"} />
                         <div className="flex flex-col justify-center">
@@ -688,6 +740,67 @@ const Events = () => {
             </motion.div>
         )}
       </AnimatePresence>
+      <AnimatePresence>
+  {selectedEvent && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      onClick={() => setSelectedEvent(null)}
+    >
+      <motion.div
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        exit={{ scale: 0.9 }}
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white max-w-2xl w-full rounded-xl shadow-2xl p-6 relative"
+      >
+        {/* Close */}
+        <button
+          onClick={() => setSelectedEvent(null)}
+          className="absolute top-3 right-3 text-2xl text-gray-600 hover:text-black"
+        >
+          ✕
+        </button>
+
+        {/* Image */}
+        <img
+          src={selectedEvent.img}
+          alt={selectedEvent.title}
+          className="w-full h-[220px] object-cover rounded-lg mb-4"
+        />
+
+        {/* Date */}
+        <div className="flex items-center gap-2 text-sm text-[#00383D] font-semibold mb-2">
+          <CalendarDays className="w-4 h-4" />
+          <span>{new Date(selectedEvent.date).toLocaleDateString()}</span>
+        </div>
+
+        {/* Title */}
+        <h3 className="text-xl font-bold text-[#00383D] mb-3">
+          {selectedEvent.title}
+        </h3>
+
+        {/* Content */}
+        <p className="text-gray-800 text-sm leading-relaxed max-h-[200px] overflow-y-auto">
+          {selectedEvent.content}
+        </p>
+
+        {/* Action */}
+        <div className="mt-5 text-right">
+          <button
+            onClick={() => handleReadMore(selectedEvent.id)}
+            className="px-5 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all"
+          >
+            Read Full Event →
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
     </main>
   );
 };
