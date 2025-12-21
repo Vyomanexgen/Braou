@@ -485,6 +485,9 @@ const Events = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const galleryRef = useRef(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
+useEffect(() => {
+  console.log("VITE_BASE_API =", import.meta.env.VITE_BASE_API);
+}, []);
 
 
   const getFullImageUrl = (path) => {
