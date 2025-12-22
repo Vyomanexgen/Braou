@@ -1019,9 +1019,15 @@ setLiveBroadcast(activeEvent?.data || null);
             {liveBroadcast.channel}
           </span>
         )}
-        <span>
-          : {liveBroadcast.title} ({liveBroadcast.start_time} - {liveBroadcast.end_time})
-        </span>
+        {/* <span>
+           {liveBroadcast.title} ({liveBroadcast.start_time} - {liveBroadcast.end_time})
+        </span> */}
+
+        <span className="flex items-center gap-1">
+  : {liveBroadcast.title}  
+  {new Date(liveBroadcast.date).toLocaleDateString("en-IN")} ( {liveBroadcast.start_time} - {liveBroadcast.end_time} )
+</span>
+
       </div>
       <button
         onClick={() => window.open(liveBroadcast.join_now_link, "_blank")}
