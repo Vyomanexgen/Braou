@@ -191,13 +191,14 @@ useEffect(() => {
 
       {/* ================= MAIN NAVBAR ================= */}
 
-      <nav
+      <nav className="
+  w-full
+- h-14 sm:h-16 lg:h-20
++ min-h-14 sm:min-h-16 lg:min-h-20
+  fixed top-0 left-0
+  z-40
 
-        className="
 
-          w-full
-
-          h-14 sm:h-16 lg:h-20
 
           bg-black
 

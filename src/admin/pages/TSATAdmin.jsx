@@ -146,9 +146,9 @@ function ScrollingAdmin() {
       view={
         <div className="space-y-4 pr-10">
           <Info label="Title" value={item.title} />
-          {item.schedule_text && (
+          {/* {item.schedule_text && (
             <Info label="Schedule Text" value={item.schedule_text} />
-          )}
+          )} */}
 
           <div className="grid grid-cols-2 gap-3">
             <IconRow
@@ -183,11 +183,11 @@ function ScrollingAdmin() {
             value={item.title}
             onChange={(v) => setItem({ ...item, title: v })}
           />
-          <Input
+          {/* <Input
             label="Schedule Text"
             value={item.schedule_text}
             onChange={(v) => setItem({ ...item, schedule_text: v })}
-          />
+          /> */}
           <Input
             type="date"
             label="Date"

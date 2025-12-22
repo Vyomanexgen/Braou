@@ -3,6 +3,15 @@ import { FaEdit } from "react-icons/fa";
 import { adminFetch } from "../utils/adminFetch";
 
 /* =========================
+   UTILITY FUNCTIONS
+   ========================= */
+const decodeHtml = (html) => {
+  const txt = document.createElement("textarea");
+  txt.innerHTML = html;
+  return txt.value;
+};
+
+/* =========================
    EDITABLE CARD (OUTSIDE)
    ========================= */
 function EditableCard({
@@ -19,7 +28,9 @@ function EditableCard({
   onSave,
   onCancel,
 }) {
+
   return (
+    
     <div className="mb-6">
       {/* Title */}
       {!isEditing || !isActivity ? (
@@ -42,15 +53,17 @@ function EditableCard({
             {Array.isArray(content) ? (
               <ul className="list-disc pl-5 pr-10 space-y-1">
                 {content.map((c, i) => (
-                  <li key={i} className="font-semibold">
-                    {c}
-                  </li>
-                ))}
+  <li key={i} className="font-semibold">
+    {decodeHtml(c)}
+  </li>
+))}
+
               </ul>
             ) : (
               <p className="font-semibold pr-10 whitespace-pre-wrap">
-                {content}
-              </p>
+  {decodeHtml(content)}
+</p>
+
             )}
 
             <button
@@ -217,6 +230,8 @@ export default function AboutAdmin() {
         onEdit={() => {
           setTempText(aboutText);
           setBackupText(aboutText);
+          setTempText(decodeHtml(aboutText));
+          setBackupText(decodeHtml(aboutText));
           setEditingKey("about");
         }}
         onTextChange={setTempText}
@@ -238,13 +253,28 @@ export default function AboutAdmin() {
             tempTitle={tempTitle}
             tempText={tempText}
             saving={saving}
-            onEdit={() => {
-              setTempTitle(item.title || "");
-              setTempText((item.bullet_points || []).join("\n"));
-              setBackupTitle(item.title || "");
-              setBackupText((item.bullet_points || []).join("\n"));
-              setEditingKey(key);
-            }}
+          onEdit={() => {
+            setTempTitle(item.title || "");
+            setTempText((item.bullet_points || []).join("\n"));
+            setBackupTitle(item.title || "");
+            setBackupText((item.bullet_points || []).join("\n"));
+
+ setTempTitle(decodeHtml(item.title || ""));
+ setTempText(
+   (item.bullet_points || [])
+     .map(pt => decodeHtml(pt))
+     .join("\n")
+ );
+ setBackupTitle(decodeHtml(item.title || ""));
+ setBackupText(
+   (item.bullet_points || [])
+     .map(pt => decodeHtml(pt))
+     .join("\n")
+);
+
+ setEditingKey(key);
+}}
+
             onTitleChange={setTempTitle}
             onTextChange={setTempText}
             onSave={() => saveActivity(key)}

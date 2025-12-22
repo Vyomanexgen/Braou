@@ -101,17 +101,20 @@ import { motion } from "framer-motion";
 
 const Header = () => {
   return (
-    <header className="w-full bg-white border-b border-gray-300 shadow-sm overflow-hidden">
+ <header className="w-full bg-white border-b border-gray-300 shadow-sm overflow-hidden m-0 p-0">
       <div
-        className="
-          w-full max-w-[1900px] mx-auto
-          px-2 md:px-4 lg:px-8 py-3
-          flex items-center 
-          justify-between
-        "
-      >
+  className="
+    w-full max-w-[1900px] mx-auto
+    px-2 md:px-4 lg:px-8 py-0
+    flex items-center 
+    justify-between
+  "
+>
+
+
         {/* LEFT SECTION: Logo */}
-        <div className="flex-shrink-0 z-10 bg-white pr-2">
+        <div className="flex-shrink-0 z-10 bg-white pr-2 m-0">
+
           <motion.img
             whileHover={{ scale: 1.03 }}
             src="/pictures/Logo_C_PNG[1] 1.png"
