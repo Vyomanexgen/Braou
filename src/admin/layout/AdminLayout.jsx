@@ -1,13 +1,26 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
-import Header from "../../components/Header";
+import AdminHeader from "../components/AdminHeader";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
+  const [headerHeight, setHeaderHeight] = useState(0);
 
-  // 🚨 FORCE RESET FLAG
   const forceReset = localStorage.getItem("FORCE_PASSWORD_RESET") === "true";
+
+  useEffect(() => {
+    const updateHeight = () => {
+      const header = document.getElementById("admin-header");
+      if (header) {
+        setHeaderHeight(header.offsetHeight);
+      }
+    };
+
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, []);
 
   useEffect(() => {
     const handleUnauthorized = (event) => {
@@ -17,29 +30,31 @@ export default function AdminLayout() {
     };
 
     window.addEventListener("admin-unauthorized", handleUnauthorized);
-
-    return () => {
+    return () =>
       window.removeEventListener("admin-unauthorized", handleUnauthorized);
-    };
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-sky-50 flex flex-col">
-      {/* SAME HEADER USED IN PUBLIC + ADMIN */}
-      {/* <Header /> */}
+    <div className="bg-sky-50">
+      {/* FIXED HEADER */}
+      <AdminHeader />
 
-      <div className="flex flex-1">
-        {/*  Hide sidebar during forced password reset */}
-        {!forceReset && <Sidebar />}
+      {/* FIXED SIDEBAR */}
+      {!forceReset && <Sidebar headerHeight={headerHeight} />}
 
-        <main
-          className={`flex-1 p-6 transition-all ${
-            forceReset ? "ml-0" : "ml-64 max-md:ml-0"
-          }`}
-        >
-          <Outlet />
-        </main>
-      </div>
+      {/* MAIN CONTENT */}
+      <main
+        className={`ml-64 p-6 transition-all ${
+          forceReset ? "ml-0" : "max-md:ml-0"
+        }`}
+        style={{
+          marginTop: headerHeight,
+          height: `calc(100vh - ${headerHeight}px)`,
+          overflowY: "auto",
+        }}
+      >
+        <Outlet />
+      </main>
     </div>
   );
 }
