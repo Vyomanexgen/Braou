@@ -234,18 +234,30 @@ const AIR = () => {
 
       {/* Marquee Animation */}
       <style>
-        {`
-         .marquee {
-  animation: scrollText 60s linear infinite;
-}
+{`
+  .marquee {
+    animation: scrollText 80s linear infinite;
+  }
 
+  @media (max-width: 1024px) {
+    .marquee {
+      animation-duration: 80s;
+    }
+  }
 
-          @keyframes scrollText {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-          }
-        `}
-      </style>
+  @media (max-width: 640px) {
+    .marquee {
+      animation-duration: 30s;
+    }
+  }
+
+  @keyframes scrollText {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+`}
+</style>
+
     </>
   );
 };
