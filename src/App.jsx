@@ -72,26 +72,79 @@ const AppInitializer = () => {
   useEffect(() => {
     let mounted = true;
 
-    const initApp = async () => {
-      let fetchedBanner = null;
+    // const initApp = async () => {
+    //   let fetchedBanner = null;
 
-      try {
-        const bannerRes = await fetch(BANNER_API_URL).catch(() => null);
+    //   try {
+    //     const bannerRes = await fetch(BANNER_API_URL).catch(() => null);
 
-        if (bannerRes?.ok) {
-          const result = await bannerRes.json();
-          const banners = result?.data || [];
-          fetchedBanner = banners[banners.length - 1]?.image_url || null;
+    //     if (bannerRes?.ok) {
+    //       const result = await bannerRes.json();
+    //       const banners = result?.data || [];
+    //       fetchedBanner = banners[banners.length - 1]?.image_url || null;
 
-          if (mounted) setBannerImage(fetchedBanner);
+    //       if (mounted) setBannerImage(fetchedBanner);
+    //     }
+    //   } catch (err) {
+    //     console.error("Init error:", err);
+    //   } finally {
+    //     if (mounted) setIsLoading(false);
+    //   }
+    // };
+
+const initApp = async () => {
+  try {
+    const bannerRes = await fetch(BANNER_API_URL).catch(() => null);
+
+    if (bannerRes?.ok) {
+      const result = await bannerRes.json();
+      const banners = result?.data || [];
+      
+      // Get the most recent banner entry
+      const latestBanner = banners[banners.length - 1];
+
+      if (latestBanner) {
+        // 1. Get Today's date in YYYY-MM-DD format based on local time
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+        // 2. Map fields exactly as they appear in your Postman request/response
+        // We use .split('T')[0] in case the backend returns a full ISO timestamp
+        const cleanStart = (latestBanner.start_date || "").split('T')[0];
+        const cleanEnd = (latestBanner.end_date || "").split('T')[0];
+        
+        // Check for 'active' property
+        const isActive = latestBanner.active ?? false;
+
+        // 3. Debugging Log - Check this in F12 Console
+        console.log("Banner Debug Final:", { todayStr, cleanStart, cleanEnd, isActive });
+
+        // 4. Strict Comparison Logic
+        // The banner shows ONLY if:
+        // - It is explicitly marked as active
+        // - Dates are not empty strings
+        // - Today falls within the start and end range
+        const isLive = 
+          isActive === true && 
+          cleanStart !== "" && 
+          cleanEnd !== "" && 
+          todayStr >= cleanStart && 
+          todayStr <= cleanEnd;
+
+        if (isLive && latestBanner.image_url && mounted) {
+          setBannerImage(latestBanner.image_url);
+        } else if (mounted) {
+          // Hide banner if any condition fails
+          setBannerImage(null);
         }
-      } catch (err) {
-        console.error("Init error:", err);
-      } finally {
-        if (mounted) setIsLoading(false);
       }
-    };
-
+    }
+  } catch (err) {
+    console.error("Init error:", err);
+  } finally {
+    if (mounted) setIsLoading(false);
+  }
+};
     initApp();
 
     return () => {
@@ -100,10 +153,21 @@ const AppInitializer = () => {
   }, []);
 
   /* 🔥 OPEN BANNER ONLY WHEN ROUTE CHANGES TO PUBLIC */
+  // useEffect(() => {
+  //   if (bannerImage && !isAdminRoute) {
+  //     const timer = setTimeout(() => setIsBannerOpen(true), 100);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [bannerImage, isAdminRoute]);
+  /* 🔥 OPEN BANNER ONLY WHEN CONDITIONS ARE MET */
   useEffect(() => {
+    // Only show if we have an image AND we are not in the admin panel
     if (bannerImage && !isAdminRoute) {
       const timer = setTimeout(() => setIsBannerOpen(true), 100);
       return () => clearTimeout(timer);
+    } else {
+      // Ensure banner is closed if the image is null or user navigates to admin
+      setIsBannerOpen(false);
     }
   }, [bannerImage, isAdminRoute]);
 

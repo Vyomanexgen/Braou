@@ -241,13 +241,13 @@ const AIR = () => {
 
   @media (max-width: 1024px) {
     .marquee {
-      animation-duration: 80s;
+      animation-duration: 580s;
     }
   }
 
   @media (max-width: 640px) {
     .marquee {
-      animation-duration: 30s;
+      animation-duration: 120s;
     }
   }
 

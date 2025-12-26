@@ -54,36 +54,78 @@ export default function EventsAdmin() {
       alert("Failed to load gallery");
     }
   };
+const isDuplicateImage = (file) => {
+  return gallery.some((img) => {
+    const url = img.image_url || "";
+    return (
+      url.includes(file.name) ||
+      img.size === file.size
+    );
+  });
+};
 
   /* ================= REPLACE GALLERY IMAGE ================= */
-  const replaceGalleryImage = async (galleryId, file) => {
-    if (!file) return;
+  // const replaceGalleryImage = async (galleryId, file) => {
+  //   if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      alert("Only image files allowed");
-      return;
-    }
+  //   if (!file.type.startsWith("image/")) {
+  //     alert("Only image files allowed");
+  //     return;
+  //   }
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Image must be less than 5MB");
-      return;
-    }
+  //   if (file.size > 5 * 1024 * 1024) {
+  //     alert("Image must be less than 5MB");
+  //     return;
+  //   }
 
-    const formData = new FormData();
-    formData.append("image", file);
+  //   const formData = new FormData();
+  //   formData.append("image", file);
 
-    const res = await adminFetch(`/braou/gallery/${galleryId}`, {
-      method: "PUT",
-      body: formData,
-    });
+  //   const res = await adminFetch(`/braou/gallery/${galleryId}`, {
+  //     method: "PUT",
+  //     body: formData,
+  //   });
 
-    if (!res.ok) {
-      alert("Failed to replace image");
-      return;
-    }
+  //   if (!res.ok) {
+  //     alert("Failed to replace image");
+  //     return;
+  //   }
 
-    fetchGallery();
-  };
+  //   fetchGallery();
+  // };
+const replaceGalleryImage = async (galleryId, file) => {
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("Only image files allowed");
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    alert("Image must be less than 5MB");
+    return;
+  }
+
+  if (isDuplicateImage(file)) {
+    alert("This image already exists in the gallery");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const res = await adminFetch(`/braou/gallery/${galleryId}`, {
+    method: "PUT",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    alert("Failed to replace image");
+    return;
+  }
+
+  fetchGallery();
+};
 
   /* ================= LOCAL UPDATE ================= */
   const updateEvent = (index, key, value) => {
@@ -218,8 +260,14 @@ export default function EventsAdmin() {
 
       {/* ================= GALLERY GRID (3 PER ROW) ================= */}
       <div className="bg-white/40 p-6 rounded-2xl mb-10">
+        {gallery.length >= 6 && (
+    <p className="text-red-600 font-semibold text-sm mb-4">
+      Maximum 6 gallery images allowed
+    </p>
+  )}
+
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
-          {gallery.map((item) => (
+          {gallery.slice(0, 6).map((item) => (
             <div
               key={item._id}
               className="relative h-40 rounded-xl bg-white/60 overflow-hidden border-2 border-dashed border-cyan-600"

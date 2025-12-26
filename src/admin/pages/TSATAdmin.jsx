@@ -269,7 +269,7 @@ function MediaAdmin({ api, title }) {
             label="Timings"
             value={item.timings || "—"}
           />
-          <IconRow icon="📅" label="Date" value={item.date || "—"} />
+          {/* <IconRow icon="📅" label="Date" value={item.date || "—"} /> */}
           {item.logo && (
             <img
               src={item.logo}
@@ -331,12 +331,12 @@ function MediaAdmin({ api, title }) {
             value={item.timings || ""}
             onChange={(v) => setItem({ ...item, timings: v })}
           />
-          <Input
+          {/* <Input
             type="date"
             label="Date"
             value={item.date || ""}
             onChange={(v) => setItem({ ...item, date: v })}
-          />
+          /> */}
         </div>
       }
       onSave={save}

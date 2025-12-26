@@ -460,7 +460,7 @@ const DEFAULT_TICKER_NEWS = [
 const DEFAULT_INFO_SERVICES = [
   {
     id: 1,
-    title: "Live Tele-Conference Programs",
+    title: "LIVE",
     fullDesc:
       "BRAOU conducts interactive live tele-conference programs every Thursday from 2–3 PM...",
     mobileColor: "bg-[#22b9d3]",
@@ -469,7 +469,7 @@ const DEFAULT_INFO_SERVICES = [
   },
   {
     id: 2,
-    title: "Vidyagani Digital Learning Portal",
+    title: "Vidyagani",
     fullDesc:
       "Vidyagani (vidyagani.braou.ac.in) is Dr. B.R. Ambedkar Open University’s digital learning portal...",
     mobileColor: "bg-[#fca51f]",
@@ -478,7 +478,7 @@ const DEFAULT_INFO_SERVICES = [
   },
   {
     id: 3,
-    title: "BRAOU YouTube Channel",
+    title: "YouTube",
     fullDesc: [
       "Video lessons for UG, PG, and distance-learning courses",
       "Course-wise and subject-wise organized playlists for easy access",
@@ -492,7 +492,7 @@ const DEFAULT_INFO_SERVICES = [
   },
   {
     id: 4,
-    title: "T-SAT Video Lessons",
+    title: "T-SAT (Vidya/Nipuna)",
     fullDesc:
       "T-SAT telecasts video lessons produced by EMR&RC through Vidya and Nipuna channels...",
     mobileColor: "bg-[#f25c34]",
@@ -501,7 +501,7 @@ const DEFAULT_INFO_SERVICES = [
   },
   {
     id: 5,
-    title: "All India Radio (AIR) Lessons",
+    title: "AIR",
     fullDesc:
       "Audio lessons produced by EMR&RC are broadcast on All India Radio (AIR), Hyderabad...",
     mobileColor: "bg-[#2d5aa8]",
@@ -510,7 +510,7 @@ const DEFAULT_INFO_SERVICES = [
   },
   {
     id: 6,
-    title: "HIBRAOU Web Radio",
+    title: "Web Radio",
     fullDesc:
       "Welcome to HiBRAOU Web Radio, your hub for live radio lessons and real-time updates...",
     mobileColor: "bg-[#3e4a59]",
@@ -841,9 +841,10 @@ const HeroSlider = ({ images }) => {
   );
 };
 
-  const InfographicSection = ({ infoServices }) => {
+ const InfographicSection = ({ infoServices }) => {
     const [selectedFeature, setSelectedFeature] = useState(null);
     const safeServices = Array.isArray(infoServices) && infoServices.length > 0 ? infoServices : DEFAULT_INFO_SERVICES;
+    
     return (
       <section className="w-full py-8 px-2 relative">
         <div className="max-w-[1200px] mx-auto relative">
@@ -858,14 +859,26 @@ const HeroSlider = ({ images }) => {
           {selectedFeature && (
             <motion.div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedFeature(null)}>
               <motion.div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden" initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} onClick={(e) => e.stopPropagation()}>
-                <div className={`${selectedFeature.mobileColor || 'bg-blue-500'} p-4 flex justify-end`}><button onClick={() => setSelectedFeature(null)} className="text-white bg-white/20 rounded-full w-8 h-8 flex items-center justify-center hover:bg-white/30">✕</button></div>
+                <div className={`${selectedFeature.mobileColor || 'bg-blue-500'} p-4 flex justify-end`}>
+                  <button onClick={() => setSelectedFeature(null)} className="text-white bg-white/20 rounded-full w-8 h-8 flex items-center justify-center hover:bg-white/30">✕</button>
+                </div>
                 <div className="p-8">
-
-                    <h2 className="text-xl sm:text-xl font-black  mb-4">
-    {selectedFeature.title}
-  </h2>
-                  <div className="text-slate-700 text-sm sm:text-lg leading-relaxed">{Array.isArray(selectedFeature.fullDesc) ? (<ul className="list-disc pl-6 space-y-2">{selectedFeature.fullDesc.map((point, index) => <li key={index}>{point}</li>)}</ul>) : (<p>{selectedFeature.fullDesc}</p>)}</div>
-                  <div className="mt-6 text-right"><button onClick={() => setSelectedFeature(null)} className="px-5 py-2 bg-slate-200 rounded-lg font-bold hover:bg-slate-300 text-slate-800">Close</button></div>
+                  {/* Updated class: added text-center */}
+                  <h2 className="text-xl sm:text-xl font-black mb-4 text-center">
+                    {selectedFeature.title}
+                  </h2>
+                  <div className="text-slate-700 text-sm sm:text-lg leading-relaxed">
+                    {Array.isArray(selectedFeature.fullDesc) ? (
+                      <ul className="list-disc pl-6 space-y-2">
+                        {selectedFeature.fullDesc.map((point, index) => <li key={index}>{point}</li>)}
+                      </ul>
+                    ) : (
+                      <p>{selectedFeature.fullDesc}</p>
+                    )}
+                  </div>
+                  <div className="mt-6 text-right">
+                    <button onClick={() => setSelectedFeature(null)} className="px-5 py-2 bg-slate-200 rounded-lg font-bold hover:bg-slate-300 text-slate-800">Close</button>
+                  </div>
                 </div>
               </motion.div>
             </motion.div>
@@ -873,6 +886,6 @@ const HeroSlider = ({ images }) => {
         </AnimatePresence>
       </section>
     );
-  };
+};
 
 export default Home;
