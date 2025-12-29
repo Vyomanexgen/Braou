@@ -266,7 +266,21 @@ const initApp = async () => {
 };
 
 /* ========= POPUP BANNER ========= */
+/* ========= POPUP BANNER ========= */
 const PopupBanner = ({ isOpen, onClose, imageSrc }) => {
+  const AUTO_CLOSE_TIME = 20; // <-- auto close after 8 seconds
+
+  // Auto-close effect
+  useEffect(() => {
+    if (!isOpen || !imageSrc) return;
+
+    const timer = setTimeout(() => {
+      onClose();
+    }, AUTO_CLOSE_TIME * 1000);
+
+    return () => clearTimeout(timer);
+  }, [isOpen, imageSrc, onClose]);
+
   return (
     <AnimatePresence>
       {isOpen && imageSrc && (
@@ -275,12 +289,16 @@ const PopupBanner = ({ isOpen, onClose, imageSrc }) => {
           onClick={onClose}
         >
           <motion.div
-            className="relative bg-white rounded-lg shadow-2xl w-full max-w-3xl"
+            className="relative bg-white rounded-lg shadow-2xl inline-block max-w-[90vw] max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Responsive scalable close button */}
             <button
               onClick={onClose}
-              className="absolute top-3 right-3 z-50 bg-red-700 text-white rounded-full w-9 h-9 flex items-center justify-center font-bold"
+              className="absolute top-2 right-2 z-50 bg-red-700 text-white 
+              rounded-full font-bold flex items-center justify-center
+              w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12
+              text-xs sm:text-sm md:text-base lg:text-lg"
             >
               ✕
             </button>
