@@ -6,6 +6,7 @@ const BASE = import.meta.env.VITE_BASE_API;
 const CAROUSEL_API = "/carousel";
 const HOME_API = "/home";
 const decodeHtml = (text = "") => {
+  if (typeof text !== 'string') return text; // Add this line
   const txt = document.createElement("textarea");
   txt.innerHTML = text;
   return txt.value;
@@ -133,9 +134,9 @@ function EditableSection({ title, value, onSave, disabled }) {
   const [text, setText] = useState("");
   const [backup, setBackup] = useState("");
 
-  useEffect(() => {
-    setText(value || "");
-  }, [value]);
+useEffect(() => {
+  setText(decodeHtml(value) || ""); // Added decodeHtml here
+}, [value]);
 
   const cancelEdit = () => {
     setText(backup);
@@ -209,11 +210,12 @@ function ScrollingEditor({ items, onSave, disabled }) {
   const [original, setOriginal] = useState([]);
   const [dirty, setDirty] = useState(false);
 
-  useEffect(() => {
-    setList(items);
-    setOriginal(items);
-    setDirty(false);
-  }, [items]);
+ useEffect(() => {
+  const cleanItems = items.map(item => decodeHtml(item)); // Clean the list first
+  setList(cleanItems);
+  setOriginal(cleanItems);
+  setDirty(false);
+}, [items]);
 
   const markDirty = (updated) => {
     setList(updated);

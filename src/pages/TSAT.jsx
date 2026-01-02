@@ -866,6 +866,14 @@ const parseTime = (timeStr, dateStr) => {
   // Uses local constructor to avoid 5.5 hour UTC shift
   return new Date(year, month - 1, day, hours, minutes, 0, 0);
 };
+// ✅ ADD THIS: Converts "14:30" to "2:30 PM" for the frontend display
+const format12h = (timeStr) => {
+  if (!timeStr) return "";
+  let [hours, minutes] = timeStr.split(":").map(Number);
+  const suffix = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12 || 12; // Converts 0 to 12, 13 to 1, etc.
+  return `${hours}:${minutes.toString().padStart(2, '0')} ${suffix}`;
+};
 
 const TSAT = () => {
   const [vidya, setVidya] = useState(DEFAULT_VIDYA);
@@ -1023,9 +1031,17 @@ setLiveBroadcast(activeEvent?.data || null);
            {liveBroadcast.title} ({liveBroadcast.start_time} - {liveBroadcast.end_time})
         </span> */}
 
-        <span className="flex items-center gap-1">
-  : {liveBroadcast.title}  
-  {new Date(liveBroadcast.date).toLocaleDateString("en-IN")} ( {liveBroadcast.start_time} - {liveBroadcast.end_time} )
+        {/* <span className="flex items-center gap-1">
+  : {liveBroadcast.title} :   
+   {new Date(liveBroadcast.date).toLocaleDateString("en-IN")} ( {liveBroadcast.start_time} - {liveBroadcast.end_time} )
+</span> */}
+
+<span className="flex items-center gap-1">
+  : {liveBroadcast.title}: 
+  {/* Show Date as DD/MM/YYYY */}
+   {liveBroadcast.date.split('-').reverse().join('/')} 
+  {/* Use format12h here */}
+  ( {format12h(liveBroadcast.start_time)} - {format12h(liveBroadcast.end_time)} )
 </span>
 
       </div>

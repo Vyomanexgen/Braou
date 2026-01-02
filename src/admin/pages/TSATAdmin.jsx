@@ -6,6 +6,7 @@ import {
   FaEye,
   FaEyeSlash,
   FaLink,
+  FaCalendarAlt,
 } from "react-icons/fa";
 import { adminFetch } from "../utils/adminFetch";
 
@@ -99,9 +100,144 @@ function EditableCard({ title, view, edit, onSave, onCancel }) {
 }
 
 /* ========================= SCROLLING ========================= */
+// function ScrollingAdmin() {
+//   const [item, setItem] = useState(null);
+//   const [original, setOriginal] = useState(null);
+
+//   useEffect(() => {
+//     adminFetch(SCROLLING_API)
+//       .then((r) => r.json())
+//       .then((j) => {
+//         const scrollingItem = j?.data?.data;
+//         if (!scrollingItem) return;
+
+//         const normalized = {
+//           ...clone(scrollingItem),
+//           show: Boolean(scrollingItem.show),
+//           schedule_text: j?.data?.schedule_text || "",
+//         };
+
+//         setItem(normalized);
+//         setOriginal(clone(normalized));
+//       });
+//   }, []);
+
+//   if (!item) return <Empty />;
+
+//   const save = async () => {
+//     await adminFetch(`${SCROLLING_API}/${item._id}`, {
+//       method: "PUT",
+//       body: JSON.stringify({
+//         title: item.title,
+//         date: item.date,
+//         start_time: item.start_time,
+//         end_time: item.end_time,
+//         join_now_link: item.join_now_link,
+//         schedule_text: item.schedule_text,
+//         show: item.show ? 1 : 0,
+//       }),
+//     });
+
+//     setOriginal(clone(item));
+//   };
+
+//   return (
+//     <EditableCard
+//       title="Scrolling Content"
+//       view={
+//         <div className="space-y-4 pr-10">
+//           <Info label="Title" value={item.title} />
+//           {/* {item.schedule_text && (
+//             <Info label="Schedule Text" value={item.schedule_text} />
+//           )} */}
+
+//           <div className="grid grid-cols-2 gap-3">
+//             <IconRow
+//               icon={<FaClock />}
+//               label="Start Time"
+//               value={item.start_time}
+//             />
+//             <IconRow
+//               icon={<FaClock />}
+//               label="End Time"
+//               value={item.end_time}
+//             />
+//           </div>
+
+//           <StatusBox show={item.show} />
+
+//           {item.join_now_link && item.show && (
+//             <a
+//               href={item.join_now_link}
+//               target="_blank"
+//               className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-semibold"
+//             >
+//               <FaLink /> Join Now
+//             </a>
+//           )}
+//         </div>
+//       }
+//       edit={
+//         <div className="space-y-3">
+//           <Input
+//             label="Title"
+//             value={item.title}
+//             onChange={(v) => setItem({ ...item, title: v })}
+//           />
+//           {/* <Input
+//             label="Schedule Text"
+//             value={item.schedule_text}
+//             onChange={(v) => setItem({ ...item, schedule_text: v })}
+//           /> */}
+//           <Input
+//             type="date"
+//             label="Date"
+//             value={item.date}
+//             onChange={(v) => setItem({ ...item, date: v })}
+//           />
+//           <Input
+//             label="Start Time"
+//             value={item.start_time}
+//             onChange={(v) => setItem({ ...item, start_time: v })}
+//           />
+//           <Input
+//             label="End Time"
+//             value={item.end_time}
+//             onChange={(v) => setItem({ ...item, end_time: v })}
+//           />
+//           <Input
+//             label="Join Now Link"
+//             value={item.join_now_link || ""}
+//             onChange={(v) => setItem({ ...item, join_now_link: v })}
+//           />
+//           <Toggle
+//             label="Show scrolling"
+//             checked={item.show}
+//             onChange={(v) => setItem({ ...item, show: v })}
+//           />
+//         </div>
+//       }
+//       onSave={save}
+//       onCancel={() => setItem(clone(original))}
+//     />
+//   );
+// }
+
+/* ========================= SCROLLING ========================= */
+/* ========================= SCROLLING ========================= */
 function ScrollingAdmin() {
   const [item, setItem] = useState(null);
   const [original, setOriginal] = useState(null);
+
+  // Helper to show 12h format in the View mode
+  const format12h = (timeStr) => {
+    if (!timeStr) return "—";
+    const [h, m] = timeStr.split(":");
+    let hours = parseInt(h, 10);
+    const suffix = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12;
+    return `${hours}:${m} ${suffix}`;
+  };
 
   useEffect(() => {
     adminFetch(SCROLLING_API)
@@ -113,7 +249,6 @@ function ScrollingAdmin() {
         const normalized = {
           ...clone(scrollingItem),
           show: Boolean(scrollingItem.show),
-          schedule_text: j?.data?.schedule_text || "",
         };
 
         setItem(normalized);
@@ -132,11 +267,9 @@ function ScrollingAdmin() {
         start_time: item.start_time,
         end_time: item.end_time,
         join_now_link: item.join_now_link,
-        schedule_text: item.schedule_text,
         show: item.show ? 1 : 0,
       }),
     });
-
     setOriginal(clone(item));
   };
 
@@ -146,34 +279,24 @@ function ScrollingAdmin() {
       view={
         <div className="space-y-4 pr-10">
           <Info label="Title" value={item.title} />
-          {/* {item.schedule_text && (
-            <Info label="Schedule Text" value={item.schedule_text} />
-          )} */}
+          
+         <IconRow icon={<FaCalendarAlt />} label="Broadcast Date" value={item.date} />
 
           <div className="grid grid-cols-2 gap-3">
+            {/* UPDATED: Wrap values in format12h() */}
             <IconRow
               icon={<FaClock />}
               label="Start Time"
-              value={item.start_time}
+              value={format12h(item.start_time)}
             />
             <IconRow
               icon={<FaClock />}
               label="End Time"
-              value={item.end_time}
+              value={format12h(item.end_time)}
             />
           </div>
 
           <StatusBox show={item.show} />
-
-          {item.join_now_link && item.show && (
-            <a
-              href={item.join_now_link}
-              target="_blank"
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-semibold"
-            >
-              <FaLink /> Join Now
-            </a>
-          )}
         </div>
       }
       edit={
@@ -183,37 +306,41 @@ function ScrollingAdmin() {
             value={item.title}
             onChange={(v) => setItem({ ...item, title: v })}
           />
-          {/* <Input
-            label="Schedule Text"
-            value={item.schedule_text}
-            onChange={(v) => setItem({ ...item, schedule_text: v })}
-          /> */}
+          
           <Input
             type="date"
             label="Date"
             value={item.date}
             onChange={(v) => setItem({ ...item, date: v })}
           />
-          <Input
-            label="Start Time"
-            value={item.start_time}
-            onChange={(v) => setItem({ ...item, start_time: v })}
-          />
-          <Input
-            label="End Time"
-            value={item.end_time}
-            onChange={(v) => setItem({ ...item, end_time: v })}
-          />
+
+          <div className="grid grid-cols-2 gap-4">
+            {/* Keep type="time" here - it needs 24h format to work correctly */}
+            <Input
+              type="time"
+              label="Start Time"
+              value={item.start_time}
+              onChange={(v) => setItem({ ...item, start_time: v })}
+            />
+            <Input
+              type="time"
+              label="End Time"
+              value={item.end_time}
+              onChange={(v) => setItem({ ...item, end_time: v })}
+            />
+          </div>
+
           <Input
             label="Join Now Link"
             value={item.join_now_link || ""}
             onChange={(v) => setItem({ ...item, join_now_link: v })}
           />
-          <Toggle
+
+          {/* <Toggle
             label="Show scrolling"
             checked={item.show}
             onChange={(v) => setItem({ ...item, show: v })}
-          />
+          /> */}
         </div>
       }
       onSave={save}
