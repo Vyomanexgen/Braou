@@ -848,7 +848,7 @@ const HeroSlider = ({ images }) => {
     return (
       <section className="w-full py-8 px-2 relative">
         <div className="max-w-[1200px] mx-auto relative">
-          <img src="/pictures/second.png" className="w-full object-contain select-none" alt="infographic" />
+          <img src="/pictures/hgh-Photoroom.png" className="w-full object-contain select-none" alt="infographic" />
           {safeServices.map((item) => (
             <div key={item.id} style={item.layout} onClick={() => setSelectedFeature(item)} className="absolute cursor-pointer group">
               <button className="hidden md:flex absolute bottom-[10%] left-[30%] h-[28px] px-3 items-center justify-center text-[12px] font-bold bg-white/50 text-white backdrop-blur-md border border-white/30 rounded transition hover:bg-red-600 hover:text-white">Know more</button>
