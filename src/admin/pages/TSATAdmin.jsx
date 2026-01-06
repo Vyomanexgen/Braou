@@ -100,131 +100,6 @@ function EditableCard({ title, view, edit, onSave, onCancel }) {
 }
 
 /* ========================= SCROLLING ========================= */
-// function ScrollingAdmin() {
-//   const [item, setItem] = useState(null);
-//   const [original, setOriginal] = useState(null);
-
-//   useEffect(() => {
-//     adminFetch(SCROLLING_API)
-//       .then((r) => r.json())
-//       .then((j) => {
-//         const scrollingItem = j?.data?.data;
-//         if (!scrollingItem) return;
-
-//         const normalized = {
-//           ...clone(scrollingItem),
-//           show: Boolean(scrollingItem.show),
-//           schedule_text: j?.data?.schedule_text || "",
-//         };
-
-//         setItem(normalized);
-//         setOriginal(clone(normalized));
-//       });
-//   }, []);
-
-//   if (!item) return <Empty />;
-
-//   const save = async () => {
-//     await adminFetch(`${SCROLLING_API}/${item._id}`, {
-//       method: "PUT",
-//       body: JSON.stringify({
-//         title: item.title,
-//         date: item.date,
-//         start_time: item.start_time,
-//         end_time: item.end_time,
-//         join_now_link: item.join_now_link,
-//         schedule_text: item.schedule_text,
-//         show: item.show ? 1 : 0,
-//       }),
-//     });
-
-//     setOriginal(clone(item));
-//   };
-
-//   return (
-//     <EditableCard
-//       title="Scrolling Content"
-//       view={
-//         <div className="space-y-4 pr-10">
-//           <Info label="Title" value={item.title} />
-//           {/* {item.schedule_text && (
-//             <Info label="Schedule Text" value={item.schedule_text} />
-//           )} */}
-
-//           <div className="grid grid-cols-2 gap-3">
-//             <IconRow
-//               icon={<FaClock />}
-//               label="Start Time"
-//               value={item.start_time}
-//             />
-//             <IconRow
-//               icon={<FaClock />}
-//               label="End Time"
-//               value={item.end_time}
-//             />
-//           </div>
-
-//           <StatusBox show={item.show} />
-
-//           {item.join_now_link && item.show && (
-//             <a
-//               href={item.join_now_link}
-//               target="_blank"
-//               className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-semibold"
-//             >
-//               <FaLink /> Join Now
-//             </a>
-//           )}
-//         </div>
-//       }
-//       edit={
-//         <div className="space-y-3">
-//           <Input
-//             label="Title"
-//             value={item.title}
-//             onChange={(v) => setItem({ ...item, title: v })}
-//           />
-//           {/* <Input
-//             label="Schedule Text"
-//             value={item.schedule_text}
-//             onChange={(v) => setItem({ ...item, schedule_text: v })}
-//           /> */}
-//           <Input
-//             type="date"
-//             label="Date"
-//             value={item.date}
-//             onChange={(v) => setItem({ ...item, date: v })}
-//           />
-//           <Input
-//             label="Start Time"
-//             value={item.start_time}
-//             onChange={(v) => setItem({ ...item, start_time: v })}
-//           />
-//           <Input
-//             label="End Time"
-//             value={item.end_time}
-//             onChange={(v) => setItem({ ...item, end_time: v })}
-//           />
-//           <Input
-//             label="Join Now Link"
-//             value={item.join_now_link || ""}
-//             onChange={(v) => setItem({ ...item, join_now_link: v })}
-//           />
-//           <Toggle
-//             label="Show scrolling"
-//             checked={item.show}
-//             onChange={(v) => setItem({ ...item, show: v })}
-//           />
-//         </div>
-//       }
-//       onSave={save}
-//       onCancel={() => setItem(clone(original))}
-//     />
-//   );
-// }
-
-/* ========================= SCROLLING ========================= */
-/* ========================= SCROLLING ========================= */
 function ScrollingAdmin() {
   const [item, setItem] = useState(null);
   const [original, setOriginal] = useState(null);
@@ -350,7 +225,10 @@ function ScrollingAdmin() {
 }
 
 /* ========================= MEDIA ========================= */
+
+
 function MediaAdmin({ api, title }) {
+  const BASE_API = import.meta.env.VITE_BASE_API;
   const [item, setItem] = useState(null);
   const [original, setOriginal] = useState(null);
   const [logoFile, setLogoFile] = useState(null);
@@ -366,25 +244,42 @@ function MediaAdmin({ api, title }) {
         setOriginal(clone(last));
       });
   }, [api]);
+const resolveFileUrl = (path) => {
+  if (!path) return "";
+  // If backend already gives full URL, use it
+  if (path.startsWith("http")) return path;
+  // Otherwise, prefix with BASE_API
+  return `${BASE_API}${path}`;
+};
 
   if (!item) return <Empty />;
 
-  const save = async () => {
-    const fd = new FormData();
-    fd.append("timings", item.timings || "");
-    fd.append("date", item.date || "");
-    if (logoFile) fd.append("logo", logoFile);
-    if (pdfFile) fd.append("schedule_pdf", pdfFile);
+const save = async () => {
+  const fd = new FormData();
+  fd.append("timings", item.timings || "");
+  fd.append("date", item.date || "");
+  if (logoFile) fd.append("logo", logoFile);
+  if (pdfFile) fd.append("schedule_pdf", pdfFile);
 
-    await adminFetch(`${api}/${item._id}`, {
-      method: "PUT",
-      body: fd,
-    });
+  await adminFetch(`${api}/${item._id}`, {
+    method: "PUT",
+    body: fd,
+  });
 
-    setOriginal(clone(item));
-    setLogoFile(null);
-    setPdfFile(null);
-  };
+  // ✅ REFETCH UPDATED DATA
+  const res = await adminFetch(api);
+  const json = await res.json();
+  const latest = json?.data?.slice(-1)[0];
+
+  if (latest) {
+    setItem(clone(latest));
+    setOriginal(clone(latest));
+  }
+
+  setLogoFile(null);
+  setPdfFile(null);
+};
+
 
   return (
     <EditableCard
@@ -404,11 +299,12 @@ function MediaAdmin({ api, title }) {
             />
           )}
           {item.schedule_pdf && (
-            <a
-              href={item.schedule_pdf}
-              target="_blank"
-              className="flex items-center gap-2 text-red-600 font-semibold"
-            >
+           <a
+  href={`${BASE_API}${item.schedule_pdf}`}
+  target="_blank"
+  className="flex items-center gap-2 text-red-600 font-semibold"
+>
+
               <FaFilePdf /> View Schedule PDF
             </a>
           )}
@@ -420,9 +316,10 @@ function MediaAdmin({ api, title }) {
             <div className="bg-white p-3 rounded shadow-sm">
               <p className="text-xs text-gray-500 mb-1">Existing Logo</p>
               <img
-                src={item.logo}
-                className="h-16 object-contain bg-gray-50 p-2 rounded"
-              />
+  src={`${BASE_API}${item.logo}`}
+  className="h-16 bg-white p-2 rounded object-contain"
+/>
+
             </div>
           )}
 
@@ -437,13 +334,17 @@ function MediaAdmin({ api, title }) {
               <p className="text-xs text-gray-500 mb-1">
                 Existing Schedule PDF
               </p>
+
+
               <a
-                href={item.schedule_pdf}
-                target="_blank"
-                className="flex items-center gap-2 text-red-600 font-semibold"
-              >
-                <FaFilePdf /> View Current PDF
-              </a>
+  href={resolveFileUrl(item.schedule_pdf)}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="flex items-center gap-2 text-red-600 font-semibold"
+>
+  <FaFilePdf /> View Current PDF
+</a>
+
             </div>
           )}
 

@@ -899,7 +899,20 @@ const TSAT = () => {
         //   const latest = Array.isArray(v?.data) ? v.data[0] : v.data;
         //   if (latest) setVidya({ ...DEFAULT_VIDYA, ...latest, logo: latest.schedule_pdf || DEFAULT_VIDYA.logo, schedule_pdf: latest.logo });
         // }
-        if (vidyaRes?.ok) {
+//         if (vidyaRes?.ok) {
+//   const v = await vidyaRes.json();
+//   const latestVidya = pickLatest(v?.data);
+
+//   if (latestVidya) {
+//     setVidya({
+//       timings: latestVidya.timings || DEFAULT_VIDYA.timings,
+//       logo: latestVidya.logo || DEFAULT_VIDYA.logo,
+//       schedule_pdf: latestVidya.schedule_pdf || null,
+//     });
+//   }
+// }
+
+if (vidyaRes?.ok) {
   const v = await vidyaRes.json();
   const latestVidya = pickLatest(v?.data);
 
@@ -907,10 +920,11 @@ const TSAT = () => {
     setVidya({
       timings: latestVidya.timings || DEFAULT_VIDYA.timings,
       logo: latestVidya.logo || DEFAULT_VIDYA.logo,
-      schedule_pdf: latestVidya.schedule_pdf || null,
+      schedule_pdf: latestVidya.schedule_pdf ?? null, // ✅ FIX
     });
   }
 }
+
 if (nipunaRes?.ok) {
   const n = await nipunaRes.json();
   const latestNipuna = pickLatest(n?.data);
@@ -919,7 +933,7 @@ if (nipunaRes?.ok) {
     setNipuna({
       timings: latestNipuna.timings || DEFAULT_NIPUNA.timings,
       logo: latestNipuna.logo || DEFAULT_NIPUNA.logo,
-      schedule_pdf: latestNipuna.schedule_pdf || null,
+      schedule_pdf: latestNipuna.schedule_pdf ?? null, // ✅ FIX
     });
   }
 }
@@ -1078,13 +1092,24 @@ setLiveBroadcast(activeEvent?.data || null);
               <h2 className="text-2xl md:text-3xl font-bold text-black leading-tight">T-SAT (Vidya)</h2>
               {/* {vidya.date && <p className="mt-2 md:mt-3 text-lg md:text-xl font-bold text-black">Date: {new Date(vidya.date).toLocaleDateString()}</p>} */}
               <p className="mt-1 md:mt-2 text-lg md:text-xl font-bold text-black">Timings: {vidya.timings}</p>
-              <button
-                className="mt-5 md:mt-6 px-10 md:px-14 py-2.5 md:py-3 text-white text-lg md:text-xl font-semibold rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
-                style={{ background: `linear-gradient(95deg, #006A72 0%, #004B52 40%, #000000 100%)` }}
-                onClick={() => vidya.schedule_pdf && window.open(vidya.schedule_pdf, "_blank")}
-              >
-                Schedule
-              </button>
+             <button
+  disabled={!vidya.schedule_pdf}
+  className={`mt-5 md:mt-6 px-10 md:px-14 py-2.5 md:py-3 text-white text-lg md:text-xl font-semibold rounded-full shadow-lg transition-all duration-200
+    ${
+      vidya.schedule_pdf
+        ? "hover:scale-105 active:scale-95"
+        : "opacity-50 cursor-not-allowed"
+    }`}
+  style={{
+    background: `linear-gradient(95deg, #006A72 0%, #004B52 40%, #000000 100%)`
+  }}
+  onClick={() =>
+    vidya.schedule_pdf &&
+    window.open(`${vidya.schedule_pdf}?v=${Date.now()}`, "_blank")
+  }
+>
+  Schedule
+</button>
             </div>
           </div>
 
@@ -1104,13 +1129,24 @@ setLiveBroadcast(activeEvent?.data || null);
               <h2 className="text-2xl md:text-3xl font-bold text-black leading-tight">T-SAT (Nipuna)</h2>
               {/* {nipuna.date && <p className="mt-2 md:mt-3 text-lg md:text-xl font-bold text-black">Date: {new Date(nipuna.date).toLocaleDateString()}</p>} */}
               <p className="mt-1 md:mt-2 text-lg md:text-xl font-bold text-black">Timings: {nipuna.timings}</p>
-              <button
-                className="mt-5 md:mt-6 px-10 md:px-14 py-2.5 md:py-3 text-white text-lg md:text-xl font-semibold rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
-                style={{ background: `linear-gradient(95deg, #006A72 0%, #004B52 40%, #000000 100%)` }}
-                onClick={() => nipuna.schedule_pdf && window.open(`${nipuna.schedule_pdf}?v=${Date.now()}`, "_blank")}
-              >
-                Schedule
-              </button>
+             <button
+  disabled={!nipuna.schedule_pdf}
+  className={`mt-5 md:mt-6 px-10 md:px-14 py-2.5 md:py-3 text-white text-lg md:text-xl font-semibold rounded-full shadow-lg transition-all duration-200
+    ${
+      nipuna.schedule_pdf
+        ? "hover:scale-105 active:scale-95"
+        : "opacity-50 cursor-not-allowed"
+    }`}
+  style={{
+    background: `linear-gradient(95deg, #006A72 0%, #004B52 40%, #000000 100%)`
+  }}
+  onClick={() =>
+    nipuna.schedule_pdf &&
+    window.open(`${nipuna.schedule_pdf}?v=${Date.now()}`, "_blank")
+  }
+>
+  Schedule
+</button>
             </div>
           </div>
         </section>

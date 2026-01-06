@@ -757,7 +757,7 @@ useEffect(() => {
 
                {usefulLinks.youtube && (
     <FooterLink to={usefulLinks.youtube} target="_blank">
-      Youtube (EMR&RC)
+      Youtube (BRAOU)
     </FooterLink>
   )}
 
