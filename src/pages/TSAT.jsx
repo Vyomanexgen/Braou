@@ -517,8 +517,9 @@ const TSAT = () => {
 
         {liveBroadcast && (
           <section className="w-full flex justify-center mt-4 px-4">
-            <div className="w-full max-w-3xl bg-[#D6F2F5] border border-[#0A8EC5] px-4 py-3 rounded-2xl flex flex-col md:flex-row items-center gap-3">
-              <div className="text-xs md:text-sm font-semibold text-[#00383D] flex flex-wrap items-center gap-2">
+            {/* <div className="w-full max-w-3xl bg-[#D6F2F5] border border-[#0A8EC5] px-4 py-3 rounded-2xl flex flex-col md:flex-row items-center gap-3">
+             <div className="text-xs md:text-sm font-semibold text-[#00383D] flex flex-wrap items-center gap-2 leading-relaxed break-words">
+
                 <span className="text-red-600 font-bold animate-pulse">
                   ● LIVE NOW
                 </span>
@@ -542,7 +543,40 @@ const TSAT = () => {
               >
                 Join Now
               </button>
-            </div>
+            </div> */}
+            <div className="w-full max-w-3xl bg-[#D6F2F5] border border-[#0A8EC5]
+px-4 py-3 rounded-2xl rounded-2xl">
+
+  <div className="flex flex-col md:flex-row md:items-center gap-3">
+
+    {/* TEXT BLOCK */}
+    <div className="flex-1 text-xs md:text-sm font-semibold text-[#00383D]
+    leading-relaxed break-words">
+      <span className="text-red-600 font-bold animate-pulse">
+        ● LIVE NOW
+      </span>
+      <span>
+        {" "} : {liveBroadcast.title} :{" "}
+        {liveBroadcast.date.split("-").reverse().join("/")} (
+        {format12h(liveBroadcast.start_time)} -{" "}
+        {format12h(liveBroadcast.end_time)})
+      </span>
+    </div>
+
+    {/* BUTTON BLOCK */}
+    <div className="flex md:justify-end">
+      <button
+        onClick={() => window.open(liveBroadcast.join_now_link, "_blank")}
+        className="bg-[#C62828] text-white px-6 py-1.5
+        rounded-full text-xs md:text-sm shadow whitespace-nowrap"
+      >
+        Join Now
+      </button>
+    </div>
+
+  </div>
+</div>
+
           </section>
         )}
 
