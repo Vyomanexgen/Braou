@@ -119,6 +119,118 @@
 // }
 
 
+// import { useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { adminFetch } from "../utils/adminFetch";
+
+// export default function AdminForgotPassword() {
+//   const navigate = useNavigate();
+
+//   const [email, setEmail] = useState("");
+//   const [loading, setLoading] = useState(false);
+//   const [message, setMessage] = useState("");
+//   const [error, setError] = useState("");
+
+//   const handleReset = async (e) => {
+//     e.preventDefault();
+//     setError("");
+//     setMessage("");
+//     setLoading(true);
+
+//     try {
+//       const res = await adminFetch("/auth/forgot-password", {
+//         method: "POST",
+//         body: JSON.stringify({ email }),
+//       });
+//       const data = await res.json();
+//       if (!res.ok) throw new Error(data?.message || "Failed to send reset email");
+
+//       localStorage.setItem("FORCE_PASSWORD_RESET", "true");
+//       setMessage("Temporary password sent to your email.");
+//       setEmail("");
+//     } catch (err) {
+//       setError(err.message || "Something went wrong");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     // Mobile: Dark Green Gradient (matches Image 3). 
+//     // Desktop: Light Blue solid color (matches left side of Image 1).
+//     <div className="min-h-screen w-full flex relative overflow-hidden bg-gradient-to-br from-[#004d40] via-[#002d26] to-black md:bg-none md:bg-[#99f6ff]">
+      
+//       {/* THE SLICER (Desktop Only - Creates the Dark Right Side) */}
+//       <div 
+//         className="hidden md:block absolute inset-0 z-10 bg-gradient-to-br from-[#004d40] via-[#002d26] to-black"
+//         style={{
+//           // The / slant shape for the dark background
+//           clipPath: "polygon(45% 0, 100% 0, 100% 100%, 65% 100%)"
+//         }}
+//       />
+
+//       {/* LEFT CONTENT (Welcome Text - Hidden on Mobile) */}
+//       <div className="relative z-20 hidden md:flex w-[45%] flex-col justify-center pl-16 lg:pl-24 pr-10 text-black">
+//         <h2 className="text-5xl font-black text-black mb-6 tracking-tight whitespace-nowrap">
+//   WELCOME BACK!
+// </h2>
+
+//         <p className="text-xl text-gray-800 font-medium leading-relaxed max-w-sm">
+//           Forgot your password? Don’t worry - you can easily reset it
+//           using your E-Mail.
+//         </p>
+//       </div>
+
+//       {/* RIGHT CONTENT (Form - Visible on All Screens) */}
+//       <div className="relative z-20 w-full md:w-[55%] flex flex-col justify-center px-8 sm:px-16 lg:px-24 py-12 text-white">
+//         <div className="max-w-md w-full ml-auto md:mr-10">
+//           <h1 className="text-5xl font-bold mb-10">Forgot Password</h1>
+          
+//           {message && <p className="text-green-300 mb-4 text-sm font-medium">{message}</p>}
+//           {error && <p className="text-red-400 mb-4 text-sm font-medium">{error}</p>}
+
+//           <form onSubmit={handleReset}>
+//             <div className="mb-8 relative">
+//               <input
+//                 type="email"
+//                 value={email}
+//                 onChange={(e) => setEmail(e.target.value)}
+//                 required
+//                 // Updated placeholder color to a teal/blue shade
+//                 className="w-full bg-transparent border-b border-white/50 focus:border-white outline-none text-lg py-2 transition-all placeholder-teal-400"
+//                 placeholder="Enter your email"
+//               />
+//               {/* Email Icon */}
+//               <span className="absolute right-0 bottom-3 text-teal-400">
+//                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+//                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+//                     <polyline points="22,6 12,13 2,6"></polyline>
+//                  </svg>
+//               </span>
+//             </div>
+
+//             <p
+//               onClick={() => navigate("/admin/login")}
+//               className="text-white/70 text-sm mb-12 cursor-pointer hover:underline"
+//             >
+//               Back to login?
+//             </p>
+
+//             <button
+//               type="submit"
+//               disabled={loading}
+//               className="w-full md:w-auto px-14 py-3 rounded-full bg-[#ccfaff] text-[#004d40] text-xl font-bold hover:bg-white transition-all shadow-xl"
+//             >
+//               {loading ? "Sending..." : "Reset Password"}
+//             </button>
+//           </form>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { adminFetch } from "../utils/adminFetch";
@@ -130,8 +242,9 @@ export default function AdminForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [isSent, setIsSent] = useState(false); // Track if mail was sent successfully
 
-  const handleReset = async (e) => {
+  const handleForgot = async (e) => {
     e.preventDefault();
     setError("");
     setMessage("");
@@ -140,90 +253,111 @@ export default function AdminForgotPassword() {
     try {
       const res = await adminFetch("/auth/forgot-password", {
         method: "POST",
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: email.trim() }),
       });
+      
       const data = await res.json();
+      
       if (!res.ok) throw new Error(data?.message || "Failed to send reset email");
 
+      // Set flag so Login page knows to redirect to Reset Password page later
       localStorage.setItem("FORCE_PASSWORD_RESET", "true");
-      setMessage("Temporary password sent to your email.");
+      
+      setMessage("A temporary password has been sent to your email address.");
+      setIsSent(true);
       setEmail("");
     } catch (err) {
-      setError(err.message || "Something went wrong");
+      setError(err.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    // Mobile: Dark Green Gradient (matches Image 3). 
-    // Desktop: Light Blue solid color (matches left side of Image 1).
-    <div className="min-h-screen w-full flex relative overflow-hidden bg-gradient-to-br from-[#004d40] via-[#002d26] to-black md:bg-none md:bg-[#99f6ff]">
+    <div className="min-h-screen w-full flex relative overflow-hidden bg-[#004d40] md:bg-[#99f6ff]">
       
-      {/* THE SLICER (Desktop Only - Creates the Dark Right Side) */}
+      {/* THE SLICER (Desktop Only) */}
       <div 
         className="hidden md:block absolute inset-0 z-10 bg-gradient-to-br from-[#004d40] via-[#002d26] to-black"
         style={{
-          // The / slant shape for the dark background
           clipPath: "polygon(45% 0, 100% 0, 100% 100%, 65% 100%)"
         }}
       />
 
-      {/* LEFT CONTENT (Welcome Text - Hidden on Mobile) */}
-      <div className="relative z-20 hidden md:flex w-[45%] flex-col justify-center pl-16 lg:pl-24 pr-10 text-black">
-        <h2 className="text-5xl font-black text-black mb-6 tracking-tight whitespace-nowrap">
-  WELCOME BACK!
-</h2>
-
+      {/* LEFT CONTENT (Info - Visible on desktop) */}
+      <div className="relative z-20 hidden md:flex w-[45%] flex-col justify-center px-16 lg:px-24 text-black">
+        <h2 className="text-5xl font-black mb-6 tracking-tight">
+          TROUBLE <br /> LOGGING IN?
+        </h2>
         <p className="text-xl text-gray-800 font-medium leading-relaxed max-w-sm">
-          Forgot your password? Don’t worry - you can easily reset it
-          using your E-Mail.
+          Enter your registered email and we'll send you a temporary password to regain access.
         </p>
       </div>
 
-      {/* RIGHT CONTENT (Form - Visible on All Screens) */}
+      {/* RIGHT CONTENT (The Form) */}
       <div className="relative z-20 w-full md:w-[55%] flex flex-col justify-center px-8 sm:px-16 lg:px-24 py-12 text-white">
         <div className="max-w-md w-full ml-auto md:mr-10">
-          <h1 className="text-5xl font-bold mb-10">Forgot Password</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Forgot Password</h1>
           
-          {message && <p className="text-green-300 mb-4 text-sm font-medium">{message}</p>}
-          {error && <p className="text-red-400 mb-4 text-sm font-medium">{error}</p>}
-
-          <form onSubmit={handleReset}>
-            <div className="mb-8 relative">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                // Updated placeholder color to a teal/blue shade
-                className="w-full bg-transparent border-b border-white/50 focus:border-white outline-none text-lg py-2 transition-all placeholder-teal-400"
-                placeholder="Enter your email"
-              />
-              {/* Email Icon */}
-              <span className="absolute right-0 bottom-3 text-teal-400">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                    <polyline points="22,6 12,13 2,6"></polyline>
-                 </svg>
-              </span>
+          {/* Success Message */}
+          {message && (
+            <div className="bg-green-500/20 border border-green-500 text-green-100 p-4 rounded-lg mb-6">
+              {message}
             </div>
+          )}
 
-            <p
-              onClick={() => navigate("/admin/login")}
-              className="text-white/70 text-sm mb-12 cursor-pointer hover:underline"
-            >
-              Back to login?
-            </p>
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-500/20 border border-red-500 text-red-200 p-4 rounded-lg mb-6">
+              {error}
+            </div>
+          )}
 
+          {!isSent ? (
+            <form onSubmit={handleForgot}>
+              <div className="mb-8 relative">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full bg-transparent border-b border-white/50 focus:border-white outline-none text-lg py-3 transition-all placeholder-teal-400"
+                  placeholder="Enter your email"
+                />
+                <span className="absolute right-0 bottom-3 text-teal-400">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                      <polyline points="22,6 12,13 2,6"></polyline>
+                   </svg>
+                </span>
+              </div>
+
+              <div className="flex flex-col gap-6">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full md:w-auto px-10 py-3 rounded-full bg-[#ccfaff] text-[#004d40] text-lg font-bold hover:bg-white transition-all shadow-xl disabled:opacity-50"
+                >
+                  {loading ? "Sending Code..." : "Send Temporary Password"}
+                </button>
+
+                <p
+                  onClick={() => navigate("/admin/login")}
+                  className="text-white/70 text-sm cursor-pointer hover:text-white hover:underline transition-all"
+                >
+                  Remembered it? Back to login
+                </p>
+              </div>
+            </form>
+          ) : (
+            /* Button shown only after successful email send */
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full md:w-auto px-14 py-3 rounded-full bg-[#ccfaff] text-[#004d40] text-xl font-bold hover:bg-white transition-all shadow-xl"
+              onClick={() => navigate("/admin/login")}
+              className="w-full md:w-auto px-10 py-3 rounded-full bg-white text-[#004d40] text-lg font-bold hover:bg-[#ccfaff] transition-all"
             >
-              {loading ? "Sending..." : "Reset Password"}
+              Go to Login Page
             </button>
-          </form>
+          )}
         </div>
       </div>
     </div>
