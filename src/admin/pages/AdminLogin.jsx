@@ -17,117 +17,205 @@
 //   if (isAuthenticated && !forceReset) {
 //     return <Navigate to="/admin/home" replace />;
 //   }
-
-//   const handleLogin = async (e) => {
-//     e.preventDefault();
-//     setError("");
-//     setLoading(true);
-
-//     try {
-//       const res = await adminFetch("/auth/login", {
-//         method: "POST",
-//         body: JSON.stringify({ email, password }),
-//       });
-
-//       const data = await res.json();
-
-//       if (!res.ok) {
-//         throw new Error(data?.message || "Login failed");
-//       }
-
-//       loginSuccess();
-
-//       if (forceReset) {
-//         navigate("/admin/reset-password", { replace: true });
-//       } else {
-//         navigate("/admin/home", { replace: true });
-//       }
-//     } catch (err) {
-//       setError(err.message || "Invalid email or password");
-//     } finally {
-//       setLoading(false);
+//   if (isAuthenticated) {
+//     const isForced = localStorage.getItem("FORCE_PASSWORD_RESET") === "true";
+//     if (isForced) {
+//       return <Navigate to="/admin/reset-password" replace />;
 //     }
-//   };
+//     return <Navigate to="/admin/home" replace />;
+//   }
 
-//   return (
-//     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 overflow-x-hidden">
-//       <div className="relative w-full max-w-6xl md:min-h-[520px] rounded-xl overflow-hidden shadow-2xl bg-white">
-//         {/* RIGHT BACKGROUND */}
-//         <div className="hidden md:block absolute inset-0 bg-gradient-to-br from-cyan-100 via-cyan-200 to-cyan-300 z-0" />
 
-//         {/* LEFT DIAGONAL */}
-//         <div
-//           className="hidden md:block absolute top-[-40%] left-[-60%] w-[140%] h-[160%]
-//           bg-gradient-to-b from-teal-700 via-teal-800 to-black rotate-[60deg] z-10"
-//         />
+// // const handleLogin = async (e) => {
+// //   e.preventDefault();
+// //   setError("");
+// //   setLoading(true);
 
-//         {/* CONTENT */}
-//         <div className="relative z-20 flex flex-col md:flex-row h-full">
-//           {/* FORM */}
-//           <form
-//             onSubmit={handleLogin}
-//             className="w-full md:w-[55%] px-6 sm:px-10 md:px-20 py-10 md:py-16
-//               bg-gradient-to-b from-teal-700 via-teal-800 to-black md:bg-none text-white"
-//           >
-//             <h1 className="text-3xl sm:text-4xl font-bold mb-8 pt-6">
-//               Admin Login
-//             </h1>
+// //   try {
+// //     const res = await adminFetch("/auth/login", {
+// //       method: "POST",
+// //       body: JSON.stringify({ email, password }),
+// //     });
 
-//             {error && <p className="text-red-300 mb-6 text-sm">{error}</p>}
+// //     // const data = await res.json();
 
-//             {/* EMAIL */}
-//             <div className="mb-8">
-//               <input
-//                 type="email"
-//                 value={email}
-//                 onChange={(e) => setEmail(e.target.value)}
-//                 required
-//                 className="w-full bg-transparent outline-none text-lg placeholder-cyan-200"
-//                 placeholder="Enter email"
-//               />
-//               <div className="w-full h-[2px] bg-white mt-3" />
-//             </div>
+// //     // if (!res.ok) {
+// //     //   throw new Error(data?.message || "Login failed");
+// //     // }
 
-//             {/* PASSWORD */}
-//             <div className="mb-6">
-//               <input
-//                 type="password"
-//                 value={password}
-//                 onChange={(e) => setPassword(e.target.value)}
-//                 required
-//                 className="w-full bg-transparent outline-none text-lg placeholder-cyan-200"
-//                 placeholder="Enter password"
-//               />
-//               <div className="w-full h-[2px] bg-white mt-3" />
-//             </div>
+// //     // // --- CRITICAL CHANGE START ---
+// //     // // Check if the server says this user needs to reset their password
+// //     // // (Ensure 'mustReset' matches the exact key your backend sends)
+// //     // const needsReset = data.mustReset === true || data.user?.mustReset === true;
 
-//             <p
-//               onClick={() => navigate("/admin/forgot-password")}
-//               className="text-cyan-100 text-sm mb-8 cursor-pointer hover:underline"
-//             >
-//               Forgot Password?
-//             </p>
+// //     // if (needsReset) {
+// //     //   // 1. Mark the session as "Reset Required"
+// //     //   localStorage.setItem("FORCE_PASSWORD_RESET", "true");
+// //     //   // 2. Save the email for the next screen
+// //     //   localStorage.setItem("RESET_EMAIL", email);
+      
+// //     //   loginSuccess(); // Update context to authenticated
+      
+// //     //   // 3. Force them to the reset page instead of home
+// //     //   navigate("/admin/reset-password", { replace: true });
+// //     // } else {
+// //     //   // 4. Normal login flow
+// //     //   localStorage.removeItem("FORCE_PASSWORD_RESET");
+// //     //   localStorage.removeItem("RESET_EMAIL");
+      
+// //     //   loginSuccess();
+// //     //   navigate("/admin/home", { replace: true });
+// //     // }
 
-//             <button
-//               type="submit"
-//               disabled={loading}
-//               className="w-full sm:w-auto px-14 py-3 rounded-full bg-cyan-100 text-black
-//                 text-lg font-semibold hover:bg-cyan-200 transition disabled:opacity-60"
-//             >
-//               {loading ? "Logging in..." : "Login"}
-//             </button>
-//           </form>
+// //     // Inside AdminLogin.jsx handleLogin
+// // const data = await res.json();
+// // const needsReset = data.mustReset === true || data.user?.mustReset === true;
 
-//           {/* RIGHT CONTENT */}
-//           <div className="hidden md:flex w-[40%] items-center justify-start text-center px-14">
-//             <div>
-//               <h2 className="text-4xl font-extrabold mb-6">WELCOME BACK!</h2>
-//               <p className="text-lg text-gray-800 leading-relaxed text-justify">
-//                 We are happy to have you with us again. If you need anything, we
-//                 are here to help.
-//               </p>
-//             </div>
+// // if (needsReset) {
+// //   localStorage.setItem("FORCE_PASSWORD_RESET", "true");
+// //   localStorage.setItem("RESET_EMAIL", email);
+// //   loginSuccess();
+// //   navigate("/admin/reset-password", { replace: true }); // Go directly to reset
+// // } else {
+// //   localStorage.removeItem("FORCE_PASSWORD_RESET");
+// //   loginSuccess();
+// //   navigate("/admin/home", { replace: true });
+// // }
+// //     // --- CRITICAL CHANGE END ---
+
+// //   } catch (err) {
+// //     setError(err.message || "Invalid email or password");
+// //   } finally {
+// //     setLoading(false);
+// //   }
+// // };
+// const handleLogin = async (e) => {
+//   e.preventDefault();
+//   setError("");
+//   setLoading(true);
+
+//   try {
+//     const res = await adminFetch("/auth/login", {
+//       method: "POST",
+//       body: JSON.stringify({ email, password }),
+//     });
+
+//     const data = await res.json();
+    
+//     // 🔥 DEBUG LOG: Open your browser console (F12) to see this!
+//     console.log("Login Response Data:", data);
+
+//     if (!res.ok) {
+//       throw new Error(data?.message || "Login failed");
+//     }
+
+//     // A more robust check for "truthy" values (handles 1, "true", or true)
+//     const needsReset = 
+//       data.mustReset == true || 
+//       data.user?.mustReset == true || 
+//       data.data?.mustReset == true;
+
+//     console.log("Needs Reset Evaluation:", needsReset);
+
+//     if (needsReset) {
+//       console.log("Redirecting to Reset Password...");
+//       localStorage.setItem("FORCE_PASSWORD_RESET", "true");
+//       localStorage.setItem("RESET_EMAIL", email);
+      
+//       // Update context state
+//       loginSuccess(); 
+      
+//       // Navigate directly
+//       navigate("/admin/reset-password", { replace: true });
+//     } else {
+//       console.log("Normal login, redirecting to Home...");
+//       localStorage.removeItem("FORCE_PASSWORD_RESET");
+//       localStorage.removeItem("RESET_EMAIL");
+      
+//       loginSuccess();
+//       navigate("/admin/home", { replace: true });
+//     }
+
+//   } catch (err) {
+//     console.error("Login Error:", err);
+//     setError(err.message || "Invalid email or password");
+//   } finally {
+//     setLoading(false);
+//   }
+// };  
+
+// return (
+//     // On small screens, background is the dark green. On large screens, it's the light blue.
+//     <div className="min-h-screen w-full flex relative overflow-hidden bg-[#004d40] md:bg-[#99f6ff]">
+      
+//       {/* THE SLICER (Only visible on MD screens and up) */}
+//       <div 
+//         className="hidden md:block absolute inset-0 z-10 bg-gradient-to-br from-[#004d40] via-[#00695c] to-black"
+//         style={{
+//           clipPath: "polygon(0 0, 45% 0, 65% 100%, 0% 100%)"
+//         }}
+//       />
+
+//       {/* LEFT CONTENT (Form) */}
+//       {/* On mobile, this takes full width and height. On desktop, it takes 55% */}
+//       <div className="relative z-20 w-full md:w-[55%] flex flex-col justify-center px-8 sm:px-16 lg:px-24 py-12 text-white">
+//         <h1 className="text-4xl md:text-5xl font-bold mb-2">Admin Login</h1>
+        
+//         {error && <p className="text-red-400 mt-4 text-sm font-medium">{error}</p>}
+
+//         <form onSubmit={handleLogin} className="mt-10 md:mt-12 max-w-md">
+//           <div className="mb-8 md:mb-10">
+//            <input
+//   type="email"
+//   value={email}
+//   onChange={(e) => setEmail(e.target.value)}
+//   required
+//   className="w-full bg-transparent border-b border-white/50 focus:border-white outline-none text-lg py-2 transition-all placeholder-[#99f6ff]"
+//   placeholder="Enter Your Email"
+// />
+
 //           </div>
+
+//           <div className="mb-6 md:mb-8">
+//            <input
+//   type="password"
+//   value={password}
+//   onChange={(e) => setPassword(e.target.value)}
+//   required
+//   className="w-full bg-transparent border-b border-white/50 focus:border-white outline-none text-lg py-2 transition-all placeholder-[#99f6ff]"
+//   placeholder="Enter Your Password"
+// />
+
+//           </div>
+
+//           <p
+//             onClick={() => navigate("/admin/forgot-password")}
+//             className="text-white/70 text-sm mb-10 md:mb-12 cursor-pointer hover:underline"
+//           >
+//             Forgot Password?
+//           </p>
+
+//           <button
+//             type="submit"
+//             disabled={loading}
+//             className="w-full md:w-auto px-14 py-3 rounded-full bg-[#ccfaff] text-[#004d40] text-xl font-bold hover:bg-white transition-all shadow-xl"
+//           >
+//             {loading ? "Logging in..." : "Login"}
+//           </button>
+//         </form>
+//       </div>
+
+//       {/* RIGHT CONTENT (Welcome Text - Hidden on Mobile) */}
+//       <div className="hidden md:flex flex-1 items-center justify-center z-0">
+//         <div className="max-w-md text-center">
+//         <h2 className="text-5xl font-black text-black mb-6 tracking-tight whitespace-nowrap">
+//   WELCOME BACK!
+// </h2>
+
+//           <p className="text-xl text-gray-800 font-medium leading-relaxed px-4">
+//             We are happy to have you with us again. If <br />
+//             you need anything, we are here to help.
+//           </p>
 //         </div>
 //       </div>
 //     </div>
@@ -135,28 +223,87 @@
 // }
 
 
-
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAdmin } from "../context/AdminContext";
 import { adminFetch } from "../utils/adminFetch";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 
 export default function AdminLogin() {
   const navigate = useNavigate();
   const { loginSuccess, isAuthenticated } = useAdmin();
+const [showPassword, setShowPassword] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const forceReset = localStorage.getItem("FORCE_PASSWORD_RESET") === "true";
-
-  if (isAuthenticated && !forceReset) {
+  /**
+   * 1. PRE-RENDER REDIRECT
+   * If the user is already authenticated, decide where to send them immediately.
+   */
+  if (isAuthenticated) {
+    const forceReset = localStorage.getItem("FORCE_PASSWORD_RESET") === "true";
+    if (forceReset) {
+      return <Navigate to="/admin/reset-password" replace />;
+    }
     return <Navigate to="/admin/home" replace />;
   }
 
-  const handleLogin = async (e) => {
+  /**
+   * 2. LOGIN HANDLER
+   */
+  // const handleLogin = async (e) => {
+  //   e.preventDefault();
+  //   setError("");
+  //   setLoading(true);
+
+  //   try {
+  //     const res = await adminFetch("/auth/login", {
+  //       method: "POST",
+  //       body: JSON.stringify({ email, password }),
+  //     });
+
+  //     const data = await res.json();
+
+  //     if (!res.ok) {
+  //       throw new Error(data?.message || "Login failed");
+  //     }
+
+  //     // 3. CHECK BACKEND RESPONSE FOR RESET FLAG
+  //     // This handles both data.mustReset and data.user.mustReset structures
+  //     const needsReset = data.mustReset === true || data.user?.mustReset === true;
+
+  //     if (needsReset) {
+  //       // Set flags before triggering context update
+  //       localStorage.setItem("FORCE_PASSWORD_RESET", "true");
+  //       localStorage.setItem("RESET_EMAIL", email);
+        
+  //       // Update Global Auth State
+  //       //loginSuccess(); 
+        
+  //       // Navigate to Reset Page
+  //       navigate("/admin/reset-password", { replace: true });
+  //     } else {
+  //       // Normal Login: Clear any stale reset flags
+  //       localStorage.removeItem("FORCE_PASSWORD_RESET");
+  //       localStorage.removeItem("RESET_EMAIL");
+        
+  //       // Update Global Auth State
+  //       loginSuccess();
+        
+  //       // Navigate to Dashboard
+  //       navigate("/admin/home", { replace: true });
+  //     }
+  //   } catch (err) {
+  //     setError(err.message || "Invalid email or password");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
@@ -166,22 +313,44 @@ export default function AdminLogin() {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
+
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Login failed");
-      loginSuccess();
-      navigate(forceReset ? "/admin/reset-password" : "/admin/home", { replace: true });
+
+      // NEW: Catch the 403 error specifically for password reset requirement
+      if (res.status === 403 && data.errors?.code === "PASSWORD_RESET_REQUIRED") {
+        localStorage.setItem("FORCE_PASSWORD_RESET", "true");
+        localStorage.setItem("RESET_EMAIL", email);
+        navigate("/admin/reset-password", { replace: true });
+        return; 
+      }
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Login failed");
+      }
+
+      // Check for reset flag in successful response (fallback)
+      const needsReset = data.mustReset === true || data.user?.mustReset === true;
+
+      if (needsReset) {
+        localStorage.setItem("FORCE_PASSWORD_RESET", "true");
+        localStorage.setItem("RESET_EMAIL", email);
+        navigate("/admin/reset-password", { replace: true });
+      } else {
+        localStorage.removeItem("FORCE_PASSWORD_RESET");
+        localStorage.removeItem("RESET_EMAIL");
+        loginSuccess();
+        navigate("/admin/home", { replace: true });
+      }
     } catch (err) {
       setError(err.message || "Invalid email or password");
     } finally {
       setLoading(false);
     }
   };
-
   return (
-    // On small screens, background is the dark green. On large screens, it's the light blue.
     <div className="min-h-screen w-full flex relative overflow-hidden bg-[#004d40] md:bg-[#99f6ff]">
       
-      {/* THE SLICER (Only visible on MD screens and up) */}
+      {/* THE SLICER (Design Element) */}
       <div 
         className="hidden md:block absolute inset-0 z-10 bg-gradient-to-br from-[#004d40] via-[#00695c] to-black"
         style={{
@@ -190,61 +359,81 @@ export default function AdminLogin() {
       />
 
       {/* LEFT CONTENT (Form) */}
-      {/* On mobile, this takes full width and height. On desktop, it takes 55% */}
       <div className="relative z-20 w-full md:w-[55%] flex flex-col justify-center px-8 sm:px-16 lg:px-24 py-12 text-white">
         <h1 className="text-4xl md:text-5xl font-bold mb-2">Admin Login</h1>
         
-        {error && <p className="text-red-400 mt-4 text-sm font-medium">{error}</p>}
+        {error && (
+          <div className="bg-red-500/20 border border-red-400 text-red-100 p-3 rounded-lg mt-4 text-sm font-medium">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleLogin} className="mt-10 md:mt-12 max-w-md">
-          <div className="mb-8 md:mb-10">
-           <input
-  type="email"
-  value={email}
-  onChange={(e) => setEmail(e.target.value)}
-  required
-  className="w-full bg-transparent border-b border-white/50 focus:border-white outline-none text-lg py-2 transition-all placeholder-[#99f6ff]"
-  placeholder="Enter Your Email"
-/>
+         <div className="mb-8 md:mb-10">
+  <input
+    type="email"
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    required
+    className="w-full bg-transparent border-b border-white/50 focus:border-white outline-none text-lg py-2 transition-all placeholder-[#99f6ff]"
+    placeholder="Enter you Email ID"
+  />
+</div>
 
-          </div>
+          {/* <div className="mb-6 md:mb-8">
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full bg-transparent border-b border-white/50 focus:border-white outline-none text-lg py-2 transition-all placeholder-[#99f6ff]"
+              placeholder="Enter Your Password"
+            />
+          </div> */}
+          <div className="mb-6 md:mb-8 relative">
+  <input
+    type={showPassword ? "text" : "password"}
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    required
+    className="w-full bg-transparent border-b border-white/50 focus:border-white outline-none text-lg py-2 pr-10 transition-all placeholder-[#99f6ff]"
+    placeholder="Enter Your Password"
+  />
+<br />
+  <button
+    type="button"
+    onClick={() => setShowPassword((prev) => !prev)}
+    className="absolute right-0 top-1/2 -translate-y-1/2 text-white/70 hover:text-white"
+  >
+    {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+  </button>
+</div>
 
-          <div className="mb-6 md:mb-8">
-           <input
-  type="password"
-  value={password}
-  onChange={(e) => setPassword(e.target.value)}
-  required
-  className="w-full bg-transparent border-b border-white/50 focus:border-white outline-none text-lg py-2 transition-all placeholder-[#99f6ff]"
-  placeholder="Enter Your Password"
-/>
-
-          </div>
 
           <p
-            onClick={() => navigate("/admin/forgot-password")}
-            className="text-white/70 text-sm mb-10 md:mb-12 cursor-pointer hover:underline"
-          >
-            Forgot Password?
-          </p>
+  onClick={() => navigate("/admin/forgot-password")}
+  className="text-white/70 text-sm mb-6 cursor-pointer hover:underline block"
+>
+  Forgot Password?
+</p>
+
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full md:w-auto px-14 py-3 rounded-full bg-[#ccfaff] text-[#004d40] text-xl font-bold hover:bg-white transition-all shadow-xl"
+            className="w-full md:w-auto px-14 py-3 rounded-full bg-[#ccfaff] text-[#004d40] text-xl font-bold hover:bg-white transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>
 
-      {/* RIGHT CONTENT (Welcome Text - Hidden on Mobile) */}
+      {/* RIGHT CONTENT (Welcome Text) */}
       <div className="hidden md:flex flex-1 items-center justify-center z-0">
         <div className="max-w-md text-center">
-        <h2 className="text-5xl font-black text-black mb-6 tracking-tight whitespace-nowrap">
-  WELCOME BACK!
-</h2>
-
+          <h2 className="text-5xl font-black text-black mb-6 tracking-tight">
+            WELCOME BACK!
+          </h2>
           <p className="text-xl text-gray-800 font-medium leading-relaxed px-4">
             We are happy to have you with us again. If <br />
             you need anything, we are here to help.

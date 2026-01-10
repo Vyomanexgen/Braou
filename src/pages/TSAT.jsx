@@ -368,12 +368,25 @@ const DEFAULT_NIPUNA = {
   schedule_pdf: null,
 };
 
-const pickLatest = (list) => {
-  if (!Array.isArray(list) || list.length === 0) return null;
-  return list.reduce((latest, item) =>
-    new Date(item.updatedAt) > new Date(latest.updatedAt) ? item : latest
-  );
-};
+// const pickLatest = (list) => {
+//   if (!Array.isArray(list) || list.length === 0) return null;
+//   return list.reduce((latest, item) => {
+//     const currentUpdate = new Date(item.updatedAt || item.createdAt);
+//     const latestUpdate = new Date(latest.updatedAt || latest.createdAt);
+//     return currentUpdate > latestUpdate ? item : latest;
+//   });
+// };
+
+
+// const pickLatest = (list) => {
+//   if (!Array.isArray(list) || list.length === 0) return null;
+//   return list.reduce((latest, item) => {
+//     const a = new Date(item.updatedAt || item.createdAt);
+//     const b = new Date(latest.updatedAt || latest.createdAt);
+//     return a > b ? item : latest;
+//   });
+// };
+
 
 // Treat date & time as local (IST)
 const parseTime = (timeStr, dateStr) => {
@@ -420,8 +433,19 @@ const TSAT = () => {
         ]);
 
         if (vidyaRes?.ok) {
-          const v = await vidyaRes.json();
-          const latestVidya = pickLatest(v?.data);
+         const v = await vidyaRes.json();
+
+const sortedVidya = [...(v?.data || [])].sort(
+  (a, b) =>
+    new Date(b.updatedAt || b.createdAt) -
+    new Date(a.updatedAt || a.createdAt)
+);
+
+const latestVidya = sortedVidya[0];
+  console.log("LATEST VIDYA PDF:", sortedVidya[0]?.schedule_pdf);
+  console.log("LATEST VIDYA updatedAt:", sortedVidya[0]?.updatedAt);
+
+
           if (latestVidya) {
             setVidya({
               timings: latestVidya.timings || DEFAULT_VIDYA.timings,
@@ -432,8 +456,16 @@ const TSAT = () => {
         }
 
         if (nipunaRes?.ok) {
-          const n = await nipunaRes.json();
-          const latestNipuna = pickLatest(n?.data);
+         const n = await nipunaRes.json();
+
+const sortedNipuna = [...(n?.data || [])].sort(
+  (a, b) =>
+    new Date(b.updatedAt || b.createdAt) -
+    new Date(a.updatedAt || a.createdAt)
+);
+
+const latestNipuna = sortedNipuna[0];
+
           if (latestNipuna) {
             setNipuna({
               timings: latestNipuna.timings || DEFAULT_NIPUNA.timings,
@@ -590,11 +622,15 @@ px-4 py-3 rounded-2xl rounded-2xl">
                 backgroundSize: "200%",
               }}
             >
-              <img
-                src={vidya.logo}
-                className="w-16 h-20 mb-3"
-                onError={(e) => (e.currentTarget.src = DEFAULT_VIDYA.logo)}
-              />
+            <img
+  src={vidya.logo ? `${vidya.logo}?t=${Date.now()}` : DEFAULT_VIDYA.logo}
+  className="w-16 h-20 mb-3 object-contain"
+  onError={(e) => {
+    e.currentTarget.onerror = null;
+    e.currentTarget.src = DEFAULT_VIDYA.logo;
+  }}
+/>
+
               <h2 className="text-2xl font-bold">T-SAT (Vidya)</h2>
               <p className="mt-2 text-lg font-bold">
                 Timings: {vidya.timings}
@@ -605,10 +641,11 @@ px-4 py-3 rounded-2xl rounded-2xl">
                   background:
                     "linear-gradient(95deg,#006A72,#004B52,#000)",
                 }}
-                onClick={() =>
-                  vidya.schedule_pdf &&
-                  window.open(vidya.schedule_pdf, "_blank")
-                }
+onClick={() => {
+  if (!vidya.schedule_pdf) return;
+  window.open(`${vidya.schedule_pdf}?t=${Date.now()}`, "_blank");
+}}
+
               >
                 Schedule
               </button>
@@ -624,11 +661,15 @@ px-4 py-3 rounded-2xl rounded-2xl">
                 backgroundSize: "200%",
               }}
             >
-              <img
-                src={nipuna.logo}
-                className="w-16 h-20 mb-3"
-                onError={(e) => (e.currentTarget.src = DEFAULT_NIPUNA.logo)}
-              />
+          <img
+  src={nipuna.logo ? `${nipuna.logo}?t=${Date.now()}` : DEFAULT_NIPUNA.logo}
+  className="w-16 h-20 mb-3 object-contain"
+  onError={(e) => {
+    e.currentTarget.onerror = null;
+    e.currentTarget.src = DEFAULT_NIPUNA.logo;
+  }}
+/>
+
               <h2 className="text-2xl font-bold">T-SAT (Nipuna)</h2>
               <p className="mt-2 text-lg font-bold">
                 Timings: {nipuna.timings}
@@ -639,13 +680,11 @@ px-4 py-3 rounded-2xl rounded-2xl">
                   background:
                     "linear-gradient(95deg,#006A72,#004B52,#000)",
                 }}
-                onClick={() =>
-                  nipuna.schedule_pdf &&
-                  window.open(
-                    `${nipuna.schedule_pdf}?v=${Date.now()}`,
-                    "_blank"
-                  )
-                }
+              onClick={() => {
+  if (!nipuna.schedule_pdf) return;
+  window.open(`${nipuna.schedule_pdf}?t=${Date.now()}`, "_blank");
+}}
+
               >
                 Schedule
               </button>
